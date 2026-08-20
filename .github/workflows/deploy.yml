@@ -43,12 +43,12 @@ jobs:
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
           echo "image_tag=${PRIMARY_TAG}" >> $GITHUB_OUTPUT
 
-      - name: Build and Push Docker image (AMD64 & ARM64)
+      - name: Build and Push Docker image (ARM64 Exclusivo)
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
