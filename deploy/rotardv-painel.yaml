@@ -1,0 +1,74 @@
+---
+# DEPLOYMENT DO PAINEL WEB ROTARDV
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rotardv-painel
+  namespace: rotardv-prod
+  labels:
+    app: rotardv-painel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rotardv-painel
+  template:
+    metadata:
+      labels:
+        app: rotardv-painel
+    spec:
+      containers:
+      - name: rotardv-painel
+        image: docker.io/luisfelipe/rotardv-painel:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - secretRef:
+            name: rotardv-painel-secrets
+        - configMapRef:
+            name: rotardv-painel-configmap
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /api/auth/providers
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/auth/providers
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+
+---
+# SERVICE DO PAINEL WEB
+apiVersion: v1
+kind: Service
+metadata:
+  name: rotardv-painel-service
+  namespace: rotardv-prod
+  labels:
+    app: rotardv-painel
+spec:
+  type: ClusterIP
+  selector:
+    app: rotardv-painel
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http

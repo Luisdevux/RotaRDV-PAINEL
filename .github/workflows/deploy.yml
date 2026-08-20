@@ -1,0 +1,70 @@
+name: Build & Deploy RotaRDV Painel
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-push:
+    name: 🐳 Build & Push Docker Image
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASS }}
+
+      - name: Generate Image Tags
+        id: meta
+        run: |
+          IMAGE_NAME="${{ secrets.DOCKERHUB_USER }}/rotardv-painel"
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-8)
+          TAGS="${IMAGE_NAME}:latest,${IMAGE_NAME}:${SHORT_SHA}"
+          PRIMARY_TAG="${IMAGE_NAME}:${SHORT_SHA}"
+          
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          echo "image_tag=${PRIMARY_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: 🚀 Deploy to Kubernetes Cluster (VM)
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH on VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "🚀 Atualizando o deployment rotardv-painel para a imagem: ${{ needs.build-and-push.outputs.image_tag }}..."
+            sudo k3s kubectl set image deployment/rotardv-painel rotardv-painel=${{ needs.build-and-push.outputs.image_tag }} -n rotardv-prod
+            sudo k3s kubectl rollout status deployment/rotardv-painel -n rotardv-prod --timeout=180s
+            echo "✅ Deploy concluído com sucesso!"
+            sudo k3s kubectl get pods -n rotardv-prod -l app=rotardv-painel

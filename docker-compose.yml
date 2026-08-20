@@ -1,0 +1,16 @@
+services:
+  rotardv-painel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rotardv-painel
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://rotardv-api.luisfelipe.dpdns.org
+      - API_URL_SERVER_SIDED=https://rotardv-api.luisfelipe.dpdns.org
+      - NEXTAUTH_URL=https://rotardv.luisfelipe.dpdns.org
+      - NEXTAUTH_SECRET=rotardv_nextauth_super_secret_key_32chars_min_2026
+      - NEXT_PUBLIC_APP_LOGO_URL=https://rota-rdv.web.fslab.dev/7c4bb021-7946-44b4-acc2-cdb9c29aadc2.jpeg
