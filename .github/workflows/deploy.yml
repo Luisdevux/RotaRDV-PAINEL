@@ -3,7 +3,6 @@ name: Build & Deploy RotaRDV Painel
 on:
   push:
     branches:
-      - develop
       - main
   workflow_dispatch:
 
