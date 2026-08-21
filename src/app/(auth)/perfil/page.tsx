@@ -191,9 +191,9 @@ export default function PerfilPage() {
                 <Label htmlFor="cargo">Cargo / Função (Não editável)</Label>
                 <Input
                   id="cargo"
-                  value={user?.role ? (user.role === "ADMIN" ? "Super Administrador" : user.role === "GESTOR" ? "Gestor" : user.role === "MOTORISTA" ? "Motorista" : user.role) : "Gestor"}
+                  value={user?.role || ""}
                   disabled
-                  className="rounded-xl opacity-70 bg-muted cursor-not-allowed"
+                  className="rounded-xl opacity-70 bg-muted"
                 />
               </div>
             </div>
