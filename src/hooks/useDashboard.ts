@@ -3,10 +3,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { empresaService } from "../services/empresaService";
 import { useAuth } from "./useAuth";
+import { useActiveEmpresa } from "../providers/ActiveEmpresaProvider";
 
 export function useDashboard(customEmpresaId?: string) {
-  const { empresaId: userEmpresaId, isAdmin } = useAuth();
-  const targetEmpresaId = customEmpresaId || userEmpresaId;
+  const { empresaId: userEmpresaId } = useAuth();
+  const { empresaId: activeEmpresaId, empresa } = useActiveEmpresa();
+  const targetEmpresaId = customEmpresaId || activeEmpresaId || empresa?._id || userEmpresaId;
 
   return useQuery({
     queryKey: ["dashboard", targetEmpresaId],
@@ -20,3 +22,4 @@ export function useDashboard(customEmpresaId?: string) {
     staleTime: 60 * 1000, // 1 minuto
   });
 }
+

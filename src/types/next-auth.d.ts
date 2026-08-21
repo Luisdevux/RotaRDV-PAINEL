@@ -12,6 +12,8 @@ declare module "next-auth" {
       role?: "admin" | "gestor" | "motorista";
       empresa_id?: string;
       isAdmin?: boolean;
+      cpf?: string;
+      telefone?: string;
     } & DefaultSession["user"];
   }
 
@@ -20,6 +22,8 @@ declare module "next-auth" {
     role?: "admin" | "gestor" | "motorista";
     empresa_id?: string;
     isAdmin?: boolean;
+    cpf?: string;
+    telefone?: string;
     accessToken?: string;
     refreshToken?: string;
   }
@@ -31,6 +35,8 @@ declare module "next-auth/jwt" {
     role?: "admin" | "gestor" | "motorista";
     empresa_id?: string;
     isAdmin?: boolean;
+    cpf?: string;
+    telefone?: string;
     accessToken?: string;
     refreshToken?: string;
     accessTokenExpires?: number;

@@ -3,7 +3,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,13 +13,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { SafeImage } from "@/components/ui/safe-image";
+import { maskCNPJ, maskCPF, maskTelefone, unmask, isValidCNPJ } from "@/lib/masks";
 import { Building2, User, Lock, Mail, Phone, FileText, ArrowRight, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
 
 const LOGO_URL = process.env.NEXT_PUBLIC_APP_LOGO_URL || "https://rota-rdv.web.fslab.dev/7c4bb021-7946-44b4-acc2-cdb9c29aadc2.jpeg";
 
 const signupSchema = z.object({
   nome_empresa: z.string().min(2, "Nome da empresa é obrigatório"),
-  cnpj: z.string().min(14, "CNPJ inválido (mínimo 14 dígitos)"),
+  cnpj: z.string().min(14, "CNPJ é obrigatório").refine((val) => isValidCNPJ(val), {
+    message: "CNPJ inválido (suporta padrão numérico e alfanumérico oficial)",
+  }),
   email_empresa: z.string().email("E-mail corporativo inválido"),
   telefone_empresa: z.string().optional(),
   
@@ -46,6 +48,7 @@ export default function CadastroPage() {
     register,
     handleSubmit,
     trigger,
+    setValue,
     formState: { errors },
   } = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -63,15 +66,15 @@ export default function CadastroPage() {
     try {
       await signup({
         nome_empresa: data.nome_empresa,
-        cnpj: data.cnpj.replace(/\D/g, ""),
+        cnpj: unmask(data.cnpj).toUpperCase(),
         email_empresa: data.email_empresa,
-        telefone_empresa: data.telefone_empresa,
+        telefone_empresa: data.telefone_empresa ? unmask(data.telefone_empresa) : undefined,
         gestor: {
           nome: data.nome,
           email: data.email,
           senha: data.senha,
-          cpf: data.cpf ? data.cpf.replace(/\D/g, "") : undefined,
-          telefone: data.telefone,
+          cpf: data.cpf ? unmask(data.cpf) : undefined,
+          telefone: data.telefone ? unmask(data.telefone) : undefined,
         },
       });
     } catch {
@@ -130,6 +133,7 @@ export default function CadastroPage() {
                         id="nome_empresa"
                         placeholder="Ex: TransLogística Rodoviária LTDA"
                         className="pl-9 rounded-xl"
+                        maxLength={100}
                         {...register("nome_empresa")}
                       />
                     </div>
@@ -140,14 +144,17 @@ export default function CadastroPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="cnpj">CNPJ</Label>
+                      <Label htmlFor="cnpj">CNPJ (Numérico ou Alfanumérico)</Label>
                       <div className="relative">
                         <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="cnpj"
                           placeholder="00.000.000/0000-00"
-                          className="pl-9 rounded-xl"
-                          {...register("cnpj")}
+                          className="pl-9 rounded-xl uppercase"
+                          maxLength={18}
+                          {...register("cnpj", {
+                            onChange: (e) => setValue("cnpj", maskCNPJ(e.target.value)),
+                          })}
                         />
                       </div>
                       {errors.cnpj && (
@@ -156,14 +163,17 @@ export default function CadastroPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="telefone_empresa">Telefone Corporativo (Opcional)</Label>
+                      <Label htmlFor="telefone_empresa">Telefone Corporativo</Label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="telefone_empresa"
-                          placeholder="(11) 99999-9999"
+                          placeholder="(00) 00000-0000"
                           className="pl-9 rounded-xl"
-                          {...register("telefone_empresa")}
+                          maxLength={15}
+                          {...register("telefone_empresa", {
+                            onChange: (e) => setValue("telefone_empresa", maskTelefone(e.target.value)),
+                          })}
                         />
                       </div>
                     </div>
@@ -178,6 +188,7 @@ export default function CadastroPage() {
                         type="email"
                         placeholder="contato@translogistica.com.br"
                         className="pl-9 rounded-xl"
+                        maxLength={100}
                         {...register("email_empresa")}
                       />
                     </div>
@@ -199,6 +210,7 @@ export default function CadastroPage() {
                         id="nome"
                         placeholder="Ex: Carlos Eduardo Silva"
                         className="pl-9 rounded-xl"
+                        maxLength={80}
                         {...register("nome")}
                       />
                     </div>
@@ -217,6 +229,7 @@ export default function CadastroPage() {
                           type="email"
                           placeholder="carlos@translogistica.com.br"
                           className="pl-9 rounded-xl"
+                          maxLength={100}
                           {...register("email")}
                         />
                       </div>
@@ -226,20 +239,39 @@ export default function CadastroPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="cpf">CPF (Opcional)</Label>
+                      <Label htmlFor="cpf">CPF do Gestor</Label>
                       <div className="relative">
                         <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="cpf"
                           placeholder="000.000.000-00"
                           className="pl-9 rounded-xl"
-                          {...register("cpf")}
+                          maxLength={14}
+                          {...register("cpf", {
+                            onChange: (e) => setValue("cpf", maskCPF(e.target.value)),
+                          })}
                         />
                       </div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="telefone">Telefone / WhatsApp</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="telefone"
+                          placeholder="(00) 00000-0000"
+                          className="pl-9 rounded-xl"
+                          maxLength={15}
+                          {...register("telefone", {
+                            onChange: (e) => setValue("telefone", maskTelefone(e.target.value)),
+                          })}
+                        />
+                      </div>
+                    </div>
+
                     <div className="space-y-1.5">
                       <Label htmlFor="senha">Senha de Acesso</Label>
                       <div className="relative">
@@ -249,6 +281,7 @@ export default function CadastroPage() {
                           type="password"
                           placeholder="Mínimo 8 caracteres"
                           className="pl-9 rounded-xl"
+                          maxLength={64}
                           {...register("senha")}
                         />
                       </div>
@@ -256,83 +289,80 @@ export default function CadastroPage() {
                         <p className="text-xs text-destructive">{errors.senha.message}</p>
                       )}
                     </div>
+                  </div>
 
-                    <div className="space-y-1.5">
-                      <Label htmlFor="confirmarSenha">Confirmar Senha</Label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="confirmarSenha"
-                          type="password"
-                          placeholder="Repita sua senha"
-                          className="pl-9 rounded-xl"
-                          {...register("confirmarSenha")}
-                        />
-                      </div>
-                      {errors.confirmarSenha && (
-                        <p className="text-xs text-destructive">{errors.confirmarSenha.message}</p>
-                      )}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="confirmarSenha">Confirmar Senha</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="confirmarSenha"
+                        type="password"
+                        placeholder="Repita a senha"
+                        className="pl-9 rounded-xl"
+                        maxLength={64}
+                        {...register("confirmarSenha")}
+                      />
                     </div>
+                    {errors.confirmarSenha && (
+                      <p className="text-xs text-destructive">{errors.confirmarSenha.message}</p>
+                    )}
                   </div>
                 </div>
               )}
             </CardContent>
 
-            <CardFooter className="flex items-center justify-between border-t border-border/60 pt-4">
-              {step === 2 ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={prevStep}
-                  className="rounded-xl gap-2"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Voltar
-                </Button>
-              ) : (
-                <div />
-              )}
-
+            <CardFooter className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border/60 pt-4 bg-muted/20">
               {step === 1 ? (
-                <Button
-                  type="button"
-                  variant="default"
-                  onClick={nextStep}
-                  className="rounded-xl gap-2 font-bold px-6"
-                >
-                  Próximo Passo
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+                <>
+                  <p className="text-xs text-muted-foreground">
+                    Já possui conta?{" "}
+                    <Link href="/login" className="text-primary font-bold hover:underline">
+                      Fazer Login
+                    </Link>
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={nextStep}
+                    className="w-full sm:w-auto rounded-xl font-bold gap-2 shadow-md"
+                  >
+                    Avançar para Gestor
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </>
               ) : (
-                <Button
-                  type="submit"
-                  variant="default"
-                  className="rounded-xl gap-2 font-bold px-6 shadow-lg shadow-primary/20"
-                  disabled={isSigningUp}
-                >
-                  {isSigningUp ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Cadastrando...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="h-4 w-4" />
-                      Finalizar Cadastro
-                    </>
-                  )}
-                </Button>
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={prevStep}
+                    className="w-full sm:w-auto rounded-xl gap-2 font-semibold"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Voltar aos Dados da Empresa
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isSigningUp}
+                    className="w-full sm:w-auto rounded-xl font-bold gap-2 shadow-md"
+                  >
+                    {isSigningUp ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Cadastrando...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="h-4 w-4" />
+                        Finalizar Cadastro
+                      </>
+                    )}
+                  </Button>
+                </>
               )}
             </CardFooter>
           </form>
         </Card>
-
-        <p className="text-xs text-center text-muted-foreground">
-          Já possui uma conta cadastrada?{" "}
-          <Link href="/login" className="text-primary font-bold hover:underline">
-            Faça login aqui
-          </Link>
-        </p>
       </div>
     </div>
   );

@@ -9,8 +9,10 @@ export type CombustivelPreferencial =
   | 'OUTRO';
 
 export interface Reboque {
+  placas?: string[];
   placa?: string;
   modelo?: string;
+  ano_fabricacao?: number;
 }
 
 export interface Veiculo {
@@ -20,6 +22,7 @@ export interface Veiculo {
   combustivel_preferencial: CombustivelPreferencial;
   capacidade_tanque: number;
   ano_fabricacao: number;
+  status?: 'ativo' | 'inativo' | string;
   reboque?: Reboque;
   empresa_id?: string;
   createdAt?: string;

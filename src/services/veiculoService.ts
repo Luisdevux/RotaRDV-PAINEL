@@ -30,6 +30,11 @@ export const veiculoService = {
     return response.data?.dados || response.data?.data || (response.data as any);
   },
 
+  async atualizarStatus(id: string, status: 'ativo' | 'inativo'): Promise<Veiculo> {
+    const response = await api.patch<ApiResponse<Veiculo>>(`/veiculos/${id}/status`, { status });
+    return response.data?.dados || response.data?.data || (response.data as any);
+  },
+
   async deletar(id: string): Promise<void> {
     await api.delete(`/veiculos/${id}`);
   }

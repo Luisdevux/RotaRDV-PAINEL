@@ -44,10 +44,9 @@ export const empresaService = {
     await api.delete(`/empresas/${id}`);
   },
 
-  async uploadLogo(id: string, file: File): Promise<{ url: string }> {
+  async uploadFoto(id: string, file: File): Promise<{ url: string }> {
     const formData = new FormData();
-    formData.append('foto_logo', file);
-    formData.append('logo', file);
+    formData.append('file', file);
 
     const response = await api.post<ApiResponse<{ url: string }>>(`/empresas/${id}/foto`, formData, {
       headers: {
@@ -57,7 +56,7 @@ export const empresaService = {
     return response.data?.dados || response.data?.data || (response.data as any);
   },
 
-  async deletarLogo(id: string): Promise<void> {
+  async deletarFoto(id: string): Promise<void> {
     await api.delete(`/empresas/${id}/foto`);
   },
 

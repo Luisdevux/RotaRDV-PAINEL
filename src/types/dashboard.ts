@@ -9,6 +9,8 @@ export interface DashboardResumo {
   viagens_em_andamento: number;
   viagens_concluidas: number;
   total_km_rodado: number;
+  total_litros?: number;
+  media_consumo_frota?: number;
   total_despesas: number;
   despesas_por_categoria: DespesasPorCategoria;
 }

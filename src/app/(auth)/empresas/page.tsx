@@ -3,7 +3,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import { SafeImage } from "@/components/ui/safe-image";
 import { useEmpresasAdmin } from "@/hooks/useEmpresa";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -16,14 +15,13 @@ import { PaginationControls } from "@/components/ui/pagination-controls";
 import { 
   Building2, 
   Search, 
-  Building, 
-  Mail, 
-  Phone, 
   CheckCircle2, 
   XCircle, 
-  Loader2 
+  Phone,
+  Mail,
 } from "lucide-react";
-import { formatCNPJ, formatDateTime } from "@/lib/formatters";
+import { formatCNPJ, formatDateTime, formatTelefone } from "@/lib/formatters";
+import { unmask } from "@/lib/masks";
 import { Empresa } from "@/types";
 
 export default function EmpresasAdminPage() {
@@ -40,9 +38,10 @@ export default function EmpresasAdminPage() {
 
   const filteredEmpresas = empresasList.filter((e) => {
     const term = searchTerm.toLowerCase();
+    const cleanSearch = unmask(searchTerm).toUpperCase();
     return (
       e.nome_empresa?.toLowerCase().includes(term) ||
-      e.cnpj?.includes(term) ||
+      (e.cnpj && (e.cnpj.toLowerCase().includes(term) || e.cnpj.includes(cleanSearch))) ||
       e.email?.toLowerCase().includes(term)
     );
   });
@@ -124,8 +123,16 @@ export default function EmpresasAdminPage() {
 
                   <TableCell>
                     <div className="space-y-0.5 text-xs">
-                      <p className="text-foreground font-medium">{empresa.email}</p>
-                      {empresa.telefone && <p className="text-muted-foreground">{empresa.telefone}</p>}
+                      <p className="text-foreground font-medium flex items-center gap-1">
+                        <Mail className="h-3 w-3 text-muted-foreground" />
+                        {empresa.email}
+                      </p>
+                      {empresa.telefone && (
+                        <p className="text-muted-foreground font-mono flex items-center gap-1">
+                          <Phone className="h-3 w-3" />
+                          {formatTelefone(empresa.telefone)}
+                        </p>
+                      )}
                     </div>
                   </TableCell>
 
@@ -143,16 +150,31 @@ export default function EmpresasAdminPage() {
 
                   <TableCell className="text-right">
                     <Button
-                      variant={empresa.status === "ativo" ? "outline" : "default"}
+                      variant="outline"
                       size="sm"
-                      className="rounded-xl text-xs font-semibold"
-                      disabled={isAlterandoStatus}
-                      onClick={() => {
-                        const nextStatus = empresa.status === "ativo" ? "inativo" : "ativo";
-                        setStatusModalEmpresa({ empresa, nextStatus });
-                      }}
+                      className={`rounded-xl text-xs font-semibold gap-1.5 ${
+                        empresa.status === "ativo"
+                          ? "text-destructive hover:bg-destructive/10 border-destructive/30"
+                          : "text-success hover:bg-success/10 border-success/30"
+                      }`}
+                      onClick={() =>
+                        setStatusModalEmpresa({
+                          empresa,
+                          nextStatus: empresa.status === "ativo" ? "inativo" : "ativo",
+                        })
+                      }
                     >
-                      {empresa.status === "ativo" ? "Bloquear" : "Ativar"}
+                      {empresa.status === "ativo" ? (
+                        <>
+                          <XCircle className="h-3.5 w-3.5" />
+                          Desativar
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                          Ativar
+                        </>
+                      )}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -176,17 +198,21 @@ export default function EmpresasAdminPage() {
         />
       </Card>
 
-      {/* Modal de Confirmação de Alteração de Status da Empresa */}
+      {/* Modal de Confirmação de Alteração de Status */}
       <ConfirmDialog
         open={Boolean(statusModalEmpresa)}
         onOpenChange={(open) => !open && setStatusModalEmpresa(null)}
-        title={statusModalEmpresa?.nextStatus === "inativo" ? "Bloquear Acesso da Transportadora" : "Ativar Acesso da Transportadora"}
+        title={
+          statusModalEmpresa?.nextStatus === "inativo"
+            ? "Desativar Transportadora"
+            : "Ativar Transportadora"
+        }
         description={
           statusModalEmpresa?.nextStatus === "inativo"
-            ? `Tem certeza que deseja bloquear a empresa "${statusModalEmpresa?.empresa.nome_empresa}"? Todos os gestores e motoristas desta organização perderão o acesso ao sistema.`
-            : `Deseja reativar o acesso da empresa "${statusModalEmpresa?.empresa.nome_empresa}"? Gestores e motoristas poderão acessar o sistema normalmente.`
+            ? `Tem certeza que deseja desativar a transportadora "${statusModalEmpresa?.empresa.nome_empresa}"? Os gestores e motoristas desta empresa não conseguirão acessar a plataforma.`
+            : `Deseja reativar o acesso da transportadora "${statusModalEmpresa?.empresa.nome_empresa}" à plataforma?`
         }
-        confirmText={statusModalEmpresa?.nextStatus === "inativo" ? "Sim, Bloquear Empresa" : "Sim, Reativar Empresa"}
+        confirmText={statusModalEmpresa?.nextStatus === "inativo" ? "Sim, Desativar" : "Sim, Ativar"}
         cancelText="Cancelar"
         variant={statusModalEmpresa?.nextStatus === "inativo" ? "destructive" : "default"}
         isLoading={isAlterandoStatus}

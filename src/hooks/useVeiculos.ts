@@ -42,6 +42,20 @@ export function useVeiculos(params?: { page?: number; limite?: number; placa?: s
     },
   });
 
+  const alterarStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: 'ativo' | 'inativo' }) => {
+      return await veiculoService.atualizarStatus(id, status);
+    },
+    onSuccess: (_, variables) => {
+      toast.success(`Veículo ${variables.status === 'ativo' ? 'ativado' : 'desativado'} com sucesso!`);
+      queryClient.invalidateQueries({ queryKey: ["veiculos"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.friendlyMessage || "Erro ao alterar status do veículo.");
+    },
+  });
+
   const deletarMutation = useMutation({
     mutationFn: async (id: string) => {
       return await veiculoService.deletar(id);
@@ -62,6 +76,8 @@ export function useVeiculos(params?: { page?: number; limite?: number; placa?: s
     isCriando: criarMutation.isPending,
     atualizarVeiculo: atualizarMutation.mutateAsync,
     isAtualizando: atualizarMutation.isPending,
+    alterarStatusVeiculo: alterarStatusMutation.mutateAsync,
+    isAlterandoStatus: alterarStatusMutation.isPending,
     deletarVeiculo: deletarMutation.mutateAsync,
     isDeletando: deletarMutation.isPending,
   };

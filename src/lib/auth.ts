@@ -96,6 +96,8 @@ export const authOptions: NextAuthOptions = {
               role: isAdm ? "admin" : (apiUser.role || "gestor"),
               empresa_id: apiUser.empresa_id,
               isAdmin: isAdm,
+              cpf: apiUser.cpf,
+              telefone: apiUser.telefone,
               image: apiUser.foto_perfil,
               accessToken: apiUser.accessToken || apiUser.accesstoken,
               refreshToken: apiUser.refreshtoken || apiUser.refreshToken,
@@ -136,6 +138,8 @@ export const authOptions: NextAuthOptions = {
             user.role = isAdm ? "admin" : (apiUser.role || "gestor");
             user.empresa_id = apiUser.empresa_id;
             user.isAdmin = isAdm;
+            user.cpf = apiUser.cpf;
+            user.telefone = apiUser.telefone;
             user.image = apiUser.foto_perfil || user.image;
             user.accessToken = apiUser.accessToken || apiUser.accesstoken;
             user.refreshToken = apiUser.refreshtoken || apiUser.refreshToken;
@@ -160,6 +164,8 @@ export const authOptions: NextAuthOptions = {
         token.role = user.role;
         token.empresa_id = user.empresa_id;
         token.isAdmin = user.isAdmin;
+        token.cpf = user.cpf;
+        token.telefone = user.telefone;
         token.accessToken = accessToken;
         token.refreshToken = user.refreshToken;
         token.accessTokenExpires = getTokenExpiration(accessToken);
@@ -181,6 +187,8 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as any;
         session.user.empresa_id = token.empresa_id as string;
         session.user.isAdmin = token.isAdmin as boolean;
+        session.user.cpf = token.cpf as string;
+        session.user.telefone = token.telefone as string;
         session.accessToken = token.accessToken as string;
         session.refreshToken = token.refreshToken as string;
         session.error = token.error as string;

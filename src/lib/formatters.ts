@@ -55,12 +55,15 @@ export function formatConsumo(kmPorLitro?: number | null): string {
 }
 
 /**
- * Formata CNPJ (00.000.000/0000-00)
+ * Formata CNPJ (00.000.000/0000-00 ou padrão alfanumérico XX.XXX.XXX/XXXX-99)
  */
 export function formatCNPJ(cnpj?: string | null): string {
   if (!cnpj) return "-";
-  const clean = cnpj.replace(/\D/g, "");
-  return clean.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+  const clean = cnpj.toUpperCase().replace(/[^0-9A-Z]/g, "");
+  if (clean.length === 14) {
+    return `${clean.slice(0, 2)}.${clean.slice(2, 5)}.${clean.slice(5, 8)}/${clean.slice(8, 12)}-${clean.slice(12, 14)}`;
+  }
+  return clean;
 }
 
 /**
@@ -69,7 +72,37 @@ export function formatCNPJ(cnpj?: string | null): string {
 export function formatCPF(cpf?: string | null): string {
   if (!cpf) return "-";
   const clean = cpf.replace(/\D/g, "");
-  return clean.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
+  if (clean.length === 11) {
+    return `${clean.slice(0, 3)}.${clean.slice(3, 6)}.${clean.slice(6, 9)}-${clean.slice(9, 11)}`;
+  }
+  return clean;
+}
+
+/**
+ * Formata Telefone Celular/Fixo ((00) 00000-0000 ou (00) 0000-0000)
+ */
+export function formatTelefone(telefone?: string | null): string {
+  if (!telefone) return "-";
+  const clean = telefone.replace(/\D/g, "");
+  if (clean.length === 11) {
+    return `(${clean.slice(0, 2)}) ${clean.slice(2, 7)}-${clean.slice(7)}`;
+  }
+  if (clean.length === 10) {
+    return `(${clean.slice(0, 2)}) ${clean.slice(2, 6)}-${clean.slice(6)}`;
+  }
+  return telefone;
+}
+
+/**
+ * Formata CEP (00000-000)
+ */
+export function formatCEP(cep?: string | null): string {
+  if (!cep) return "-";
+  const clean = cep.replace(/\D/g, "");
+  if (clean.length === 8) {
+    return `${clean.slice(0, 5)}-${clean.slice(5)}`;
+  }
+  return cep;
 }
 
 /**

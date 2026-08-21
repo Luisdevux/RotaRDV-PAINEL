@@ -3,13 +3,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { empresaService } from "../services/empresaService";
 import { useAuth } from "./useAuth";
+import { useActiveEmpresa } from "../providers/ActiveEmpresaProvider";
 import { AtualizarEmpresaInput, CriarEmpresaInput, EmpresaStatus } from "../types";
 import { toast } from "sonner";
 
 export function useEmpresa(customId?: string) {
   const queryClient = useQueryClient();
   const { empresaId: userEmpresaId } = useAuth();
-  const empresaId = customId || userEmpresaId;
+  const { empresaId: activeEmpresaId, empresa: activeEmpresa } = useActiveEmpresa();
+  const empresaId = customId || activeEmpresaId || activeEmpresa?._id || userEmpresaId;
 
   const empresaQuery = useQuery({
     queryKey: ["empresa", empresaId],
@@ -35,31 +37,31 @@ export function useEmpresa(customId?: string) {
     },
   });
 
-  const uploadLogoMutation = useMutation({
+  const uploadFotoMutation = useMutation({
     mutationFn: async (file: File) => {
       if (!empresaId) throw new Error("ID da empresa não informado");
-      return await empresaService.uploadLogo(empresaId, file);
+      return await empresaService.uploadFoto(empresaId, file);
     },
     onSuccess: () => {
-      toast.success("Logotipo atualizado com sucesso!");
+      toast.success("Foto atualizada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["empresa", empresaId] });
     },
     onError: (error: any) => {
-      toast.error(error.friendlyMessage || "Erro ao enviar logotipo.");
+      toast.error(error.friendlyMessage || "Erro ao enviar foto.");
     },
   });
 
-  const deletarLogoMutation = useMutation({
+  const deletarFotoMutation = useMutation({
     mutationFn: async () => {
       if (!empresaId) throw new Error("ID da empresa não informado");
-      return await empresaService.deletarLogo(empresaId);
+      return await empresaService.deletarFoto(empresaId);
     },
     onSuccess: () => {
-      toast.success("Logotipo removido!");
+      toast.success("Foto removida com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["empresa", empresaId] });
     },
     onError: (error: any) => {
-      toast.error(error.friendlyMessage || "Erro ao remover logotipo.");
+      toast.error(error.friendlyMessage || "Erro ao remover foto.");
     },
   });
 
@@ -68,10 +70,10 @@ export function useEmpresa(customId?: string) {
     empresa: empresaQuery.data,
     atualizarEmpresa: atualizarMutation.mutateAsync,
     isAtualizando: atualizarMutation.isPending,
-    uploadLogo: uploadLogoMutation.mutateAsync,
-    isUploadingLogo: uploadLogoMutation.isPending,
-    deletarLogo: deletarLogoMutation.mutateAsync,
-    isDeletandoLogo: deletarLogoMutation.isPending,
+    uploadFoto: uploadFotoMutation.mutateAsync,
+    isUploadingFoto: uploadFotoMutation.isPending,
+    deletarFoto: deletarFotoMutation.mutateAsync,
+    isDeletandoFoto: deletarFotoMutation.isPending,
   };
 }
 

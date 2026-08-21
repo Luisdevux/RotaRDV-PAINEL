@@ -39,11 +39,34 @@ export interface CriarMotoristaInput {
   veiculo_id?: string;
 }
 
+export interface CriarMembroAdministrativoInput {
+  nome: string;
+  email: string;
+  senha: string;
+  role: 'admin' | 'gestor';
+  cargo: string;
+  cpf?: string;
+  telefone?: string;
+}
+
+export interface AtualizarMembroAdministrativoInput {
+  nome: string;
+  cargo: string;
+  role: UserRole;
+  cpf?: string;
+  telefone?: string;
+}
+
 export interface AtualizarUsuarioInput {
   nome?: string;
+  email?: string;
   cpf?: string;
   telefone?: string;
   cargo?: string;
+  role?: UserRole;
+  isAdmin?: boolean;
+  empresa?: UsuarioEmpresaSnapshot;
+  empresa_id?: string;
   veiculo_id?: string | null;
   status?: UserStatus;
 }

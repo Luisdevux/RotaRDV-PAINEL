@@ -50,6 +50,20 @@ export function useMotoristas(customEmpresaId?: string, params?: { page?: number
     },
   });
 
+  const alterarStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: 'ativo' | 'inativo' }) => {
+      return await usuarioService.atualizarStatus(id, status);
+    },
+    onSuccess: (_, variables) => {
+      toast.success(`Motorista ${variables.status === 'ativo' ? 'ativado' : 'inativado'} com sucesso!`);
+      queryClient.invalidateQueries({ queryKey: ["motoristas", targetEmpresaId] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard", targetEmpresaId] });
+    },
+    onError: (error: any) => {
+      toast.error(error.friendlyMessage || "Erro ao alterar status do motorista.");
+    },
+  });
+
   const desvincularMutation = useMutation({
     mutationFn: async (motoristaId: string) => {
       if (!targetEmpresaId) throw new Error("Empresa não identificada");
@@ -71,6 +85,8 @@ export function useMotoristas(customEmpresaId?: string, params?: { page?: number
     isCadastrando: cadastrarMutation.isPending,
     atualizarMotorista: atualizarMutation.mutateAsync,
     isAtualizando: atualizarMutation.isPending,
+    alterarStatusMotorista: alterarStatusMutation.mutateAsync,
+    isAlterandoStatus: alterarStatusMutation.isPending,
     desvincularMotorista: desvincularMutation.mutateAsync,
     isDesvinculando: desvincularMutation.isPending,
   };

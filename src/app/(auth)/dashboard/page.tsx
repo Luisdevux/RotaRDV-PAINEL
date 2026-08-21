@@ -10,7 +10,7 @@ import { MetricCard } from "@/components/MetricCard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, formatKM } from "@/lib/formatters";
+import { formatCurrency, formatKM, formatConsumo } from "@/lib/formatters";
 import { 
   Users, 
   Truck, 
@@ -58,8 +58,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function DashboardPage() {
   const { user, isAdmin, isGestor } = useAuth();
-  const { empresa } = useActiveEmpresa();
-  const { data: dashboardData, isLoading } = useDashboard();
+  const { empresa, empresaId } = useActiveEmpresa();
+  const { data: dashboardData, isLoading } = useDashboard(empresa?._id || empresaId || undefined);
 
   const resumo = dashboardData?.resumo || {
     total_motoristas: 0,
@@ -67,6 +67,8 @@ export default function DashboardPage() {
     viagens_em_andamento: 0,
     viagens_concluidas: 0,
     total_km_rodado: 0,
+    total_litros: 0,
+    media_consumo_frota: 0,
     total_despesas: 0,
     despesas_por_categoria: {
       ABASTECIMENTO: 0,
@@ -136,14 +138,14 @@ export default function DashboardPage() {
         <MetricCard
           title="Distância Total"
           value={formatKM(resumo.total_km_rodado)}
-          subtitle="Quilômetros auditados"
+          subtitle={resumo.media_consumo_frota ? `Média da frota: ${formatConsumo(resumo.media_consumo_frota)}` : "Quilômetros auditados"}
           icon={TrendingUp}
           variant="warning"
         />
         <MetricCard
           title="Despesas Operacionais"
           value={formatCurrency(resumo.total_despesas)}
-          subtitle="Comprovantes lançados"
+          subtitle={resumo.total_litros ? `${resumo.total_litros.toLocaleString('pt-BR')}L de combustível` : "Comprovantes lançados"}
           icon={ReceiptText}
           variant="destructive"
         />

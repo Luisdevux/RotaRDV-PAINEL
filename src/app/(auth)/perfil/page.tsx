@@ -2,23 +2,19 @@
 
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { usuarioService } from "@/services/usuarioService";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { formatCPF } from "@/lib/formatters";
+import { maskCPF, maskTelefone, unmask } from "@/lib/masks";
 import { 
   User, 
-  Mail, 
-  Phone, 
-  FileText, 
-  ShieldCheck, 
   UploadCloud, 
   Loader2, 
   CheckCircle2 
@@ -41,29 +37,64 @@ export default function PerfilPage() {
   const { user, isAdmin, updateSession } = useAuth();
   const [uploading, setUploading] = useState(false);
 
+  // Busca os dados atualizados e completos do usuário diretamente na API
+  const { data: usuarioData, isLoading: isLoadingPerfil, refetch } = useQuery({
+    queryKey: ["perfil", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      return await usuarioService.buscarPorID(user.id);
+    },
+    enabled: Boolean(user?.id),
+  });
+
   const {
     register,
     handleSubmit,
+    setValue,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<PerfilFormValues>({
     resolver: zodResolver(perfilSchema),
-    values: {
-      nome: user?.name || "",
+    defaultValues: {
+      nome: "",
       telefone: "",
       cpf: "",
-      cargo: user?.role || "",
+      cargo: "",
     },
   });
+
+  // Atualiza os valores do formulário com os dados carregados da API ou da sessão
+  useEffect(() => {
+    if (usuarioData) {
+      reset({
+        nome: usuarioData.nome || user?.name || "",
+        telefone: maskTelefone(usuarioData.telefone || user?.telefone || ""),
+        cpf: maskCPF(usuarioData.cpf || user?.cpf || ""),
+        cargo: usuarioData.role || user?.role || "",
+      });
+    } else if (user) {
+      reset({
+        nome: user.name || "",
+        telefone: maskTelefone(user.telefone || ""),
+        cpf: maskCPF(user.cpf || ""),
+        cargo: user.role || "",
+      });
+    }
+  }, [usuarioData, user, reset]);
 
   const onSubmit = async (data: PerfilFormValues) => {
     if (!user?.id) return;
     try {
+      const cleanCpf = data.cpf ? unmask(data.cpf) : undefined;
+      const cleanTelefone = data.telefone ? unmask(data.telefone) : undefined;
+
       await usuarioService.atualizar(user.id, {
         nome: data.nome,
-        telefone: data.telefone,
-        cpf: data.cpf ? data.cpf.replace(/\D/g, "") : undefined,
+        telefone: cleanTelefone,
+        cpf: cleanCpf,
       });
       toast.success("Perfil atualizado com sucesso!");
+      await refetch();
       await updateSession();
     } catch (error: any) {
       toast.error(error.friendlyMessage || "Erro ao atualizar perfil.");
@@ -77,6 +108,7 @@ export default function PerfilPage() {
       try {
         await usuarioService.uploadFotoPerfil(user.id, file);
         toast.success("Foto de perfil atualizada!");
+        await refetch();
         await updateSession();
       } catch (error: any) {
         toast.error(error.friendlyMessage || "Erro ao enviar foto.");
@@ -85,6 +117,8 @@ export default function PerfilPage() {
       }
     }
   };
+
+  const fotoPerfilAtual = usuarioData?.foto_perfil || user?.image || "";
 
   return (
     <div className="max-w-3xl space-y-6 animate-fade-in">
@@ -114,7 +148,7 @@ export default function PerfilPage() {
           {/* Avatar Section */}
           <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-2xl bg-muted/30 border border-border/60">
             <Avatar className="h-20 w-20 border-2 border-border shadow-md">
-              <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
+              <AvatarImage src={fotoPerfilAtual} alt={user?.name || ""} />
               <AvatarFallback className="bg-primary text-primary-foreground font-black text-xl">
                 {user?.name ? user.name.slice(0, 2).toUpperCase() : "RD"}
               </AvatarFallback>
@@ -158,7 +192,12 @@ export default function PerfilPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="nome">Nome Completo</Label>
-                <Input id="nome" className="rounded-xl" {...register("nome")} />
+                <Input 
+                  id="nome" 
+                  className="rounded-xl" 
+                  maxLength={80}
+                  {...register("nome")} 
+                />
                 {errors.nome && (
                   <p className="text-xs text-destructive">{errors.nome.message}</p>
                 )}
@@ -169,7 +208,7 @@ export default function PerfilPage() {
                 <Input
                   id="email"
                   type="email"
-                  value={user?.email || ""}
+                  value={usuarioData?.email || user?.email || ""}
                   disabled
                   className="rounded-xl opacity-70 bg-muted"
                 />
@@ -179,21 +218,37 @@ export default function PerfilPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="cpf">CPF</Label>
-                <Input id="cpf" placeholder="000.000.000-00" className="rounded-xl" {...register("cpf")} />
+                <Input 
+                  id="cpf" 
+                  placeholder="000.000.000-00" 
+                  className="rounded-xl" 
+                  maxLength={14}
+                  {...register("cpf", {
+                    onChange: (e) => setValue("cpf", maskCPF(e.target.value)),
+                  })} 
+                />
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="telefone">Telefone</Label>
-                <Input id="telefone" placeholder="(11) 98888-7777" className="rounded-xl" {...register("telefone")} />
+                <Input 
+                  id="telefone" 
+                  placeholder="(00) 00000-0000" 
+                  className="rounded-xl" 
+                  maxLength={15}
+                  {...register("telefone", {
+                    onChange: (e) => setValue("telefone", maskTelefone(e.target.value)),
+                  })} 
+                />
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="cargo">Cargo / Função (Não editável)</Label>
                 <Input
                   id="cargo"
-                  value={user?.role || ""}
+                  value={user?.role ? user.role.toUpperCase() : "GESTOR"}
                   disabled
-                  className="rounded-xl opacity-70 bg-muted"
+                  className="rounded-xl opacity-70 bg-muted uppercase"
                 />
               </div>
             </div>
@@ -202,7 +257,7 @@ export default function PerfilPage() {
               <Button
                 type="submit"
                 variant="default"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isLoadingPerfil}
                 className="rounded-xl font-bold gap-2 shadow-md"
               >
                 {isSubmitting ? (

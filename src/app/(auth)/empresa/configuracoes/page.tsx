@@ -3,7 +3,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import { SafeImage } from "@/components/ui/safe-image";
 import { useEmpresa } from "@/hooks/useEmpresa";
 import { useActiveEmpresa } from "@/providers/ActiveEmpresaProvider";
@@ -14,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { formatCNPJ } from "@/lib/formatters";
+import { maskTelefone, maskCEP, maskUF, unmask } from "@/lib/masks";
 import { 
   Building2, 
   Mail, 
@@ -45,26 +45,27 @@ type EmpresaConfigValues = z.infer<typeof empresaConfigSchema>;
 
 export default function EmpresaConfiguracoesPage() {
   const { empresa, refreshEmpresa } = useActiveEmpresa();
-  const { atualizarEmpresa, isAtualizando, uploadLogo, isUploadingLogo, deletarLogo, isDeletandoLogo } = useEmpresa();
+  const { atualizarEmpresa, isAtualizando, uploadFoto, isUploadingFoto, deletarFoto, isDeletandoFoto } = useEmpresa();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [deleteLogoModalOpen, setDeleteLogoModalOpen] = useState(false);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<EmpresaConfigValues>({
     resolver: zodResolver(empresaConfigSchema),
     values: {
       nome_empresa: empresa?.nome_empresa || "",
       email: empresa?.email || "",
-      telefone: empresa?.telefone || "",
-      cep: empresa?.endereco?.cep || "",
+      telefone: maskTelefone(empresa?.telefone || ""),
+      cep: maskCEP(empresa?.endereco?.cep || ""),
       logradouro: empresa?.endereco?.logradouro || "",
       numero: empresa?.endereco?.numero || "",
       bairro: empresa?.endereco?.bairro || "",
       cidade: empresa?.endereco?.cidade || "",
-      estado: empresa?.endereco?.estado || "",
+      estado: maskUF(empresa?.endereco?.estado || ""),
     },
   });
 
@@ -72,14 +73,14 @@ export default function EmpresaConfiguracoesPage() {
     await atualizarEmpresa({
       nome_empresa: data.nome_empresa,
       email: data.email,
-      telefone: data.telefone,
+      telefone: data.telefone ? unmask(data.telefone) : undefined,
       endereco: {
-        cep: data.cep,
+        cep: data.cep ? unmask(data.cep) : undefined,
         logradouro: data.logradouro,
         numero: data.numero,
         bairro: data.bairro,
         cidade: data.cidade,
-        estado: data.estado,
+        estado: data.estado ? data.estado.toUpperCase() : undefined,
       },
     });
     await refreshEmpresa();
@@ -89,13 +90,13 @@ export default function EmpresaConfiguracoesPage() {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      await uploadLogo(file);
+      await uploadFoto(file);
       await refreshEmpresa();
     }
   };
 
   const handleConfirmDeleteLogo = async () => {
-    await deletarLogo();
+    await deletarFoto();
     await refreshEmpresa();
     setDeleteLogoModalOpen(false);
   };
@@ -132,23 +133,23 @@ export default function EmpresaConfiguracoesPage() {
                   accept="image/png, image/jpeg, image/jpg"
                   className="hidden"
                   onChange={handleLogoUpload}
-                  disabled={isUploadingLogo}
+                  disabled={isUploadingFoto}
                 />
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   className="rounded-xl gap-1.5 text-xs font-semibold"
-                  disabled={isUploadingLogo}
+                  disabled={isUploadingFoto}
                   asChild
                 >
                   <span>
-                    {isUploadingLogo ? (
+                    {isUploadingFoto ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     ) : (
                       <UploadCloud className="h-3.5 w-3.5" />
                     )}
-                    Carregar Nova Imagem
+                    {empresa?.foto_logo ? "Alterar Logotipo" : "Enviar Logotipo"}
                   </span>
                 </Button>
               </label>
@@ -158,40 +159,39 @@ export default function EmpresaConfiguracoesPage() {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="rounded-xl text-xs text-destructive hover:bg-destructive/10 gap-1.5"
                   onClick={() => setDeleteLogoModalOpen(true)}
-                  disabled={isDeletandoLogo}
+                  disabled={isDeletandoFoto}
+                  className="rounded-xl gap-1.5 text-xs font-semibold text-destructive hover:bg-destructive/10"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
-                  Remover Logo
+                  Remover
                 </Button>
               )}
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Formatos aceitos: JPG, PNG ou JPEG. Recomendado tamanho quadrado de no mínimo 300x300px.
+              Formatos permitidos: JPG, PNG até 5MB. Dimensão recomendada: 400x400px.
             </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Modal de Confirmação de Remoção de Logotipo */}
+      {/* Modal de confirmação de exclusão do logotipo */}
       <ConfirmDialog
         open={deleteLogoModalOpen}
         onOpenChange={setDeleteLogoModalOpen}
-        title="Remover Logotipo da Transportadora"
-        description="Tem certeza que deseja remover o logotipo corporativo? A identidade padrão do RotaRDV será exibida até que um novo arquivo seja carregado."
-        confirmText="Sim, Remover Logo"
+        title="Remover Logotipo Corporativo"
+        description="Tem certeza que deseja remover o logotipo da empresa? Essa ação não pode ser desfeita."
+        confirmText="Sim, remover"
         cancelText="Cancelar"
         variant="destructive"
-        isLoading={isDeletandoLogo}
         onConfirm={handleConfirmDeleteLogo}
       />
 
-      {/* Dados Cadastrais Form */}
+      {/* Formulário de Dados Cadastrais */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card className="rounded-2xl border-border/80 shadow-sm">
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <CardTitle className="text-base font-bold flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-primary" />
@@ -214,6 +214,7 @@ export default function EmpresaConfiguracoesPage() {
                 <Input
                   id="nome_empresa"
                   className="rounded-xl"
+                  maxLength={100}
                   {...register("nome_empresa")}
                 />
                 {errors.nome_empresa && (
@@ -227,6 +228,7 @@ export default function EmpresaConfiguracoesPage() {
                   id="email"
                   type="email"
                   className="rounded-xl"
+                  maxLength={100}
                   {...register("email")}
                 />
                 {errors.email && (
@@ -240,9 +242,12 @@ export default function EmpresaConfiguracoesPage() {
                 <Label htmlFor="telefone">Telefone / WhatsApp</Label>
                 <Input
                   id="telefone"
-                  placeholder="(11) 3333-4444"
+                  placeholder="(00) 00000-0000"
                   className="rounded-xl"
-                  {...register("telefone")}
+                  maxLength={15}
+                  {...register("telefone", {
+                    onChange: (e) => setValue("telefone", maskTelefone(e.target.value)),
+                  })}
                 />
               </div>
 
@@ -252,7 +257,10 @@ export default function EmpresaConfiguracoesPage() {
                   id="cep"
                   placeholder="00000-000"
                   className="rounded-xl"
-                  {...register("cep")}
+                  maxLength={9}
+                  {...register("cep", {
+                    onChange: (e) => setValue("cep", maskCEP(e.target.value)),
+                  })}
                 />
               </div>
             </div>
@@ -264,6 +272,7 @@ export default function EmpresaConfiguracoesPage() {
                   id="logradouro"
                   placeholder="Av. das Nações"
                   className="rounded-xl"
+                  maxLength={120}
                   {...register("logradouro")}
                 />
               </div>
@@ -274,6 +283,7 @@ export default function EmpresaConfiguracoesPage() {
                   id="numero"
                   placeholder="1000"
                   className="rounded-xl"
+                  maxLength={20}
                   {...register("numero")}
                 />
               </div>
@@ -286,6 +296,7 @@ export default function EmpresaConfiguracoesPage() {
                   id="bairro"
                   placeholder="Distrito Industrial"
                   className="rounded-xl"
+                  maxLength={80}
                   {...register("bairro")}
                 />
               </div>
@@ -297,7 +308,9 @@ export default function EmpresaConfiguracoesPage() {
                   placeholder="SP"
                   maxLength={2}
                   className="rounded-xl uppercase font-mono"
-                  {...register("estado")}
+                  {...register("estado", {
+                    onChange: (e) => setValue("estado", maskUF(e.target.value)),
+                  })}
                 />
               </div>
 
@@ -307,6 +320,7 @@ export default function EmpresaConfiguracoesPage() {
                   id="cidade"
                   placeholder="São Paulo"
                   className="rounded-xl"
+                  maxLength={80}
                   {...register("cidade")}
                 />
               </div>

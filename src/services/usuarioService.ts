@@ -32,8 +32,7 @@ export const usuarioService = {
 
   async uploadFotoPerfil(id: string, file: File): Promise<{ url: string }> {
     const formData = new FormData();
-    formData.append('foto', file);
-    formData.append('foto_perfil', file);
+    formData.append('file', file);
 
     const response = await api.post<ApiResponse<{ url: string }>>(`/usuarios/${id}/foto`, formData, {
       headers: {
