@@ -96,7 +96,7 @@ export function MotoristaEditModal({
           </DialogHeader>
 
           <div className="space-y-3.5 py-4">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="edit-nome">Nome Completo *</Label>
               <Input
                 id="edit-nome"
@@ -110,7 +110,7 @@ export function MotoristaEditModal({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label htmlFor="edit-cpf">CPF</Label>
                 <Input
                   id="edit-cpf"
@@ -122,7 +122,7 @@ export function MotoristaEditModal({
                   })}
                 />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label htmlFor="edit-telefone">Telefone</Label>
                 <Input
                   id="edit-telefone"
@@ -136,7 +136,7 @@ export function MotoristaEditModal({
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="edit-veiculo">Caminhão Vinculado</Label>
               <Select
                 value={editVeiculoId}

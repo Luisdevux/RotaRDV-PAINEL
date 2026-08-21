@@ -7,3 +7,5 @@ export * from './usuarioService';
 export * from './veiculoService';
 export * from './viagemService';
 export * from './despesaService';
+export * from './viaCepService';
+

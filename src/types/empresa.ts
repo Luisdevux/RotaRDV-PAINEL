@@ -12,6 +12,28 @@ export interface Endereco {
   estado?: string;
 }
 
+export interface ViaCepResponse {
+  cep: string;
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  ibge?: string;
+  gia?: string;
+  ddd?: string;
+  siafi?: string;
+  erro?: boolean | string;
+}
+
+export interface EnderecoViaCep {
+  cep: string;
+  logradouro: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+}
+
 export interface GestorResumo {
   _id: string;
   nome: string;

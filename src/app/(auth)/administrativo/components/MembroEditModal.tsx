@@ -97,7 +97,7 @@ export function MembroEditModal({
           </DialogHeader>
 
           <div className="space-y-3.5 py-4">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="edit-nome">Nome Completo *</Label>
               <Input
                 id="edit-nome"
@@ -110,7 +110,7 @@ export function MembroEditModal({
               )}
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="edit-cargo">Cargo / Função na Empresa *</Label>
               <Input
                 id="edit-cargo"
@@ -158,7 +158,7 @@ export function MembroEditModal({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label htmlFor="edit-cpf">CPF</Label>
                 <Input
                   id="edit-cpf"
@@ -170,7 +170,7 @@ export function MembroEditModal({
                   })}
                 />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label htmlFor="edit-telefone">Telefone</Label>
                 <Input
                   id="edit-telefone"

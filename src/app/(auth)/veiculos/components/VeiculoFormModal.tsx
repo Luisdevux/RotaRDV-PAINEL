@@ -184,8 +184,10 @@ export function VeiculoFormModal({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label htmlFor="placa">Placa do Cavalo *</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="placa" className="text-xs font-semibold text-foreground">
+                    Placa do Cavalo *
+                  </Label>
                   <Input
                     id="placa"
                     placeholder="ABC-1234 ou ABC1D23"
@@ -201,8 +203,10 @@ export function VeiculoFormModal({
                   )}
                 </div>
 
-                <div className="space-y-1">
-                  <Label htmlFor="modelo">Modelo do Caminhão *</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="modelo" className="text-xs font-semibold text-foreground">
+                    Modelo do Caminhão *
+                  </Label>
                   <Input
                     id="modelo"
                     placeholder="Ex: Scania R450, Volvo FH 540"
@@ -217,8 +221,10 @@ export function VeiculoFormModal({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <Label htmlFor="combustivel">Combustível Preferencial</Label>
+                <div className="space-y-1.5 flex flex-col justify-end">
+                  <Label htmlFor="combustivel" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
+                    Combustível Preferencial
+                  </Label>
                   <Select
                     value={combustivel}
                     onValueChange={(val: CombustivelPreferencial) => setCombustivel(val)}
@@ -237,8 +243,10 @@ export function VeiculoFormModal({
                   </Select>
                 </div>
 
-                <div className="space-y-1">
-                  <Label htmlFor="capacidade_tanque">Capacidade Tanque (L) *</Label>
+                <div className="space-y-1.5 flex flex-col justify-end">
+                  <Label htmlFor="capacidade_tanque" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
+                    Capacidade Tanque (L) *
+                  </Label>
                   <Input
                     id="capacidade_tanque"
                     type="number"
@@ -253,8 +261,10 @@ export function VeiculoFormModal({
                   )}
                 </div>
 
-                <div className="space-y-1">
-                  <Label htmlFor="ano_fabricacao">Ano Fabricação *</Label>
+                <div className="space-y-1.5 flex flex-col justify-end">
+                  <Label htmlFor="ano_fabricacao" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
+                    Ano de Fabricação *
+                  </Label>
                   <Input
                     id="ano_fabricacao"
                     type="number"
@@ -293,8 +303,10 @@ export function VeiculoFormModal({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label htmlFor="reboque_modelo">Tipo / Modelo do Implemento</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="reboque_modelo" className="text-xs font-semibold text-foreground">
+                    Tipo / Modelo do Implemento
+                  </Label>
                   <Input
                     id="reboque_modelo"
                     placeholder="Ex: Randon Graneleiro Bitrem, Noma 9 Eixos"
@@ -304,8 +316,10 @@ export function VeiculoFormModal({
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <Label htmlFor="reboque_ano_fabricacao">Ano do Implemento</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="reboque_ano_fabricacao" className="text-xs font-semibold text-foreground">
+                    Ano do Implemento
+                  </Label>
                   <Input
                     id="reboque_ano_fabricacao"
                     type="number"

@@ -23,11 +23,13 @@ import {
   Trash2, 
   Loader2, 
   CheckCircle2,
-  FileText
+  FileText,
+  Search
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useViaCep } from "@/hooks/useViaCep";
 
 const empresaConfigSchema = z.object({
   nome_empresa: z.string().min(2, "Nome da empresa é obrigatório"),
@@ -46,6 +48,7 @@ type EmpresaConfigValues = z.infer<typeof empresaConfigSchema>;
 export default function EmpresaConfiguracoesPage() {
   const { empresa, refreshEmpresa } = useActiveEmpresa();
   const { atualizarEmpresa, isAtualizando, uploadFoto, isUploadingFoto, deletarFoto, isDeletandoFoto } = useEmpresa();
+  const { consultarCep, isLoadingCep } = useViaCep();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [deleteLogoModalOpen, setDeleteLogoModalOpen] = useState(false);
 
@@ -68,6 +71,34 @@ export default function EmpresaConfiguracoesPage() {
       estado: maskUF(empresa?.endereco?.estado || ""),
     },
   });
+
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawVal = e.target.value;
+    const masked = maskCEP(rawVal);
+    setValue("cep", masked);
+
+    const clean = unmask(rawVal);
+    if (clean.length === 8) {
+      consultarCep(clean, (end) => {
+        setValue("logradouro", end.logradouro, { shouldValidate: true });
+        setValue("bairro", end.bairro, { shouldValidate: true });
+        setValue("cidade", end.cidade, { shouldValidate: true });
+        setValue("estado", end.estado, { shouldValidate: true });
+      });
+    }
+  };
+
+  const handleCepBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const clean = unmask(e.target.value);
+    if (clean.length === 8) {
+      consultarCep(clean, (end) => {
+        setValue("logradouro", end.logradouro, { shouldValidate: true });
+        setValue("bairro", end.bairro, { shouldValidate: true });
+        setValue("cidade", end.cidade, { shouldValidate: true });
+        setValue("estado", end.estado, { shouldValidate: true });
+      });
+    }
+  };
 
   const onSubmit = async (data: EmpresaConfigValues) => {
     await atualizarEmpresa({
@@ -252,16 +283,33 @@ export default function EmpresaConfiguracoesPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="cep">CEP</Label>
-                <Input
-                  id="cep"
-                  placeholder="00000-000"
-                  className="rounded-xl"
-                  maxLength={9}
-                  {...register("cep", {
-                    onChange: (e) => setValue("cep", maskCEP(e.target.value)),
-                  })}
-                />
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="cep">CEP</Label>
+                  {isLoadingCep && (
+                    <span className="text-[11px] text-primary flex items-center gap-1 font-medium animate-pulse">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Buscando...
+                    </span>
+                  )}
+                </div>
+                <div className="relative">
+                  <Input
+                    id="cep"
+                    placeholder="00000-000"
+                    className="rounded-xl pr-9 font-mono"
+                    maxLength={9}
+                    {...register("cep")}
+                    onChange={handleCepChange}
+                    onBlur={handleCepBlur}
+                  />
+                  <div className="absolute right-3 top-2.5 text-muted-foreground pointer-events-none">
+                    {isLoadingCep ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    ) : (
+                      <Search className="h-4 w-4 text-muted-foreground/60" />
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 

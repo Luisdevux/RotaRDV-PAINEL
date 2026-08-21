@@ -82,7 +82,7 @@ export function MembroNovoModal({
           </DialogHeader>
 
           <div className="space-y-3.5 py-4">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="nome">Nome Completo *</Label>
               <Input
                 id="nome"
@@ -96,7 +96,7 @@ export function MembroNovoModal({
               )}
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="email">E-mail de Acesso *</Label>
               <Input
                 id="email"
@@ -110,7 +110,7 @@ export function MembroNovoModal({
               )}
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="senha">Senha Inicial *</Label>
               <Input
                 id="senha"
@@ -125,7 +125,7 @@ export function MembroNovoModal({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label htmlFor="cpf">CPF</Label>
                 <Input
                   id="cpf"
@@ -137,7 +137,7 @@ export function MembroNovoModal({
                   })}
                 />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label htmlFor="telefone">Telefone / Celular</Label>
                 <Input
                   id="telefone"
@@ -152,7 +152,7 @@ export function MembroNovoModal({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label htmlFor="cargo">Cargo / Função *</Label>
                 <Input
                   id="cargo"
@@ -164,7 +164,7 @@ export function MembroNovoModal({
                   <p className="text-xs text-destructive">{errors.cargo.message}</p>
                 )}
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label htmlFor="role">Papel de Acesso</Label>
                 <Select
                   defaultValue="gestor"

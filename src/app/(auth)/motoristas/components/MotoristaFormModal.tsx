@@ -89,7 +89,7 @@ export function MotoristaFormModal({
           </DialogHeader>
 
           <div className="space-y-3.5 py-4">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="nome">Nome Completo *</Label>
               <Input
                 id="nome"
@@ -103,7 +103,7 @@ export function MotoristaFormModal({
               )}
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="email">E-mail *</Label>
               <Input
                 id="email"
@@ -117,7 +117,7 @@ export function MotoristaFormModal({
               )}
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="senha">Senha Inicial (Opcional)</Label>
               <Input
                 id="senha"
@@ -132,7 +132,7 @@ export function MotoristaFormModal({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label htmlFor="cpf">CPF</Label>
                 <Input
                   id="cpf"
@@ -144,7 +144,7 @@ export function MotoristaFormModal({
                   })}
                 />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label htmlFor="telefone">Telefone</Label>
                 <Input
                   id="telefone"
@@ -158,7 +158,7 @@ export function MotoristaFormModal({
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="veiculo">Caminhão Vinculado (Opcional)</Label>
               <Select
                 value={selectedVeiculoId}
