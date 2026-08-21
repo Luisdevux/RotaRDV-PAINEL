@@ -2,13 +2,14 @@
 
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 
 export function DashboardWrapper({ children }: { children: React.ReactNode }) {
   const { user, isMotorista, isAdmin, logout } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (user && isMotorista && !isAdmin) {
@@ -31,12 +32,12 @@ export function DashboardWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      {/* Sidebar Navigation */}
-      <Sidebar />
+      {/* Sidebar Navigation (Desktop & Mobile Drawer) */}
+      <Sidebar mobileOpen={mobileMenuOpen} setMobileOpen={setMobileMenuOpen} />
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col overflow-x-hidden">
-        <Header />
+      <div className="flex flex-1 flex-col overflow-x-hidden min-w-0">
+        <Header onOpenMobileMenu={() => setMobileMenuOpen(true)} />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10 w-full animate-fade-in">
           {children}
         </main>

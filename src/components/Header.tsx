@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Sun, Moon, LogOut, User, Building, ShieldCheck } from "lucide-react";
+import { Sun, Moon, LogOut, User, Building, ShieldCheck, Menu } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveEmpresa } from "@/providers/ActiveEmpresaProvider";
 import {
@@ -32,7 +32,11 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/perfil": { title: "Meu Perfil", subtitle: "Informações pessoais e credenciais de acesso" },
 };
 
-export function Header() {
+interface HeaderProps {
+  onOpenMobileMenu?: () => void;
+}
+
+export function Header({ onOpenMobileMenu }: HeaderProps) {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -49,15 +53,26 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-20 flex h-20 w-full items-center justify-between border-b border-border/80 bg-background/95 backdrop-blur-md px-6">
-      {/* Page Title & Subtitle */}
-      <div>
-        <h1 className="text-xl font-bold text-foreground leading-tight tracking-tight">
-          {pageInfo.title}
-        </h1>
-        <p className="text-xs text-muted-foreground hidden sm:block">
-          {pageInfo.subtitle}
-        </p>
+    <header className="sticky top-0 z-20 flex h-20 w-full items-center justify-between border-b border-border/80 bg-background/95 backdrop-blur-md px-4 sm:px-6">
+      {/* Page Title & Subtitle + Mobile Hamburger */}
+      <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          size="icon"
+          className="md:hidden rounded-xl border-border/80 h-10 w-10 shrink-0"
+          onClick={onOpenMobileMenu}
+          title="Abrir menu de navegação"
+        >
+          <Menu className="h-5 w-5 text-foreground" />
+        </Button>
+        <div>
+          <h1 className="text-lg sm:text-xl font-bold text-foreground leading-tight tracking-tight truncate max-w-[200px] sm:max-w-none">
+            {pageInfo.title}
+          </h1>
+          <p className="text-xs text-muted-foreground hidden sm:block">
+            {pageInfo.subtitle}
+          </p>
+        </div>
       </div>
 
       {/* Right Controls (Theme Switcher + Profile Menu) */}
