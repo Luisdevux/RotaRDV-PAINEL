@@ -92,6 +92,9 @@
 }
 
 @layer base {
+  html {
+    font-size: clamp(15px, 0.4vw + 13.5px, 18.5px);
+  }
   * {
     @apply border-border;
   }

@@ -37,7 +37,7 @@ export function DashboardWrapper({ children }: { children: React.ReactNode }) {
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-x-hidden">
         <Header />
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto animate-fade-in">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10 w-full animate-fade-in">
           {children}
         </main>
       </div>
