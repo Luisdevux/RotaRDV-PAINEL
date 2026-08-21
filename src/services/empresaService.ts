@@ -49,7 +49,7 @@ export const empresaService = {
     formData.append('foto_logo', file);
     formData.append('logo', file);
 
-    const response = await api.post<ApiResponse<{ url: string }>>(`/empresas/${id}/foto-logo`, formData, {
+    const response = await api.post<ApiResponse<{ url: string }>>(`/empresas/${id}/foto`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -58,7 +58,7 @@ export const empresaService = {
   },
 
   async deletarLogo(id: string): Promise<void> {
-    await api.delete(`/empresas/${id}/foto-logo`);
+    await api.delete(`/empresas/${id}/foto`);
   },
 
   async buscarDashboard(id: string): Promise<DashboardData> {
