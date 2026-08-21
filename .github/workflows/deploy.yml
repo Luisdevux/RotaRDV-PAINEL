@@ -68,6 +68,7 @@ jobs:
           script: |
             echo "🚀 Atualizando o deployment rotardv-painel para a imagem: ${{ needs.build-and-push.outputs.image_tag }}..."
             sudo k3s kubectl set image deployment/rotardv-painel rotardv-painel=${{ needs.build-and-push.outputs.image_tag }} -n rotardv-prod
+            sudo k3s kubectl rollout restart deployment/rotardv-painel -n rotardv-prod
             sudo k3s kubectl rollout status deployment/rotardv-painel -n rotardv-prod --timeout=180s
             echo "✅ Deploy concluído com sucesso!"
             sudo k3s kubectl get pods -n rotardv-prod -l app=rotardv-painel
