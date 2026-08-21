@@ -9,6 +9,7 @@ export type MetricVariant =
   | "default" 
   | "primary" 
   | "emerald" 
+  | "success"
   | "info" 
   | "blue" 
   | "warning" 
@@ -36,7 +37,8 @@ export function MetricCard({
   const variantStyles: Record<MetricVariant, string> = {
     default: "bg-card text-card-foreground",
     primary: "border-primary/30 bg-primary/[0.04]",
-    emerald: "border-primary/30 bg-primary/[0.04]",
+    emerald: "border-success/30 bg-success/[0.04]",
+    success: "border-success/30 bg-success/[0.04]",
     info: "border-info/30 bg-info/[0.04]",
     blue: "border-info/30 bg-info/[0.04]",
     warning: "border-warning/30 bg-warning/[0.04]",
@@ -48,7 +50,8 @@ export function MetricCard({
   const iconStyles: Record<MetricVariant, string> = {
     default: "bg-muted text-muted-foreground",
     primary: "bg-primary/15 text-primary border border-primary/30",
-    emerald: "bg-primary/15 text-primary border border-primary/30",
+    emerald: "bg-success/15 text-success border border-success/30",
+    success: "bg-success/15 text-success border border-success/30",
     info: "bg-info/15 text-info border border-info/30",
     blue: "bg-info/15 text-info border border-info/30",
     warning: "bg-warning/15 text-warning border border-warning/30",

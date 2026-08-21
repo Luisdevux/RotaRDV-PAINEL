@@ -62,7 +62,6 @@ export default function PerfilPage() {
         nome: data.nome,
         telefone: data.telefone,
         cpf: data.cpf ? data.cpf.replace(/\D/g, "") : undefined,
-        cargo: data.cargo,
       });
       toast.success("Perfil atualizado com sucesso!");
       await updateSession();
@@ -189,8 +188,13 @@ export default function PerfilPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="cargo">Cargo / Função</Label>
-                <Input id="cargo" placeholder="Ex: Gestor de Frota" className="rounded-xl" {...register("cargo")} />
+                <Label htmlFor="cargo">Cargo / Função (Não editável)</Label>
+                <Input
+                  id="cargo"
+                  value={user?.role ? (user.role === "ADMIN" ? "Super Administrador" : user.role === "GESTOR" ? "Gestor" : user.role === "MOTORISTA" ? "Motorista" : user.role) : "Gestor"}
+                  disabled
+                  className="rounded-xl opacity-70 bg-muted cursor-not-allowed"
+                />
               </div>
             </div>
 

@@ -124,7 +124,7 @@ export default function DashboardPage() {
           value={resumo.total_motoristas}
           subtitle={`Frota de ${resumo.total_veiculos} veículos`}
           icon={Users}
-          variant="primary"
+          variant="success"
         />
         <MetricCard
           title="Viagens em Andamento"
@@ -236,7 +236,7 @@ export default function DashboardPage() {
                 Valores consolidados em Reais (BRL)
               </CardDescription>
             </div>
-            <Button asChild variant="ghost" size="sm" className="gap-1 text-xs text-primary">
+            <Button asChild variant="ghost" size="sm" className="gap-1 text-xs text-primary hover:text-primary/80">
               <Link href="/despesas">
                 Ver todas
                 <ArrowUpRight className="h-3.5 w-3.5" />
@@ -280,7 +280,7 @@ export default function DashboardPage() {
                         fontWeight: 700,
                       }}
                     />
-                    <Bar dataKey="valor" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="valor" fill="hsl(var(--chart-1))" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
