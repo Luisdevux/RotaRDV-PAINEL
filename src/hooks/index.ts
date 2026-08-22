@@ -7,3 +7,4 @@ export * from './useVeiculos';
 export * from './useViagens';
 export * from './useDespesas';
 export * from './useEmpresa';
+export * from './useEquipeAdministrativa';

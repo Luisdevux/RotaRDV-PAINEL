@@ -3,10 +3,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { usuarioService } from "@/services/usuarioService";
 import { useAuth } from "@/hooks/useAuth";
-import { useActiveEmpresa } from "@/providers/ActiveEmpresaProvider";
+import { useEquipeAdministrativa } from "@/hooks/useEquipeAdministrativa";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,15 +29,12 @@ import {
   UserPlus, 
   Briefcase 
 } from "lucide-react";
-import { Usuario, CriarMembroAdministrativoInput, AtualizarMembroAdministrativoInput, AtualizarUsuarioInput } from "@/types";
-import { toast } from "sonner";
+import { Usuario, CriarMembroAdministrativoInput, AtualizarMembroAdministrativoInput } from "@/types";
 import { MembroNovoModal } from "./components/MembroNovoModal";
 import { MembroEditModal } from "./components/MembroEditModal";
 
 export default function AdministrativoPage() {
-  const queryClient = useQueryClient();
   const { user: authUser, isAdmin } = useAuth();
-  const { empresa } = useActiveEmpresa();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("todos");
@@ -52,128 +47,56 @@ export default function AdministrativoPage() {
   const [editingMembro, setEditingMembro] = useState<Usuario | null>(null);
   const [statusModalMembro, setStatusModalMembro] = useState<{ membro: Usuario; nextStatus: "ativo" | "inativo" } | null>(null);
 
-  // Query para buscar lista de administradores e gestores
-  const { data: usuariosData, isLoading } = useQuery({
-    queryKey: ["equipe-administrativa", empresa?._id, page, limite],
-    queryFn: async () => {
-      return await usuarioService.listar({ page, limite });
-    },
-  });
+  // Custom hook encapsulado
+  const {
+    membros,
+    isLoading,
+    cadastrarMembro,
+    isCadastrando,
+    atualizarMembro,
+    isAtualizando,
+    alterarStatusMembro,
+    isAlterandoStatus,
+  } = useEquipeAdministrativa({ roleFilter, statusFilter });
 
-  const usuariosList: Usuario[] = usuariosData?.docs || usuariosData?.items || (Array.isArray(usuariosData) ? usuariosData : []);
-  const totalDocs = usuariosData?.totalDocs ?? usuariosData?.total ?? usuariosList.length;
-  const totalPages = usuariosData?.totalPages ?? usuariosData?.paginas ?? Math.max(1, Math.ceil(totalDocs / limite));
-
-  // Filtra apenas membros administrativos (admins e gestores) da empresa do usuário
-  const administrativeTeam = usuariosList.filter((m) => {
-    const isEquipe = m.role === "admin" || m.role === "gestor" || m.isAdmin;
-    if (!isEquipe) return false;
-
-    // Se o usuário logado for gestor, filtra apenas os da sua empresa
-    if (!isAdmin && empresa?._id && m.empresa_id && String(m.empresa_id) !== String(empresa._id)) {
-      return false;
-    }
-
+  // Busca rápida e instantânea no frontend para poupar requisições ao backend
+  const filteredTeam = membros.filter((m) => {
+    if (!searchTerm.trim()) return true;
     const term = searchTerm.toLowerCase();
     const cleanSearch = unmask(searchTerm);
-    const matchesSearch =
+    return (
       m.nome?.toLowerCase().includes(term) ||
       m.email?.toLowerCase().includes(term) ||
       (m.cpf && m.cpf.includes(cleanSearch)) ||
-      (m.empresa?.cargo && m.empresa.cargo.toLowerCase().includes(term));
-
-    const matchesRole = roleFilter === "todos" || m.role === roleFilter;
-    const matchesStatus = statusFilter === "todos" || m.status === statusFilter;
-
-    return matchesSearch && matchesRole && matchesStatus;
+      (m.empresa?.cargo && m.empresa.cargo.toLowerCase().includes(term))
+    );
   });
 
-  // Mutação para criar novo membro administrativo
-  const criarMutation = useMutation({
-    mutationFn: async (data: CriarMembroAdministrativoInput) => {
-      const payload: AtualizarUsuarioInput = {
-        nome: data.nome,
-        email: data.email,
-        cpf: data.cpf ? unmask(data.cpf) : undefined,
-        telefone: data.telefone ? unmask(data.telefone) : undefined,
-        empresa_id: empresa?._id,
-        empresa: {
-          nome: empresa?.nome_empresa,
-          cargo: data.cargo,
-        },
-        role: data.role,
-        isAdmin: data.role === "admin",
-      };
-      return await usuarioService.atualizar(data.email, payload);
-    },
-    onSuccess: () => {
-      toast.success("Membro administrativo cadastrado com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["equipe-administrativa"] });
-      setModalNovoOpen(false);
-    },
-    onError: (error: any) => {
-      toast.error(error.friendlyMessage || "Erro ao cadastrar membro da equipe.");
-    },
-  });
-
-  // Mutação para atualizar nível e cargo de um membro
-  const atualizarNivelMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: AtualizarMembroAdministrativoInput }) => {
-      const payload: AtualizarUsuarioInput = {
-        nome: data.nome,
-        cpf: data.cpf ? unmask(data.cpf) : undefined,
-        telefone: data.telefone ? unmask(data.telefone) : undefined,
-        role: data.role,
-        isAdmin: data.role === "admin",
-        empresa: {
-          cargo: data.cargo,
-        },
-      };
-      return await usuarioService.atualizar(id, payload);
-    },
-    onSuccess: () => {
-      toast.success("Nível de acesso e cargo atualizados com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["equipe-administrativa"] });
-      setEditingMembro(null);
-    },
-    onError: (error: any) => {
-      toast.error(error.friendlyMessage || "Erro ao atualizar permissões do membro.");
-    },
-  });
-
-  // Mutação para alterar status (Ativo / Inativo)
-  const alterarStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: "ativo" | "inativo" }) => {
-      return await usuarioService.atualizarStatus(id, status);
-    },
-    onSuccess: (_, variables) => {
-      toast.success(`Usuário ${variables.status === "ativo" ? "ativado" : "inativado"} com sucesso!`);
-      queryClient.invalidateQueries({ queryKey: ["equipe-administrativa"] });
-      setStatusModalMembro(null);
-    },
-    onError: (error: any) => {
-      toast.error(error.friendlyMessage || "Erro ao alterar status do usuário.");
-    },
-  });
+  const totalDocs = filteredTeam.length;
+  const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
+  const displayedTeam = filteredTeam.slice((page - 1) * limite, page * limite);
 
   const handleCreateSubmit = async (data: CriarMembroAdministrativoInput) => {
-    await criarMutation.mutateAsync(data);
+    await cadastrarMembro(data);
+    setModalNovoOpen(false);
   };
 
   const handleEditSubmit = async (data: AtualizarMembroAdministrativoInput) => {
     if (!editingMembro) return;
-    await atualizarNivelMutation.mutateAsync({
+    await atualizarMembro({
       id: editingMembro._id,
       data,
     });
+    setEditingMembro(null);
   };
 
   const handleConfirmStatus = async () => {
     if (!statusModalMembro) return;
-    await alterarStatusMutation.mutateAsync({
+    await alterarStatusMembro({
       id: statusModalMembro.membro._id,
       status: statusModalMembro.nextStatus,
     });
+    setStatusModalMembro(null);
   };
 
   return (
@@ -186,13 +109,22 @@ export default function AdministrativoPage() {
             <Input
               placeholder="Buscar por nome, e-mail, cargo ou CPF..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
               className="pl-9 rounded-xl"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <Select
+              value={roleFilter}
+              onValueChange={(val) => {
+                setRoleFilter(val);
+                setPage(1);
+              }}
+            >
               <SelectTrigger className="w-[140px] rounded-xl">
                 <SelectValue placeholder="Papel" />
               </SelectTrigger>
@@ -203,7 +135,13 @@ export default function AdministrativoPage() {
               </SelectContent>
             </Select>
 
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select
+              value={statusFilter}
+              onValueChange={(val) => {
+                setStatusFilter(val);
+                setPage(1);
+              }}
+            >
               <SelectTrigger className="w-[130px] rounded-xl">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -253,7 +191,7 @@ export default function AdministrativoPage() {
                   </div>
                 </TableCell>
               </TableRow>
-            ) : administrativeTeam.length === 0 ? (
+            ) : filteredTeam.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-xs">
                   <div className="flex flex-col items-center justify-center gap-1">
@@ -264,7 +202,7 @@ export default function AdministrativoPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              administrativeTeam.map((membro) => {
+              displayedTeam.map((membro) => {
                 const isItemAdmin = membro.role === "admin" || membro.isAdmin;
                 const isSelf = membro._id === authUser?.id;
 
@@ -410,7 +348,7 @@ export default function AdministrativoPage() {
         open={modalNovoOpen}
         onOpenChange={setModalNovoOpen}
         onSubmit={handleCreateSubmit}
-        isLoading={criarMutation.isPending}
+        isLoading={isCadastrando}
       />
 
       {/* Modal Modular de Edição de Membro */}
@@ -420,7 +358,7 @@ export default function AdministrativoPage() {
         membro={editingMembro}
         isAdmin={Boolean(isAdmin)}
         onSubmit={handleEditSubmit}
-        isLoading={atualizarNivelMutation.isPending}
+        isLoading={isAtualizando}
       />
 
       {/* Modal de Confirmação de Alteração de Status */}
@@ -440,7 +378,7 @@ export default function AdministrativoPage() {
         confirmText={statusModalMembro?.nextStatus === "inativo" ? "Sim, Inativar" : "Sim, Ativar"}
         cancelText="Cancelar"
         variant={statusModalMembro?.nextStatus === "inativo" ? "destructive" : "default"}
-        isLoading={alterarStatusMutation.isPending}
+        isLoading={isAlterandoStatus}
         onConfirm={handleConfirmStatus}
       />
     </div>

@@ -6,11 +6,12 @@ import {
   AtualizarUsuarioInput, 
   UserStatus, 
   ApiResponse, 
-  PaginatedResult 
+  PaginatedResult,
+  ListarUsuariosParams 
 } from '../types';
 
 export const usuarioService = {
-  async listar(params?: { page?: number; limite?: number; search?: string; role?: string }): Promise<PaginatedResult<Usuario>> {
+  async listar(params?: ListarUsuariosParams): Promise<PaginatedResult<Usuario>> {
     const response = await api.get<ApiResponse<PaginatedResult<Usuario>>>('/usuarios', { params });
     return response.data?.dados || response.data?.data || (response.data as any);
   },
@@ -30,7 +31,7 @@ export const usuarioService = {
     return response.data?.dados || response.data?.data || (response.data as any);
   },
 
-  async uploadFotoPerfil(id: string, file: File): Promise<{ url: string }> {
+  async uploadFoto(id: string, file: File): Promise<{ url: string }> {
     const formData = new FormData();
     formData.append('file', file);
 
@@ -42,7 +43,7 @@ export const usuarioService = {
     return response.data?.dados || response.data?.data || (response.data as any);
   },
 
-  async deletarFotoPerfil(id: string): Promise<void> {
+  async deletarFoto(id: string): Promise<void> {
     await api.delete(`/usuarios/${id}/foto`);
   }
 };

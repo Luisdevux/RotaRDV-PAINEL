@@ -70,3 +70,14 @@ export interface AtualizarUsuarioInput {
   veiculo_id?: string | null;
   status?: UserStatus;
 }
+
+export interface ListarUsuariosParams {
+  page?: number;
+  limite?: number;
+  role?: string;
+  status?: UserStatus | string;
+  empresa_id?: string;
+  cpf?: string;
+  email?: string;
+  nome?: string;
+}

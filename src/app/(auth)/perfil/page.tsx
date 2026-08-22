@@ -106,7 +106,7 @@ export default function PerfilPage() {
     if (file && user?.id) {
       setUploading(true);
       try {
-        await usuarioService.uploadFotoPerfil(user.id, file);
+        await usuarioService.uploadFoto(user.id, file);
         toast.success("Foto de perfil atualizada!");
         await refetch();
         await updateSession();
