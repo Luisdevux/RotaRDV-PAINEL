@@ -47,7 +47,9 @@ export type LocalViagem = string | { cidade: string; estado: string };
 export interface Viagem {
   _id: string;
   usuario_id: UsuarioSnapshot | string;
-  veiculo_id?: string;
+  usuario_snapshot?: UsuarioSnapshot;
+  veiculo_id?: VeiculoSnapshot | string;
+  veiculo_snapshot?: VeiculoSnapshot;
   empresa_id?: string;
   origem: LocalViagem;
   destino: LocalViagem;

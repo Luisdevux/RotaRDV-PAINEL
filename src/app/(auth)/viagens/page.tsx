@@ -60,7 +60,9 @@ export default function ViagensPage() {
     if (!debouncedSearch.trim()) return viagensList;
     const term = debouncedSearch.toLowerCase().trim();
     return viagensList.filter((v) => {
-      const motoristaNome = typeof v.usuario_id === "object" ? v.usuario_id.nome : "";
+      const motoristaNome = typeof v.usuario_id === "object" ? v.usuario_id.nome : (v.usuario_snapshot?.nome || "");
+      const veiculoPlaca = (typeof v.veiculo_id === "object" && v.veiculo_id?.placa) || v.veiculo_snapshot?.placa || v.veiculo?.placa || "";
+      const veiculoModelo = (typeof v.veiculo_id === "object" && v.veiculo_id?.modelo) || v.veiculo_snapshot?.modelo || v.veiculo?.modelo || "";
       const origemStr = formatLocal(v.origem).toLowerCase();
       const destinoStr = formatLocal(v.destino).toLowerCase();
       
@@ -68,7 +70,8 @@ export default function ViagensPage() {
         origemStr.includes(term) ||
         destinoStr.includes(term) ||
         motoristaNome.toLowerCase().includes(term) ||
-        v.veiculo?.placa?.toLowerCase().includes(term)
+        veiculoPlaca.toLowerCase().includes(term) ||
+        veiculoModelo.toLowerCase().includes(term)
       );
     });
   }, [viagensList, debouncedSearch]);
@@ -140,7 +143,6 @@ export default function ViagensPage() {
               <TableHead>Origem & Destino</TableHead>
               <TableHead>Motorista</TableHead>
               <TableHead>Veículo</TableHead>
-              <TableHead>Distância</TableHead>
               <TableHead>Total Despesas</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -149,22 +151,28 @@ export default function ViagensPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-xs">
                   Carregando viagens...
                 </TableCell>
               </TableRow>
             ) : displayedViagens.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-xs">
                   Nenhuma viagem encontrada com os filtros selecionados.
                 </TableCell>
               </TableRow>
             ) : (
               displayedViagens.map((viagem) => {
-                const motoristaNome = typeof viagem.usuario_id === "object" ? viagem.usuario_id.nome : "Motorista";
+                const motoristaNome = typeof viagem.usuario_id === "object" 
+                  ? viagem.usuario_id.nome 
+                  : (viagem.usuario_snapshot?.nome || "Motorista");
+                const motoristaFoto = typeof viagem.usuario_id === "object" 
+                  ? (viagem.usuario_id.foto_perfil || (viagem.usuario_id as any).foto) 
+                  : (viagem.usuario_snapshot?.foto_perfil || (viagem.usuario_snapshot as any)?.foto || "");
+                const veiculoInfo = (typeof viagem.veiculo_id === "object" && viagem.veiculo_id !== null ? (viagem.veiculo_id as any) : null) ||
+                  viagem.veiculo_snapshot ||
+                  viagem.veiculo;
                 const totalDespesas = viagem.resumo_financeiro?.total_geral || 0;
-                const kmPercorrido = viagem.resumo_financeiro?.metricas?.km_percorrido || 
-                  (viagem.km_final ? viagem.km_final - viagem.km_inicial : 0);
 
                 return (
                   <TableRow key={viagem._id} className="hover:bg-muted/40">
@@ -186,7 +194,7 @@ export default function ViagensPage() {
                       <div className="flex items-center gap-2.5">
                         <Avatar className="h-8 w-8 border border-border/80 shadow-sm shrink-0">
                           <AvatarImage 
-                            src={typeof viagem.usuario_id === "object" ? viagem.usuario_id.foto_perfil || (viagem.usuario_id as any).foto : ""} 
+                            src={motoristaFoto} 
                             alt={motoristaNome} 
                             className="object-cover"
                           />
@@ -199,27 +207,20 @@ export default function ViagensPage() {
                     </TableCell>
 
                     <TableCell>
-                      {viagem.veiculo?.placa ? (
+                      {veiculoInfo?.placa ? (
                         <div className="space-y-0.5 text-xs">
                           <span className="font-mono font-bold text-foreground">
-                            {formatPlaca(viagem.veiculo.placa)}
+                            {formatPlaca(veiculoInfo.placa)}
                           </span>
-                          <p className="text-muted-foreground">{viagem.veiculo.modelo}</p>
+                          <p className="text-muted-foreground">{veiculoInfo.modelo}</p>
                         </div>
                       ) : (
                         <span className="text-xs text-muted-foreground italic">-</span>
                       )}
                     </TableCell>
 
-                    <TableCell>
-                      <div className="space-y-0.5 text-xs">
-                        <p className="font-semibold text-foreground">
-                          {formatKM(kmPercorrido)}
-                        </p>
-                        <p className="text-muted-foreground text-[11px]">
-                          KM Inicial: {viagem.km_inicial} {viagem.km_final ? `• Final: ${viagem.km_final}` : ""}
-                        </p>
-                      </div>
+                    <TableCell className="font-bold text-sm text-foreground">
+                      {formatCurrency(totalDespesas)}
                     </TableCell>
 
                     <TableCell>
@@ -234,10 +235,6 @@ export default function ViagensPage() {
                           Concluída
                         </Badge>
                       )}
-                    </TableCell>
-
-                    <TableCell className="font-bold text-sm text-foreground">
-                      {formatCurrency(totalDespesas)}
                     </TableCell>
 
                     <TableCell className="text-right">
@@ -295,6 +292,48 @@ export default function ViagensPage() {
                 )}
               </div>
             </DialogHeader>
+
+            {/* Informações do Condutor e Veículo */}
+            {(() => {
+              const modalMotoristaNome = typeof selectedViagem.usuario_id === "object" 
+                ? selectedViagem.usuario_id.nome 
+                : (selectedViagem.usuario_snapshot?.nome || "Motorista");
+              const modalMotoristaFoto = typeof selectedViagem.usuario_id === "object" 
+                ? (selectedViagem.usuario_id.foto_perfil || (selectedViagem.usuario_id as any).foto) 
+                : (selectedViagem.usuario_snapshot?.foto_perfil || (selectedViagem.usuario_snapshot as any)?.foto || "");
+              const modalVeiculo = (typeof selectedViagem.veiculo_id === "object" && selectedViagem.veiculo_id !== null ? (selectedViagem.veiculo_id as any) : null) ||
+                selectedViagem.veiculo_snapshot ||
+                selectedViagem.veiculo;
+
+              return (
+                <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-muted/40 border border-border/60 text-xs my-1">
+                  <div className="flex items-center gap-2.5">
+                    <Avatar className="h-8 w-8 border border-border/80 shadow-sm">
+                      <AvatarImage src={modalMotoristaFoto} alt={modalMotoristaNome} className="object-cover" />
+                      <AvatarFallback className="text-[10px] font-bold">
+                        {modalMotoristaNome.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <span className="font-bold text-foreground block">{modalMotoristaNome}</span>
+                      <span className="text-muted-foreground text-[11px]">Condutor Responsável</span>
+                    </div>
+                  </div>
+
+                  {modalVeiculo?.placa && (
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shrink-0">
+                        <Truck className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <span className="font-mono font-bold text-foreground block">{formatPlaca(modalVeiculo.placa)}</span>
+                        <span className="text-muted-foreground text-[11px]">{modalVeiculo.modelo}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Resumo Financeiro & Métricas */}
             <div className="grid grid-cols-3 gap-3 my-2">
