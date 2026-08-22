@@ -30,7 +30,7 @@ export function useEquipeAdministrativa(options?: UseEquipeAdministrativaOptions
   const equipeQuery = useQuery({
     queryKey: ["equipe-administrativa", empresa?._id, roleFilter, statusFilter],
     queryFn: async () => {
-      const roleParam = roleFilter === "todos" ? "admin,gestor" : roleFilter;
+      const roleParam = roleFilter === "todos" ? undefined : roleFilter;
       const statusParam = statusFilter !== "todos" ? statusFilter : undefined;
       const empresaIdParam = !isAdmin && empresa?._id ? empresa._id : undefined;
 
