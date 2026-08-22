@@ -128,7 +128,7 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
             
             {(!collapsed || isMobile) && <span>{item.name}</span>}
 
-            {isActive && (
+            {isActive && collapsed && !isMobile && (
               <div className="absolute right-2 h-2 w-2 rounded-full bg-sidebar-primary" />
             )}
           </Link>
