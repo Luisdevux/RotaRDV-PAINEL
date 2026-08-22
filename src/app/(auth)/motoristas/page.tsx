@@ -2,8 +2,8 @@
 
 "use client";
 
-import React, { useState } from "react";
-import { useMotoristas } from "@/hooks/useMotoristas";
+import React, { useState, useMemo } from "react";
+import { useMotoristas, useDebounce } from "@/hooks";
 import { useVeiculos } from "@/hooks/useVeiculos";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -20,11 +20,11 @@ import {
   Search, 
   Truck, 
   Trash2, 
-  Edit3,
+  Edit3, 
   Mail, 
   Phone, 
   CheckCircle2, 
-  XCircle,
+  XCircle, 
   Loader2 
 } from "lucide-react";
 import { Usuario, CriarMotoristaInput, AtualizarUsuarioInput, Veiculo } from "@/types";
@@ -33,6 +33,7 @@ import { MotoristaEditModal } from "./components/MotoristaEditModal";
 
 export default function MotoristasPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 300);
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
 
@@ -53,25 +54,29 @@ export default function MotoristasPage() {
     isAlterandoStatus,
     desvincularMotorista, 
     isDesvinculando 
-  } = useMotoristas(undefined, { page, limite });
+  } = useMotoristas(undefined, { limite: 100 });
   
   const { data: veiculosData } = useVeiculos({ limite: 100 });
 
   const motoristasList: Usuario[] = motoristasData?.docs || motoristasData?.items || (Array.isArray(motoristasData) ? motoristasData : []);
-  const totalDocs = motoristasData?.totalDocs ?? motoristasData?.total ?? motoristasList.length;
-  const totalPages = motoristasData?.totalPages ?? motoristasData?.paginas ?? Math.max(1, Math.ceil(totalDocs / limite));
-
   const veiculosList: Veiculo[] = veiculosData?.docs || veiculosData?.items || (Array.isArray(veiculosData) ? veiculosData : []);
 
-  const filteredMotoristas = motoristasList.filter((m) => {
-    const term = searchTerm.toLowerCase();
-    const cleanSearch = unmask(searchTerm);
-    return (
-      m.nome?.toLowerCase().includes(term) ||
-      m.email?.toLowerCase().includes(term) ||
-      (m.cpf && (m.cpf.includes(cleanSearch) || m.cpf.toLowerCase().includes(term)))
-    );
-  });
+  const filteredMotoristas = useMemo(() => {
+    if (!debouncedSearch.trim()) return motoristasList;
+    const term = debouncedSearch.toLowerCase().trim();
+    const cleanSearch = unmask(debouncedSearch);
+    return motoristasList.filter((m) => {
+      return (
+        m.nome?.toLowerCase().includes(term) ||
+        m.email?.toLowerCase().includes(term) ||
+        (m.cpf && (m.cpf.includes(cleanSearch) || m.cpf.toLowerCase().includes(term)))
+      );
+    });
+  }, [motoristasList, debouncedSearch]);
+
+  const totalDocs = filteredMotoristas.length;
+  const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
+  const displayedMotoristas = filteredMotoristas.slice((page - 1) * limite, page * limite);
 
   const handleCreateSubmit = async (data: CriarMotoristaInput) => {
     await cadastrarMotorista(data);
@@ -111,7 +116,10 @@ export default function MotoristasPage() {
           <Input
             placeholder="Buscar por nome, e-mail ou CPF..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1);
+            }}
             className="pl-9 rounded-xl"
           />
         </div>
@@ -150,7 +158,7 @@ export default function MotoristasPage() {
                   </div>
                 </TableCell>
               </TableRow>
-            ) : filteredMotoristas.length === 0 ? (
+            ) : displayedMotoristas.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-xs">
                   <div className="flex flex-col items-center justify-center gap-1">
@@ -161,7 +169,7 @@ export default function MotoristasPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredMotoristas.map((motorista) => {
+              displayedMotoristas.map((motorista) => {
                 const veiculoInfo = typeof motorista.veiculo_id === "object" ? motorista.veiculo_id : veiculosList.find((v) => v._id === motorista.veiculo_id);
 
                 return (

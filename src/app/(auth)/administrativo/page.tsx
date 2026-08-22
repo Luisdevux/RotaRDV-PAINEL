@@ -2,9 +2,8 @@
 
 "use client";
 
-import React, { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useEquipeAdministrativa } from "@/hooks/useEquipeAdministrativa";
+import React, { useState, useMemo } from "react";
+import { useAuth, useEquipeAdministrativa, useDebounce } from "@/hooks";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +36,7 @@ export default function AdministrativoPage() {
   const { user: authUser, isAdmin } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 300);
   const [roleFilter, setRoleFilter] = useState<string>("todos");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [page, setPage] = useState(1);
@@ -59,18 +59,20 @@ export default function AdministrativoPage() {
     isAlterandoStatus,
   } = useEquipeAdministrativa({ roleFilter, statusFilter });
 
-  // Busca rápida e instantânea no frontend para poupar requisições ao backend
-  const filteredTeam = membros.filter((m) => {
-    if (!searchTerm.trim()) return true;
-    const term = searchTerm.toLowerCase();
-    const cleanSearch = unmask(searchTerm);
-    return (
-      m.nome?.toLowerCase().includes(term) ||
-      m.email?.toLowerCase().includes(term) ||
-      (m.cpf && m.cpf.includes(cleanSearch)) ||
-      (m.empresa?.cargo && m.empresa.cargo.toLowerCase().includes(term))
-    );
-  });
+  // Busca rápida, otimizada com debounce e useMemo no frontend
+  const filteredTeam = useMemo(() => {
+    if (!debouncedSearch.trim()) return membros;
+    const term = debouncedSearch.toLowerCase().trim();
+    const cleanSearch = unmask(debouncedSearch);
+    return membros.filter((m) => {
+      return (
+        m.nome?.toLowerCase().includes(term) ||
+        m.email?.toLowerCase().includes(term) ||
+        (m.cpf && m.cpf.includes(cleanSearch)) ||
+        (m.empresa?.cargo && m.empresa.cargo.toLowerCase().includes(term))
+      );
+    });
+  }, [membros, debouncedSearch]);
 
   const totalDocs = filteredTeam.length;
   const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
@@ -202,7 +204,7 @@ export default function AdministrativoPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              displayedTeam.map((membro) => {
+              displayedTeam.map((membro: Usuario) => {
                 const isItemAdmin = membro.role === "admin" || membro.isAdmin;
                 const isSelf = membro._id === authUser?.id;
 

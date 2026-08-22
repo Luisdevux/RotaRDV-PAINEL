@@ -2,9 +2,9 @@
 
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { useDespesas } from "@/hooks/useDespesas";
+import { useDespesas, useDebounce } from "@/hooks";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,7 @@ function DespesasContent() {
   const viagemIdFromUrl = searchParams.get("viagem_id") || undefined;
 
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 300);
   const [tipoFilter, setTipoFilter] = useState<string>("todas");
   const [comprovanteDespesa, setComprovanteDespesa] = useState<Despesa | null>(null);
   const [comprovanteOpen, setComprovanteOpen] = useState(false);
@@ -50,24 +51,28 @@ function DespesasContent() {
   const [limite, setLimite] = useState(10);
 
   const { data: despesasData, isLoading, deletarDespesa, isDeletando } = useDespesas({
-    page,
-    limite,
+    limite: 100,
     viagem_id: viagemIdFromUrl,
     tipo: tipoFilter !== "todas" ? tipoFilter : undefined,
   });
 
   const despesasList: Despesa[] = despesasData?.docs || despesasData?.items || (Array.isArray(despesasData) ? despesasData : []);
-  const totalDocs = despesasData?.totalDocs ?? despesasData?.total ?? despesasData?.count ?? despesasList.length;
-  const totalPages = despesasData?.totalPages ?? despesasData?.paginas ?? Math.max(1, Math.ceil(totalDocs / limite));
 
-  const filteredDespesas = despesasList.filter((d) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      d.local?.toLowerCase().includes(term) ||
-      d.descricao?.toLowerCase().includes(term) ||
-      d.tipo?.toLowerCase().includes(term)
-    );
-  });
+  const filteredDespesas = useMemo(() => {
+    if (!debouncedSearch.trim()) return despesasList;
+    const term = debouncedSearch.toLowerCase().trim();
+    return despesasList.filter((d) => {
+      return (
+        d.local?.toLowerCase().includes(term) ||
+        d.descricao?.toLowerCase().includes(term) ||
+        d.tipo?.toLowerCase().includes(term)
+      );
+    });
+  }, [despesasList, debouncedSearch]);
+
+  const totalDocs = filteredDespesas.length;
+  const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
+  const displayedDespesas = filteredDespesas.slice((page - 1) * limite, page * limite);
 
   const openComprovante = (despesa: Despesa) => {
     setComprovanteDespesa(despesa);
@@ -83,7 +88,10 @@ function DespesasContent() {
           <Input
             placeholder="Buscar por posto, local ou descrição..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1);
+            }}
             className="pl-9 rounded-xl"
           />
         </div>
@@ -94,7 +102,10 @@ function DespesasContent() {
             variant={tipoFilter === "todas" ? "default" : "ghost"}
             size="sm"
             className="rounded-lg text-xs font-semibold"
-            onClick={() => setTipoFilter("todas")}
+            onClick={() => {
+              setTipoFilter("todas");
+              setPage(1);
+            }}
           >
             Todas
           </Button>
@@ -102,7 +113,10 @@ function DespesasContent() {
             variant={tipoFilter === "ABASTECIMENTO" ? "default" : "ghost"}
             size="sm"
             className="rounded-lg text-xs font-semibold"
-            onClick={() => setTipoFilter("ABASTECIMENTO")}
+            onClick={() => {
+              setTipoFilter("ABASTECIMENTO");
+              setPage(1);
+            }}
           >
             Abastecimentos
           </Button>
@@ -110,7 +124,10 @@ function DespesasContent() {
             variant={tipoFilter === "ALIMENTACAO" ? "default" : "ghost"}
             size="sm"
             className="rounded-lg text-xs font-semibold"
-            onClick={() => setTipoFilter("ALIMENTACAO")}
+            onClick={() => {
+              setTipoFilter("ALIMENTACAO");
+              setPage(1);
+            }}
           >
             Alimentação
           </Button>
@@ -118,7 +135,10 @@ function DespesasContent() {
             variant={tipoFilter === "PEDAGIO" ? "default" : "ghost"}
             size="sm"
             className="rounded-lg text-xs font-semibold"
-            onClick={() => setTipoFilter("PEDAGIO")}
+            onClick={() => {
+              setTipoFilter("PEDAGIO");
+              setPage(1);
+            }}
           >
             Pedágio
           </Button>
@@ -126,7 +146,10 @@ function DespesasContent() {
             variant={tipoFilter === "MANUTENCAO" ? "default" : "ghost"}
             size="sm"
             className="rounded-lg text-xs font-semibold"
-            onClick={() => setTipoFilter("MANUTENCAO")}
+            onClick={() => {
+              setTipoFilter("MANUTENCAO");
+              setPage(1);
+            }}
           >
             Manutenção
           </Button>
@@ -153,14 +176,14 @@ function DespesasContent() {
                   Carregando despesas...
                 </TableCell>
               </TableRow>
-            ) : filteredDespesas.length === 0 ? (
+            ) : displayedDespesas.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-xs">
                   Nenhuma despesa encontrada com os filtros selecionados.
                 </TableCell>
               </TableRow>
             ) : (
-              filteredDespesas.map((despesa) => {
+              displayedDespesas.map((despesa) => {
                 const Icon = CATEGORY_ICONS[despesa.tipo] || ReceiptText;
 
                 return (

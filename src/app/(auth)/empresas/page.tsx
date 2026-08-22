@@ -2,9 +2,10 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { SafeImage } from "@/components/ui/safe-image";
 import { useEmpresasAdmin } from "@/hooks/useEmpresa";
+import { useDebounce } from "@/hooks";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,25 +27,31 @@ import { Empresa } from "@/types";
 
 export default function EmpresasAdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 300);
   const [statusModalEmpresa, setStatusModalEmpresa] = useState<{ empresa: Empresa; nextStatus: "ativo" | "inativo" } | null>(null);
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
 
-  const { data: empresasData, isLoading, alterarStatus, isAlterandoStatus } = useEmpresasAdmin({ page, limite });
+  const { data: empresasData, isLoading, alterarStatus, isAlterandoStatus } = useEmpresasAdmin({ limite: 100 });
 
   const empresasList: Empresa[] = empresasData?.docs || empresasData?.items || (Array.isArray(empresasData) ? empresasData : []);
-  const totalDocs = empresasData?.totalDocs ?? empresasData?.total ?? empresasData?.count ?? empresasList.length;
-  const totalPages = empresasData?.totalPages ?? empresasData?.paginas ?? Math.max(1, Math.ceil(totalDocs / limite));
 
-  const filteredEmpresas = empresasList.filter((e) => {
-    const term = searchTerm.toLowerCase();
-    const cleanSearch = unmask(searchTerm).toUpperCase();
-    return (
-      e.nome_empresa?.toLowerCase().includes(term) ||
-      (e.cnpj && (e.cnpj.toLowerCase().includes(term) || e.cnpj.includes(cleanSearch))) ||
-      e.email?.toLowerCase().includes(term)
-    );
-  });
+  const filteredEmpresas = useMemo(() => {
+    if (!debouncedSearch.trim()) return empresasList;
+    const term = debouncedSearch.toLowerCase().trim();
+    const cleanSearch = unmask(debouncedSearch).toUpperCase();
+    return empresasList.filter((e) => {
+      return (
+        e.nome_empresa?.toLowerCase().includes(term) ||
+        (e.cnpj && (e.cnpj.toLowerCase().includes(term) || e.cnpj.includes(cleanSearch))) ||
+        e.email?.toLowerCase().includes(term)
+      );
+    });
+  }, [empresasList, debouncedSearch]);
+
+  const totalDocs = filteredEmpresas.length;
+  const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
+  const displayedEmpresas = filteredEmpresas.slice((page - 1) * limite, page * limite);
 
   const handleConfirmStatus = async () => {
     if (!statusModalEmpresa) return;
@@ -64,7 +71,10 @@ export default function EmpresasAdminPage() {
           <Input
             placeholder="Buscar transportadora por razão social, CNPJ ou e-mail..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1);
+            }}
             className="pl-9 rounded-xl"
           />
         </div>
@@ -90,14 +100,14 @@ export default function EmpresasAdminPage() {
                   Carregando transportadoras...
                 </TableCell>
               </TableRow>
-            ) : filteredEmpresas.length === 0 ? (
+            ) : displayedEmpresas.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-xs">
                   Nenhuma transportadora encontrada.
                 </TableCell>
               </TableRow>
             ) : (
-              filteredEmpresas.map((empresa) => (
+              displayedEmpresas.map((empresa) => (
                 <TableRow key={empresa._id} className="hover:bg-muted/40">
                   <TableCell>
                     <div className="flex items-center gap-3">

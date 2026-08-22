@@ -2,8 +2,8 @@
 
 "use client";
 
-import React, { useState } from "react";
-import { useViagens } from "@/hooks/useViagens";
+import React, { useState, useMemo } from "react";
+import { useViagens, useDebounce } from "@/hooks";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,34 +43,39 @@ import Link from "next/link";
 
 export default function ViagensPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 300);
   const [statusFilter, setStatusFilter] = useState<string>("todas");
   const [selectedViagem, setSelectedViagem] = useState<Viagem | null>(null);
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
 
   const { data: viagensData, isLoading } = useViagens({
-    page,
-    limite,
+    limite: 100,
     status: statusFilter !== "todas" ? statusFilter : undefined,
   });
 
   const viagensList: Viagem[] = viagensData?.docs || viagensData?.items || (Array.isArray(viagensData) ? viagensData : []);
-  const totalDocs = viagensData?.totalDocs ?? viagensData?.total ?? viagensData?.count ?? viagensList.length;
-  const totalPages = viagensData?.totalPages ?? viagensData?.paginas ?? Math.max(1, Math.ceil(totalDocs / limite));
 
-  const filteredViagens = viagensList.filter((v) => {
-    const term = searchTerm.toLowerCase();
-    const motoristaNome = typeof v.usuario_id === "object" ? v.usuario_id.nome : "";
-    const origemStr = formatLocal(v.origem).toLowerCase();
-    const destinoStr = formatLocal(v.destino).toLowerCase();
-    
-    return (
-      origemStr.includes(term) ||
-      destinoStr.includes(term) ||
-      motoristaNome.toLowerCase().includes(term) ||
-      v.veiculo?.placa?.toLowerCase().includes(term)
-    );
-  });
+  const filteredViagens = useMemo(() => {
+    if (!debouncedSearch.trim()) return viagensList;
+    const term = debouncedSearch.toLowerCase().trim();
+    return viagensList.filter((v) => {
+      const motoristaNome = typeof v.usuario_id === "object" ? v.usuario_id.nome : "";
+      const origemStr = formatLocal(v.origem).toLowerCase();
+      const destinoStr = formatLocal(v.destino).toLowerCase();
+      
+      return (
+        origemStr.includes(term) ||
+        destinoStr.includes(term) ||
+        motoristaNome.toLowerCase().includes(term) ||
+        v.veiculo?.placa?.toLowerCase().includes(term)
+      );
+    });
+  }, [viagensList, debouncedSearch]);
+
+  const totalDocs = filteredViagens.length;
+  const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
+  const displayedViagens = filteredViagens.slice((page - 1) * limite, page * limite);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -81,7 +86,10 @@ export default function ViagensPage() {
           <Input
             placeholder="Buscar por origem, destino, motorista ou placa..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1);
+            }}
             className="pl-9 rounded-xl"
           />
         </div>
@@ -92,7 +100,10 @@ export default function ViagensPage() {
             variant={statusFilter === "todas" ? "default" : "ghost"}
             size="sm"
             className="rounded-lg text-xs font-semibold"
-            onClick={() => setStatusFilter("todas")}
+            onClick={() => {
+              setStatusFilter("todas");
+              setPage(1);
+            }}
           >
             Todas
           </Button>
@@ -100,7 +111,10 @@ export default function ViagensPage() {
             variant={statusFilter === "em_andamento" ? "default" : "ghost"}
             size="sm"
             className="rounded-lg text-xs font-semibold"
-            onClick={() => setStatusFilter("em_andamento")}
+            onClick={() => {
+              setStatusFilter("em_andamento");
+              setPage(1);
+            }}
           >
             Em Andamento
           </Button>
@@ -108,7 +122,10 @@ export default function ViagensPage() {
             variant={statusFilter === "concluída" ? "default" : "ghost"}
             size="sm"
             className="rounded-lg text-xs font-semibold"
-            onClick={() => setStatusFilter("concluída")}
+            onClick={() => {
+              setStatusFilter("concluída");
+              setPage(1);
+            }}
           >
             Concluídas
           </Button>
@@ -120,13 +137,13 @@ export default function ViagensPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Rota (Origem → Destino)</TableHead>
+              <TableHead>Origem & Destino</TableHead>
               <TableHead>Motorista</TableHead>
               <TableHead>Veículo</TableHead>
-              <TableHead>Odômetro & Distância</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Distância</TableHead>
               <TableHead>Total Despesas</TableHead>
-              <TableHead className="text-right">Auditoria</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -136,14 +153,14 @@ export default function ViagensPage() {
                   Carregando viagens...
                 </TableCell>
               </TableRow>
-            ) : filteredViagens.length === 0 ? (
+            ) : displayedViagens.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-xs">
                   Nenhuma viagem encontrada com os filtros selecionados.
                 </TableCell>
               </TableRow>
             ) : (
-              filteredViagens.map((viagem) => {
+              displayedViagens.map((viagem) => {
                 const motoristaNome = typeof viagem.usuario_id === "object" ? viagem.usuario_id.nome : "Motorista";
                 const totalDespesas = viagem.resumo_financeiro?.total_geral || 0;
                 const kmPercorrido = viagem.resumo_financeiro?.metricas?.km_percorrido || 

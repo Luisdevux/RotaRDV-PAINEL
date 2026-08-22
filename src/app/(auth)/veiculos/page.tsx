@@ -2,8 +2,8 @@
 
 "use client";
 
-import React, { useState } from "react";
-import { useVeiculos } from "@/hooks/useVeiculos";
+import React, { useState, useMemo } from "react";
+import { useVeiculos, useDebounce } from "@/hooks";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +22,7 @@ import {
   Fuel, 
   Layers, 
   CheckCircle2, 
-  XCircle,
+  XCircle, 
   Loader2 
 } from "lucide-react";
 import { Veiculo, CriarVeiculoInput, AtualizarVeiculoInput } from "@/types";
@@ -30,6 +30,7 @@ import { VeiculoFormModal } from "./components/VeiculoFormModal";
 
 export default function VeiculosPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 300);
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
 
@@ -50,25 +51,30 @@ export default function VeiculosPage() {
     isAlterandoStatus,
     deletarVeiculo, 
     isDeletando 
-  } = useVeiculos({ page, limite });
+  } = useVeiculos({ limite: 100 });
 
   const veiculosList: Veiculo[] = veiculosData?.docs || veiculosData?.items || (Array.isArray(veiculosData) ? veiculosData : []);
-  const totalDocs = veiculosData?.totalDocs ?? veiculosData?.total ?? veiculosList.length;
-  const totalPages = veiculosData?.totalPages ?? veiculosData?.paginas ?? Math.max(1, Math.ceil(totalDocs / limite));
 
-  const filteredVeiculos = veiculosList.filter((v) => {
-    const term = searchTerm.toLowerCase();
-    const cleanSearch = unmask(searchTerm).toUpperCase();
-    const matchPlacasReboque = v.reboque?.placas?.some(p => p.toLowerCase().includes(term) || p.includes(cleanSearch));
-    const matchPlacaReboque = v.reboque?.placa && (v.reboque.placa.toLowerCase().includes(term) || v.reboque.placa.includes(cleanSearch));
-    return (
-      v.modelo?.toLowerCase().includes(term) ||
-      (v.placa && (v.placa.toLowerCase().includes(term) || v.placa.includes(cleanSearch))) ||
-      (v.reboque?.modelo && v.reboque.modelo.toLowerCase().includes(term)) ||
-      matchPlacasReboque ||
-      matchPlacaReboque
-    );
-  });
+  const filteredVeiculos = useMemo(() => {
+    if (!debouncedSearch.trim()) return veiculosList;
+    const term = debouncedSearch.toLowerCase().trim();
+    const cleanSearch = unmask(debouncedSearch).toUpperCase();
+    return veiculosList.filter((v) => {
+      const matchPlacasReboque = v.reboque?.placas?.some(p => p.toLowerCase().includes(term) || p.includes(cleanSearch));
+      const matchPlacaReboque = v.reboque?.placa && (v.reboque.placa.toLowerCase().includes(term) || v.reboque.placa.includes(cleanSearch));
+      return (
+        v.modelo?.toLowerCase().includes(term) ||
+        (v.placa && (v.placa.toLowerCase().includes(term) || v.placa.includes(cleanSearch))) ||
+        (v.reboque?.modelo && v.reboque.modelo.toLowerCase().includes(term)) ||
+        matchPlacasReboque ||
+        matchPlacaReboque
+      );
+    });
+  }, [veiculosList, debouncedSearch]);
+
+  const totalDocs = filteredVeiculos.length;
+  const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
+  const displayedVeiculos = filteredVeiculos.slice((page - 1) * limite, page * limite);
 
   const handleCreateSubmit = async (data: CriarVeiculoInput | AtualizarVeiculoInput) => {
     await criarVeiculo(data as CriarVeiculoInput);
@@ -108,7 +114,10 @@ export default function VeiculosPage() {
           <Input
             placeholder="Buscar por placa, modelo ou carreta..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1);
+            }}
             className="pl-9 rounded-xl"
           />
         </div>
@@ -123,7 +132,7 @@ export default function VeiculosPage() {
         </Button>
       </div>
 
-      {/* Tabela de Veículos */}
+      {/* Veículos Table */}
       <Card className="rounded-2xl border-border/80 shadow-sm overflow-hidden bg-card">
         <Table>
           <TableHeader>
@@ -146,7 +155,7 @@ export default function VeiculosPage() {
                   </div>
                 </TableCell>
               </TableRow>
-            ) : filteredVeiculos.length === 0 ? (
+            ) : displayedVeiculos.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="h-32 text-center text-muted-foreground text-xs">
                   <div className="flex flex-col items-center justify-center gap-1">
@@ -157,7 +166,7 @@ export default function VeiculosPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredVeiculos.map((veiculo) => {
+              displayedVeiculos.map((veiculo) => {
                 const reboquePlacas = veiculo.reboque?.placas || (veiculo.reboque?.placa ? [veiculo.reboque.placa] : []);
 
                 return (
