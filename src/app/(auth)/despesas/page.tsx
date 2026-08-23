@@ -5,15 +5,18 @@
 import React, { useState, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDespesas, useDebounce } from "@/hooks";
+import { useActiveEmpresa } from "@/providers/ActiveEmpresaProvider";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ComprovanteModal } from "@/components/ComprovanteModal";
+import { ExportarRelatorioModal } from "./components/ExportarRelatorioModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { formatCurrency, formatDateTime } from "@/lib/formatters";
+import { toast } from "sonner";
 import { 
   ReceiptText, 
   Search, 
@@ -30,7 +33,8 @@ import {
   X,
   RotateCcw,
   Sparkles,
-  Route
+  Route,
+  FileDown
 } from "lucide-react";
 import { Despesa, TipoDespesa } from "@/types";
 
@@ -47,6 +51,8 @@ function DespesasContent() {
   const searchParams = useSearchParams();
   const viagemIdFromUrl = searchParams.get("viagem_id") || undefined;
 
+  const { empresa } = useActiveEmpresa();
+
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
   const [tipoFilter, setTipoFilter] = useState<string>("todas");
@@ -54,6 +60,7 @@ function DespesasContent() {
   const [dataFim, setDataFim] = useState<string>("");
   const [comprovanteDespesa, setComprovanteDespesa] = useState<Despesa | null>(null);
   const [comprovanteOpen, setComprovanteOpen] = useState(false);
+  const [exportarModalOpen, setExportarModalOpen] = useState(false);
   const [deletingDespesa, setDeletingDespesa] = useState<Despesa | null>(null);
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
@@ -304,18 +311,31 @@ function DespesasContent() {
             </div>
           </div>
 
-          {/* Botão Limpar Filtros */}
-          {hasActiveFilters && (
+          {/* Ações: Limpar Filtros & Exportar PDF */}
+          <div className="flex items-center gap-2">
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 text-xs text-muted-foreground hover:text-foreground gap-1.5 rounded-xl"
+                onClick={limparTodosFiltros}
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Limpar Filtros
+              </Button>
+            )}
+
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1.5 rounded-lg"
-              onClick={limparTodosFiltros}
+              className="h-8 text-xs font-semibold gap-1.5 rounded-xl border-border/80 shadow-xs hover:bg-muted"
+              onClick={() => setExportarModalOpen(true)}
+              title="Configurar e exportar relatório consolidado em PDF"
             >
-              <RotateCcw className="h-3 w-3" />
-              Limpar Filtros
+              <FileDown className="h-3.5 w-3.5 text-primary" />
+              Exportar Relatório PDF
             </Button>
-          )}
+          </div>
         </div>
       </Card>
 
@@ -446,6 +466,16 @@ function DespesasContent() {
         despesa={comprovanteDespesa}
         open={comprovanteOpen}
         onOpenChange={setComprovanteOpen}
+      />
+
+      {/* Modal Interativo de Exportação de Relatório PDF */}
+      <ExportarRelatorioModal
+        open={exportarModalOpen}
+        onOpenChange={setExportarModalOpen}
+        empresa={empresa}
+        initialDataInicio={dataInicio}
+        initialDataFim={dataFim}
+        initialCategoria={tipoFilter}
       />
 
       {/* Modal de Confirmação de Exclusão de Despesa */}

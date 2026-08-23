@@ -40,12 +40,19 @@ import {
   RotateCcw, 
   X, 
   XCircle,
-  Ban
+  Ban,
+  FileDown,
+  Loader2
 } from "lucide-react";
-import { Viagem } from "@/types";
+import { Viagem, Despesa } from "@/types";
+import { useActiveEmpresa } from "@/providers/ActiveEmpresaProvider";
+import { gerarRelatorioViagemPDF } from "@/lib/pdfGenerator";
+import { despesaService } from "@/services/despesaService";
+import { toast } from "sonner";
 import Link from "next/link";
 
 export default function ViagensPage() {
+  const { empresa } = useActiveEmpresa();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
   const [statusFilter, setStatusFilter] = useState<string>("todas");
@@ -56,6 +63,30 @@ export default function ViagensPage() {
   const [motivoCancelamento, setMotivoCancelamento] = useState("");
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+  const handleExportarViagemPDF = async () => {
+    if (!selectedViagem) return;
+    try {
+      setIsExportingPdf(true);
+      const resDespesas = await despesaService.listar({
+        viagem_id: selectedViagem._id,
+        limite: 100,
+      });
+      const despesasViagem: Despesa[] = resDespesas?.docs || resDespesas?.items || (Array.isArray(resDespesas) ? resDespesas : []);
+      
+      gerarRelatorioViagemPDF({
+        empresa,
+        viagem: selectedViagem,
+        despesas: despesasViagem,
+      });
+      toast.success("Relatório de Prestação de Contas (RDV) gerado com sucesso!");
+    } catch {
+      toast.error("Erro ao gerar RDV da viagem em PDF.");
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
 
   // Carrega as viagens da empresa no período auditado (até 100 por período)
   const { data: viagensData, isLoading, cancelarViagem, isCancelando } = useViagens({
@@ -417,7 +448,7 @@ export default function ViagensPage() {
       {/* Modal de Detalhes da Viagem & Resumo Financeiro */}
       {selectedViagem && (
         <Dialog open={Boolean(selectedViagem)} onOpenChange={(open) => !open && setSelectedViagem(null)}>
-          <DialogContent className="max-w-2xl p-6">
+          <DialogContent className="max-w-2xl sm:max-w-3xl p-6">
             <DialogHeader>
               <div className="flex items-center justify-between pr-6">
                 <div>
@@ -570,18 +601,42 @@ export default function ViagensPage() {
               </div>
             )}
 
-            <DialogFooter className="mt-4 flex flex-wrap items-center justify-between gap-2">
-              <Button asChild variant="outline" className="gap-2">
-                <Link href={`/despesas?viagem_id=${selectedViagem._id}`}>
-                  <ReceiptText className="h-4 w-4 text-primary" />
-                  Ver Comprovantes desta Viagem
-                </Link>
-              </Button>
-              <div className="flex items-center gap-2">
+            <div className="mt-6 pt-4 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+              {/* Lado Esquerdo: 2 botões de consulta e auditoria */}
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <Button 
+                  asChild 
+                  variant="outline" 
+                  className="h-10 px-4 rounded-xl gap-2 font-semibold text-xs border-border/80 shadow-xs hover:bg-muted shrink-0"
+                >
+                  <Link href={`/despesas?viagem_id=${selectedViagem._id}`}>
+                    <ReceiptText className="h-4 w-4 text-primary" />
+                    <span>Ver Comprovantes</span>
+                  </Link>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="h-10 px-4 rounded-xl gap-2 font-semibold text-xs border-border/80 shadow-xs hover:bg-muted shrink-0"
+                  onClick={handleExportarViagemPDF}
+                  disabled={isExportingPdf}
+                  title="Emitir folha de prestação de contas (RDV) em PDF"
+                >
+                  {isExportingPdf ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  ) : (
+                    <FileDown className="h-4 w-4 text-primary" />
+                  )}
+                  <span>Emitir RDV (PDF)</span>
+                </Button>
+              </div>
+
+              {/* Lado Direito: 2 botões de fechamento e cancelamento */}
+              <div className="flex items-center justify-end gap-3 w-full sm:w-auto">
                 {selectedViagem.status === "em_andamento" && (
                   <Button
                     variant="destructive"
-                    className="gap-1.5 font-semibold"
+                    className="h-10 px-4 rounded-xl gap-2 font-semibold text-xs shadow-xs shrink-0"
                     onClick={() => {
                       setCancelingViagem(selectedViagem);
                       setMotivoCancelamento("");
@@ -591,11 +646,15 @@ export default function ViagensPage() {
                     Cancelar Viagem
                   </Button>
                 )}
-                <Button variant="default" onClick={() => setSelectedViagem(null)}>
+                <Button 
+                  variant="default" 
+                  className="h-10 px-6 rounded-xl font-bold text-xs shadow-xs shrink-0" 
+                  onClick={() => setSelectedViagem(null)}
+                >
                   Fechar
                 </Button>
               </div>
-            </DialogFooter>
+            </div>
           </DialogContent>
         </Dialog>
       )}
