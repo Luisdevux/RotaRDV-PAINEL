@@ -76,10 +76,7 @@ export function MotoristaEditModal({
 
   const handleFormSubmit = async (data: EditMotoristaFormValues) => {
     await onSubmit({
-      nome: data.nome,
-      cpf: data.cpf ? unmask(data.cpf) : undefined,
-      cnh: data.cnh ? unmask(data.cnh) : undefined,
-      telefone: data.telefone ? unmask(data.telefone) : undefined,
+      ...data,
       veiculo_id: editVeiculoId === "nenhum" ? null : editVeiculoId || undefined,
     });
   };

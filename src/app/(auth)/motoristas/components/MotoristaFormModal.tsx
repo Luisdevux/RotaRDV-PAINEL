@@ -63,12 +63,7 @@ export function MotoristaFormModal({
 
   const handleFormSubmit = async (data: MotoristaFormValues) => {
     await onSubmit({
-      nome: data.nome,
-      email: data.email,
-      senha: data.senha || undefined,
-      cpf: data.cpf ? unmask(data.cpf) : undefined,
-      cnh: data.cnh ? unmask(data.cnh) : undefined,
-      telefone: data.telefone ? unmask(data.telefone) : undefined,
+      ...data,
       cargo: "Motorista Rodoviário",
       veiculo_id: selectedVeiculoId === "nenhum" ? undefined : selectedVeiculoId,
     });
