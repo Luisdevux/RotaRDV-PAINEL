@@ -225,6 +225,17 @@ function DespesasContent() {
             >
               Manutenção
             </Button>
+            <Button
+              variant={tipoFilter === "OUTROS" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-lg text-xs font-semibold h-8"
+              onClick={() => {
+                setTipoFilter("OUTROS");
+                setPage(1);
+              }}
+            >
+              Outros
+            </Button>
           </div>
         </div>
 
