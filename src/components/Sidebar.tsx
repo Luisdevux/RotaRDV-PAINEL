@@ -19,6 +19,7 @@ import {
   ChevronRight,
   ShieldCheck, 
   Building,
+  Briefcase,
   X
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -82,6 +83,13 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
       name: "Dados da Empresa",
       href: "/empresa/configuracoes",
       icon: Building,
+      roles: ["admin", "gestor"],
+      empresaOnly: true,
+    },
+    {
+      name: "Equipe Administrativa",
+      href: "/administrativo",
+      icon: Briefcase,
       roles: ["admin", "gestor"],
       empresaOnly: true,
     },

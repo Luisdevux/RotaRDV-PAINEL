@@ -32,15 +32,7 @@ import { Usuario, CriarMembroAdministrativoInput, AtualizarMembroAdministrativoI
 import { MembroNovoModal } from "./components/MembroNovoModal";
 import { MembroEditModal } from "./components/MembroEditModal";
 
-import { useRouter } from "next/navigation";
-
 export default function AdministrativoPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace("/empresa/configuracoes?tab=equipe");
-  }, [router]);
-
   const { user: authUser, isAdmin } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -266,12 +258,12 @@ export default function AdministrativoPage() {
 
                     <TableCell>
                       {isItemAdmin ? (
-                        <Badge variant="destructive" className="gap-1 shadow-sm font-semibold">
+                        <Badge variant="outline" className="gap-1 font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30">
                           <ShieldCheck className="h-3.5 w-3.5" />
                           Administrador
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="gap-1 border-primary/40 text-primary font-semibold">
+                        <Badge variant="outline" className="gap-1 font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30">
                           <Shield className="h-3.5 w-3.5" />
                           Gestor
                         </Badge>

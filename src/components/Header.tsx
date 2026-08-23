@@ -28,6 +28,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/viagens": { title: "Controle de Viagens", subtitle: "Auditoria de rotas, odômetro inicial/final e status" },
   "/despesas": { title: "Despesas & Comprovantes", subtitle: "Auditoria financeira, abastecimentos e fotos de notas" },
   "/empresas": { title: "Transportadoras Globais", subtitle: "Administração de empresas clientes da plataforma" },
+  "/administrativo": { title: "Equipe Administrativa", subtitle: "Gestão de administradores e gestores da transportadora" },
   "/empresa/configuracoes": { title: "Dados da Transportadora", subtitle: "CNPJ, endereços e logotipo corporativo" },
   "/perfil": { title: "Meu Perfil", subtitle: "Informações pessoais e credenciais de acesso" },
 };
