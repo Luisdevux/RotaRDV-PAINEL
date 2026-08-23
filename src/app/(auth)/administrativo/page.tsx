@@ -34,7 +34,8 @@ import { MembroNovoModal } from "./components/MembroNovoModal";
 import { MembroEditModal } from "./components/MembroEditModal";
 
 export default function AdministrativoPage() {
-  const { user: authUser, isAdmin } = useAuth();
+  const { user: authUser, isSuperAdmin } = useAuth();
+  const canManageTeam = Boolean((authUser?.role === "admin" || authUser?.isAdmin) && !isSuperAdmin);
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
@@ -157,7 +158,7 @@ export default function AdministrativoPage() {
           </div>
         </div>
 
-        {isAdmin && (
+        {canManageTeam && (
           <Button 
             variant="default" 
             onClick={() => setModalNovoOpen(true)}
@@ -169,10 +170,14 @@ export default function AdministrativoPage() {
         )}
       </div>
 
-      {!isAdmin && (
+      {!canManageTeam && (
         <div className="flex items-center gap-2 p-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-muted-foreground">
           <Info className="h-4 w-4 text-primary shrink-0" />
-          <span>Você está em modo de visualização. Apenas Administradores podem adicionar novos membros, alterar cargos ou inativar acessos.</span>
+          <span>
+            {isSuperAdmin
+              ? "Modo de auditoria global. Apenas os Administradores internos da própria empresa podem adicionar novos membros, alterar cargos ou inativar acessos."
+              : "Você está em modo de visualização. Apenas Administradores internos da empresa podem adicionar novos membros, alterar cargos ou inativar acessos."}
+          </span>
         </div>
       )}
 
@@ -187,14 +192,14 @@ export default function AdministrativoPage() {
               <TableHead className="font-bold">Cargo</TableHead>
               <TableHead className="font-bold">Nível de Acesso</TableHead>
               <TableHead className="font-bold">Status</TableHead>
-              {isAdmin && <TableHead className="font-bold text-right">Ações</TableHead>}
+              {canManageTeam && <TableHead className="font-bold text-right">Ações</TableHead>}
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 7 : 6} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={canManageTeam ? 7 : 6} className="h-32 text-center text-muted-foreground text-xs">
                   <div className="flex items-center justify-center gap-2">
                     <Loader2 className="h-5 w-5 animate-spin text-primary" />
                     <span>Carregando equipe administrativa...</span>
@@ -203,7 +208,7 @@ export default function AdministrativoPage() {
               </TableRow>
             ) : filteredTeam.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 7 : 6} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={canManageTeam ? 7 : 6} className="h-32 text-center text-muted-foreground text-xs">
                   <div className="flex flex-col items-center justify-center gap-1">
                     <ShieldCheck className="h-8 w-8 text-muted-foreground/50 mb-1" />
                     <p className="font-medium">Nenhum membro administrativo encontrado.</p>
@@ -302,7 +307,7 @@ export default function AdministrativoPage() {
                       )}
                     </TableCell>
 
-                    {isAdmin && (
+                    {canManageTeam && (
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           {/* Botão de Ativação / Inativação no padrão visual de empresas */}
@@ -384,7 +389,7 @@ export default function AdministrativoPage() {
         open={Boolean(editingMembro)}
         onOpenChange={(open) => !open && setEditingMembro(null)}
         membro={editingMembro}
-        isAdmin={Boolean(isAdmin)}
+        isAdmin={canManageTeam}
         onSubmit={handleEditSubmit}
         isLoading={isAtualizando}
       />

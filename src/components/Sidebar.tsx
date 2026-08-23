@@ -90,8 +90,7 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
       name: "Equipe Administrativa",
       href: "/administrativo",
       icon: Briefcase,
-      roles: ["admin", "gestor"],
-      empresaOnly: true,
+      roles: ["superAdmin", "admin", "gestor"],
     },
     {
       name: "Meu Perfil",
