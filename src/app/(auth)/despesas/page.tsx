@@ -4,7 +4,7 @@
 
 import React, { useState, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useDespesas, useDebounce } from "@/hooks";
+import { useDespesas, useViagens, useDebounce } from "@/hooks";
 import { useActiveEmpresa } from "@/providers/ActiveEmpresaProvider";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { ComprovanteModal } from "@/components/ComprovanteModal";
 import { ExportarRelatorioModal } from "./components/ExportarRelatorioModal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { PaginationControls } from "@/components/ui/pagination-controls";
-import { formatCurrency, formatDateTime } from "@/lib/formatters";
+import { formatCurrency, formatDateTime, formatPlaca } from "@/lib/formatters";
 import { toast } from "sonner";
 import { 
   ReceiptText, 
@@ -34,9 +34,11 @@ import {
   RotateCcw,
   Sparkles,
   Route,
-  FileDown
+  FileDown,
+  User,
+  Truck
 } from "lucide-react";
-import { Despesa, TipoDespesa } from "@/types";
+import { Despesa, TipoDespesa, Viagem } from "@/types";
 
 const CATEGORY_ICONS: Record<string, any> = {
   ABASTECIMENTO: Fuel,
@@ -65,6 +67,19 @@ function DespesasContent() {
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
 
+  // Carrega viagens para cruzar metadados de motorista e caminhão
+  const { data: viagensData } = useViagens({ limite: 100 });
+  const viagensList: Viagem[] = viagensData?.docs || viagensData?.items || (Array.isArray(viagensData) ? viagensData : []);
+
+  // Mapeamento rápido Viagem ID -> Objeto Viagem
+  const viagemMap = useMemo(() => {
+    const map = new Map<string, Viagem>();
+    viagensList.forEach((v) => {
+      if (v._id) map.set(v._id, v);
+    });
+    return map;
+  }, [viagensList]);
+
   // Carrega as despesas do período auditado no backend (até 100 registros por período)
   const { data: despesasData, isLoading, deletarDespesa, isDeletando } = useDespesas({
     limite: 100,
@@ -76,20 +91,31 @@ function DespesasContent() {
 
   const despesasList: Despesa[] = despesasData?.docs || despesasData?.items || (Array.isArray(despesasData) ? despesasData : []);
 
-  // Busca textual instantânea sobre todo o período carregado
+  // Busca textual inteligente (posto, cidade, descrição, nome do motorista, placa)
   const filteredDespesas = useMemo(() => {
     if (!debouncedSearch.trim()) return despesasList;
     const term = debouncedSearch.toLowerCase().trim();
     return despesasList.filter((d) => {
+      const v = viagemMap.get(d.viagem_id);
+      const motoristaNome = typeof v?.usuario_id === "object" 
+        ? v.usuario_id.nome 
+        : (v?.usuario_snapshot?.nome || "");
+      const veic = typeof v?.veiculo_id === "object" && v.veiculo_id !== null 
+        ? (v.veiculo_id as any) 
+        : (v?.veiculo_snapshot || (v as any)?.veiculo);
+      const placa = veic?.placa || "";
+
       return (
         d.local?.toLowerCase().includes(term) ||
         d.descricao?.toLowerCase().includes(term) ||
         d.tipo?.toLowerCase().includes(term) ||
         d.oficina_nome?.toLowerCase().includes(term) ||
-        d.praca_nome?.toLowerCase().includes(term)
+        d.praca_nome?.toLowerCase().includes(term) ||
+        motoristaNome.toLowerCase().includes(term) ||
+        placa.toLowerCase().includes(term)
       );
     });
-  }, [despesasList, debouncedSearch]);
+  }, [despesasList, debouncedSearch, viagemMap]);
 
   const totalDocs = filteredDespesas.length;
   const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
@@ -346,6 +372,7 @@ function DespesasContent() {
             <TableRow>
               <TableHead>Categoria</TableHead>
               <TableHead>Local / Estabelecimento</TableHead>
+              <TableHead>Motorista & Veículo</TableHead>
               <TableHead>Data & Hora</TableHead>
               <TableHead>Valor Total</TableHead>
               <TableHead>Comprovante Fiscal</TableHead>
@@ -355,19 +382,27 @@ function DespesasContent() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-xs">
                   Carregando despesas...
                 </TableCell>
               </TableRow>
             ) : displayedDespesas.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-xs">
                   Nenhuma despesa encontrada com os filtros selecionados.
                 </TableCell>
               </TableRow>
             ) : (
               displayedDespesas.map((despesa) => {
                 const Icon = CATEGORY_ICONS[despesa.tipo] || ReceiptText;
+                const v = viagemMap.get(despesa.viagem_id);
+                const motoristaNome = typeof v?.usuario_id === "object" 
+                  ? v.usuario_id.nome 
+                  : (v?.usuario_snapshot?.nome || "");
+                const veic = typeof v?.veiculo_id === "object" && v.veiculo_id !== null 
+                  ? (v.veiculo_id as any) 
+                  : (v?.veiculo_snapshot || (v as any)?.veiculo);
+                const placa = veic?.placa ? formatPlaca(veic.placa) : "";
 
                 return (
                   <TableRow key={despesa._id} className="hover:bg-muted/40">
@@ -394,6 +429,23 @@ function DespesasContent() {
                         )}
                         {despesa.descricao && (
                           <p className="text-muted-foreground truncate max-w-xs">{despesa.descricao}</p>
+                        )}
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="space-y-0.5 text-xs">
+                        <div className="font-semibold text-foreground flex items-center gap-1.5">
+                          <User className="h-3.5 w-3.5 text-primary shrink-0" />
+                          <span>{motoristaNome || "Motorista não informado"}</span>
+                        </div>
+                        {placa ? (
+                          <div className="text-[11px] text-muted-foreground flex items-center gap-1 font-mono">
+                            <Truck className="h-3 w-3 text-muted-foreground/80 shrink-0" />
+                            <span>{placa} {veic?.modelo ? `• ${veic.modelo}` : ""}</span>
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-muted-foreground italic">-</span>
                         )}
                       </div>
                     </TableCell>
