@@ -3,15 +3,16 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useVeiculos, useDebounce } from "@/hooks";
+import { useVeiculos, useMotoristas, useDebounce } from "@/hooks";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { PaginationControls } from "@/components/ui/pagination-controls";
-import { formatPlaca } from "@/lib/formatters";
+import { formatPlaca, formatCPF } from "@/lib/formatters";
 import { unmask } from "@/lib/masks";
 import { 
   Truck, 
@@ -23,9 +24,10 @@ import {
   Layers, 
   CheckCircle2, 
   XCircle, 
-  Loader2 
+  Loader2,
+  User
 } from "lucide-react";
-import { Veiculo, CriarVeiculoInput, AtualizarVeiculoInput } from "@/types";
+import { Veiculo, Usuario, CriarVeiculoInput, AtualizarVeiculoInput } from "@/types";
 import { VeiculoFormModal } from "./components/VeiculoFormModal";
 
 export default function VeiculosPage() {
@@ -53,7 +55,10 @@ export default function VeiculosPage() {
     isDeletando 
   } = useVeiculos({ limite: 100 });
 
+  const { data: motoristasData } = useMotoristas(undefined, { limite: 100 });
+
   const veiculosList: Veiculo[] = veiculosData?.docs || veiculosData?.items || (Array.isArray(veiculosData) ? veiculosData : []);
+  const motoristasList: Usuario[] = motoristasData?.docs || motoristasData?.items || (Array.isArray(motoristasData) ? motoristasData : []);
 
   const filteredVeiculos = useMemo(() => {
     if (!debouncedSearch.trim()) return veiculosList;
@@ -62,15 +67,21 @@ export default function VeiculosPage() {
     return veiculosList.filter((v) => {
       const matchPlacasReboque = v.reboque?.placas?.some(p => p.toLowerCase().includes(term) || p.includes(cleanSearch));
       const matchPlacaReboque = v.reboque?.placa && (v.reboque.placa.toLowerCase().includes(term) || v.reboque.placa.includes(cleanSearch));
+      const motorista = motoristasList.find((m) => {
+        const vId = typeof m.veiculo_id === "object" ? m.veiculo_id?._id : m.veiculo_id;
+        return String(vId) === String(v._id);
+      });
+
       return (
         v.modelo?.toLowerCase().includes(term) ||
         (v.placa && (v.placa.toLowerCase().includes(term) || v.placa.includes(cleanSearch))) ||
         (v.reboque?.modelo && v.reboque.modelo.toLowerCase().includes(term)) ||
+        (motorista?.nome && motorista.nome.toLowerCase().includes(term)) ||
         matchPlacasReboque ||
         matchPlacaReboque
       );
     });
-  }, [veiculosList, debouncedSearch]);
+  }, [veiculosList, motoristasList, debouncedSearch]);
 
   const totalDocs = filteredVeiculos.length;
   const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
@@ -138,6 +149,7 @@ export default function VeiculosPage() {
           <TableHeader>
             <TableRow className="bg-muted/30">
               <TableHead className="font-bold">Cavalo Mecânico</TableHead>
+              <TableHead className="font-bold">Motorista Vinculado</TableHead>
               <TableHead className="font-bold">Combustível / Tanque</TableHead>
               <TableHead className="font-bold">Implemento / Carretas</TableHead>
               <TableHead className="font-bold">Status</TableHead>
@@ -148,7 +160,7 @@ export default function VeiculosPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-xs">
                   <div className="flex items-center justify-center gap-2">
                     <Loader2 className="h-5 w-5 animate-spin text-primary" />
                     <span>Carregando frota de veículos...</span>
@@ -157,7 +169,7 @@ export default function VeiculosPage() {
               </TableRow>
             ) : displayedVeiculos.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-xs">
                   <div className="flex flex-col items-center justify-center gap-1">
                     <Truck className="h-8 w-8 text-muted-foreground/50 mb-1" />
                     <p className="font-medium">Nenhum veículo encontrado na frota.</p>
@@ -168,6 +180,10 @@ export default function VeiculosPage() {
             ) : (
               displayedVeiculos.map((veiculo) => {
                 const reboquePlacas = veiculo.reboque?.placas || (veiculo.reboque?.placa ? [veiculo.reboque.placa] : []);
+                const motoristaDoVeiculo = motoristasList.find((m) => {
+                  const vId = typeof m.veiculo_id === "object" ? m.veiculo_id?._id : m.veiculo_id;
+                  return String(vId) === String(veiculo._id);
+                });
 
                 return (
                   <TableRow key={veiculo._id} className="hover:bg-muted/40 transition-colors">
@@ -190,6 +206,31 @@ export default function VeiculosPage() {
                           <p className="text-xs text-muted-foreground">{veiculo.modelo}</p>
                         </div>
                       </div>
+                    </TableCell>
+
+                    <TableCell>
+                      {motoristaDoVeiculo ? (
+                        <div className="flex items-center gap-2.5">
+                          <Avatar className="h-8 w-8 border border-border/80 shadow-xs shrink-0">
+                            <AvatarImage src={motoristaDoVeiculo.foto_perfil || ""} alt={motoristaDoVeiculo.nome} className="object-cover" />
+                            <AvatarFallback className="bg-primary/10 text-primary font-bold text-[10px]">
+                              {motoristaDoVeiculo.nome ? motoristaDoVeiculo.nome.slice(0, 2).toUpperCase() : "MO"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="space-y-0.5 text-xs">
+                            <p className="font-bold text-foreground leading-tight">
+                              {motoristaDoVeiculo.nome}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground font-mono">
+                              {formatCPF(motoristaDoVeiculo.cpf) || motoristaDoVeiculo.email}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <Badge variant="outline" className="text-xs text-muted-foreground border-dashed bg-muted/20 font-medium">
+                          Disponível / Sem Motorista
+                        </Badge>
+                      )}
                     </TableCell>
 
                     <TableCell>

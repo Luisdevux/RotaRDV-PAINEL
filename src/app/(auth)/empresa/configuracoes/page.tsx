@@ -194,32 +194,45 @@ function EmpresaConfiguracoesContent() {
 
             <div className="space-y-2 text-center sm:text-left flex-1">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                <label className="cursor-pointer">
-                  <Input
-                    type="file"
-                    accept="image/png, image/jpeg, image/jpg"
-                    className="hidden"
-                    onChange={handleLogoUpload}
-                    disabled={isUploadingFoto || !canEditCompany}
-                  />
+                {canEditCompany ? (
+                  <label className="cursor-pointer">
+                    <Input
+                      type="file"
+                      accept="image/png, image/jpeg, image/jpg"
+                      className="hidden"
+                      onChange={handleLogoUpload}
+                      disabled={isUploadingFoto}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="rounded-xl gap-1.5 text-xs font-semibold"
+                      disabled={isUploadingFoto}
+                      asChild
+                    >
+                      <span>
+                        {isUploadingFoto ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <UploadCloud className="h-3.5 w-3.5" />
+                        )}
+                        Alterar Logotipo
+                      </span>
+                    </Button>
+                  </label>
+                ) : (
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     className="rounded-xl gap-1.5 text-xs font-semibold"
-                    disabled={isUploadingFoto || !canEditCompany}
-                    asChild
+                    disabled
                   >
-                    <span>
-                      {isUploadingFoto ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <UploadCloud className="h-3.5 w-3.5" />
-                      )}
-                      Alterar Logotipo
-                    </span>
+                    <UploadCloud className="h-3.5 w-3.5" />
+                    Alterar Logotipo
                   </Button>
-                </label>
+                )}
 
                 {empresa?.foto_logo && (
                   <Button

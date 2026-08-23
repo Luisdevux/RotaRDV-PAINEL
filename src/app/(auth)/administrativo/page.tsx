@@ -26,7 +26,8 @@ import {
   Phone, 
   Loader2, 
   UserPlus, 
-  Briefcase 
+  Briefcase,
+  Info 
 } from "lucide-react";
 import { Usuario, CriarMembroAdministrativoInput, AtualizarMembroAdministrativoInput } from "@/types";
 import { MembroNovoModal } from "./components/MembroNovoModal";
@@ -168,6 +169,13 @@ export default function AdministrativoPage() {
         )}
       </div>
 
+      {!isAdmin && (
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-muted-foreground">
+          <Info className="h-4 w-4 text-primary shrink-0" />
+          <span>Você está em modo de visualização. Apenas Administradores podem adicionar novos membros, alterar cargos ou inativar acessos.</span>
+        </div>
+      )}
+
       {/* Tabela de Membros Administrativos */}
       <Card className="border border-border/80 bg-card rounded-2xl shadow-sm overflow-hidden">
         <Table>
@@ -179,14 +187,14 @@ export default function AdministrativoPage() {
               <TableHead className="font-bold">Cargo</TableHead>
               <TableHead className="font-bold">Nível de Acesso</TableHead>
               <TableHead className="font-bold">Status</TableHead>
-              <TableHead className="font-bold text-right">Ações</TableHead>
+              {isAdmin && <TableHead className="font-bold text-right">Ações</TableHead>}
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={isAdmin ? 7 : 6} className="h-32 text-center text-muted-foreground text-xs">
                   <div className="flex items-center justify-center gap-2">
                     <Loader2 className="h-5 w-5 animate-spin text-primary" />
                     <span>Carregando equipe administrativa...</span>
@@ -195,11 +203,11 @@ export default function AdministrativoPage() {
               </TableRow>
             ) : filteredTeam.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={isAdmin ? 7 : 6} className="h-32 text-center text-muted-foreground text-xs">
                   <div className="flex flex-col items-center justify-center gap-1">
                     <ShieldCheck className="h-8 w-8 text-muted-foreground/50 mb-1" />
                     <p className="font-medium">Nenhum membro administrativo encontrado.</p>
-                    <p className="text-xs">Utilize o botão acima para registrar gestores e administradores.</p>
+                    <p className="text-xs">Utilize os filtros acima para refinar a listagem de membros.</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -218,52 +226,64 @@ export default function AdministrativoPage() {
                             {membro.nome ? membro.nome.slice(0, 2).toUpperCase() : "AD"}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <p className="font-bold text-foreground text-sm leading-tight">{membro.nome}</p>
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-xs text-foreground">
+                              {membro.nome}
+                            </span>
                             {isSelf && (
-                              <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">Você</Badge>
+                              <Badge variant="outline" className="text-[10px] h-4 px-1 border-primary/40 text-primary">
+                                Você
+                              </Badge>
                             )}
                           </div>
-                          <p className="text-xs text-muted-foreground">{membro.empresa?.cargo || (isItemAdmin ? "Administrador" : "Gestor")}</p>
+                          <span className="text-[11px] text-muted-foreground block">
+                            Adicionado à empresa
+                          </span>
                         </div>
                       </div>
                     </TableCell>
 
                     <TableCell>
-                      <div className="space-y-0.5 text-xs">
-                        <p className="flex items-center gap-1.5 text-foreground font-medium">
+                      <div className="space-y-1 text-xs">
+                        <div className="flex items-center gap-1.5 text-foreground font-medium">
                           <Mail className="h-3.5 w-3.5 text-muted-foreground" />
-                          {membro.email}
-                        </p>
+                          <span>{membro.email}</span>
+                        </div>
                         {membro.telefone && (
-                          <p className="flex items-center gap-1.5 text-muted-foreground font-mono">
+                          <div className="flex items-center gap-1.5 text-muted-foreground text-[11px]">
                             <Phone className="h-3.5 w-3.5" />
-                            {formatTelefone(membro.telefone)}
-                          </p>
+                            <span>{formatTelefone(membro.telefone)}</span>
+                          </div>
                         )}
                       </div>
                     </TableCell>
 
-                    <TableCell className="font-mono text-xs text-foreground font-medium">
-                      {formatCPF(membro.cpf)}
+                    <TableCell className="font-mono text-xs text-muted-foreground">
+                      {formatCPF(membro.cpf) || "—"}
                     </TableCell>
 
                     <TableCell>
-                      <div className="flex items-center gap-1.5 text-xs text-foreground">
+                      <div className="flex items-center gap-1.5 text-xs text-foreground font-semibold">
                         <Briefcase className="h-3.5 w-3.5 text-primary" />
-                        <span>{membro.empresa?.cargo || (isItemAdmin ? "Diretoria / Admin" : "Gestão")}</span>
+                        <span>{membro.empresa?.cargo || (isItemAdmin ? "Administrador Geral" : "Gestor de Frota")}</span>
                       </div>
                     </TableCell>
 
                     <TableCell>
                       {isItemAdmin ? (
-                        <Badge variant="outline" className="gap-1 font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30">
+                        <Badge 
+                          variant="outline" 
+                          className="rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30 font-bold gap-1 text-[11px]"
+                        >
                           <ShieldCheck className="h-3.5 w-3.5" />
                           Administrador
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="gap-1 font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30">
+                        <Badge 
+                          variant="outline" 
+                          className="rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 font-bold gap-1 text-[11px]"
+                        >
                           <Shield className="h-3.5 w-3.5" />
                           Gestor
                         </Badge>
@@ -272,57 +292,63 @@ export default function AdministrativoPage() {
 
                     <TableCell>
                       {membro.status === "ativo" ? (
-                        <Badge variant="success">Ativo</Badge>
+                        <Badge variant="success" className="gap-1 h-5 text-[10px]">
+                          Ativo
+                        </Badge>
                       ) : (
-                        <Badge variant="destructive">Inativo</Badge>
+                        <Badge variant="destructive" className="gap-1 h-5 text-[10px]">
+                          Inativo
+                        </Badge>
                       )}
                     </TableCell>
 
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        {/* Botão de Ativação / Inativação no padrão visual de empresas */}
-                        {!isSelf && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className={`rounded-xl text-xs font-semibold gap-1.5 ${
-                              membro.status === "ativo"
-                                ? "text-destructive hover:bg-destructive/10 border-destructive/30"
-                                : "text-success hover:bg-success/10 border-success/30"
-                            }`}
-                            onClick={() =>
-                              setStatusModalMembro({
-                                membro,
-                                nextStatus: membro.status === "ativo" ? "inativo" : "ativo",
-                              })
-                            }
-                          >
-                            {membro.status === "ativo" ? (
-                              <>
-                                <XCircle className="h-3.5 w-3.5" />
-                                Inativar
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle2 className="h-3.5 w-3.5" />
-                                Ativar
-                              </>
-                            )}
-                          </Button>
-                        )}
+                    {isAdmin && (
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {/* Botão de Ativação / Inativação no padrão visual de empresas */}
+                          {!isSelf && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`rounded-xl text-xs font-semibold gap-1.5 ${
+                                membro.status === "ativo"
+                                  ? "text-destructive hover:bg-destructive/10 border-destructive/30"
+                                  : "text-success hover:bg-success/10 border-success/30"
+                              }`}
+                              onClick={() =>
+                                setStatusModalMembro({
+                                  membro,
+                                  nextStatus: membro.status === "ativo" ? "inativo" : "ativo",
+                                })
+                              }
+                            >
+                              {membro.status === "ativo" ? (
+                                <>
+                                  <XCircle className="h-3.5 w-3.5" />
+                                  Inativar
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle2 className="h-3.5 w-3.5" />
+                                  Ativar
+                                </>
+                              )}
+                            </Button>
+                          )}
 
-                        {/* Botão de Editar Nível / Cargo */}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-xl"
-                          onClick={() => setEditingMembro(membro)}
-                          title="Alterar cargo e permissões"
-                        >
-                          <Edit3 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+                          {/* Botão de Editar Nível / Cargo */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-xl"
+                            onClick={() => setEditingMembro(membro)}
+                            title="Alterar cargo e permissões"
+                          >
+                            <Edit3 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })

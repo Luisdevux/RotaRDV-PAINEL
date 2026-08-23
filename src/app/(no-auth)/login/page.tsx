@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { SafeImage } from "@/components/ui/safe-image";
-import { Lock, Mail, ArrowRight, Loader2 } from "lucide-react";
+import { Lock, Mail, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react";
 
 const LOGO_URL = process.env.NEXT_PUBLIC_APP_LOGO_URL || "https://rota-rdv.web.fslab.dev/7c4bb021-7946-44b4-acc2-cdb9c29aadc2.jpeg";
 
@@ -32,6 +32,7 @@ function LoginFormContent() {
   const authError = dismissedError ? null : searchParams.get("error");
 
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -127,11 +128,24 @@ function LoginFormContent() {
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="senha"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                className="pl-9 rounded-xl"
+                className="pl-9 pr-10 rounded-xl"
                 {...register("senha")}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                tabIndex={-1}
+                title={showPassword ? "Ocultar senha" : "Ver senha"}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
             </div>
             {errors.senha && (
               <p className="text-xs text-destructive">{errors.senha.message}</p>

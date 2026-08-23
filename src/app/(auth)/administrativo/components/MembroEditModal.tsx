@@ -147,17 +147,45 @@ export function MembroEditModal({
                 <SelectTrigger className="rounded-xl bg-background">
                   <SelectValue placeholder="Selecione o papel" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gestor">Gestor (Frota, motoristas e viagens da transportadora)</SelectItem>
-                  <SelectItem value="admin">Administrador (Controle irrestrito, governança e promoção de cargos)</SelectItem>
-                  <SelectItem value="motorista">Motorista (Acesso restrito ao aplicativo)</SelectItem>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="gestor">
+                    <span className="font-semibold">Gestor</span>
+                    <span className="text-muted-foreground ml-1.5 text-xs font-normal">
+                      • Frota, motoristas e viagens
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="admin">
+                    <span className="font-semibold">Administrador</span>
+                    <span className="text-muted-foreground ml-1.5 text-xs font-normal">
+                      • Controle total e governança
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="motorista">
+                    <span className="font-semibold">Motorista</span>
+                    <span className="text-muted-foreground ml-1.5 text-xs font-normal">
+                      • Acesso restrito ao aplicativo
+                    </span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-[11px] text-muted-foreground">
-                {selectedRole === "admin" 
-                  ? "Permite gerenciar outros gestores, promover cargos e ter controle total do sistema." 
-                  : "Permite gerenciar motoristas, viagens e despesas da sua empresa."}
-              </p>
+
+              <div className="text-[11px] text-muted-foreground bg-background/80 rounded-lg p-2 border border-border/40 leading-relaxed">
+                {selectedRole === "admin" && (
+                  <span>
+                    👑 <strong>Administrador:</strong> Acesso irrestrito ao sistema, governança, criação de novos gestores e promoção de cargos.
+                  </span>
+                )}
+                {selectedRole === "gestor" && (
+                  <span>
+                    🚛 <strong>Gestor:</strong> Permite gerenciar motoristas, veículos, viagens e auditoria de despesas da sua empresa.
+                  </span>
+                )}
+                {selectedRole === "motorista" && (
+                  <span>
+                    📱 <strong>Motorista:</strong> Acesso restrito ao aplicativo móvel para lançamento de despesas e rotas de viagens.
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
