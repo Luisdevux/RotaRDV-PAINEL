@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useAuth, useEquipeAdministrativa, useDebounce } from "@/hooks";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,15 @@ import { Usuario, CriarMembroAdministrativoInput, AtualizarMembroAdministrativoI
 import { MembroNovoModal } from "./components/MembroNovoModal";
 import { MembroEditModal } from "./components/MembroEditModal";
 
+import { useRouter } from "next/navigation";
+
 export default function AdministrativoPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/empresa/configuracoes?tab=equipe");
+  }, [router]);
+
   const { user: authUser, isAdmin } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState("");

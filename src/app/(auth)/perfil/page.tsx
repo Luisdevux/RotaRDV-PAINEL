@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { maskCPF, maskTelefone, unmask } from "@/lib/masks";
+import { maskCPF, maskCNH, maskTelefone, unmask } from "@/lib/masks";
 import { 
   User, 
   UploadCloud, 
@@ -28,6 +28,7 @@ const perfilSchema = z.object({
   nome: z.string().min(2, "Nome é obrigatório"),
   telefone: z.string().optional(),
   cpf: z.string().optional(),
+  cnh: z.string().optional(),
   cargo: z.string().optional(),
 });
 
@@ -59,6 +60,7 @@ export default function PerfilPage() {
       nome: "",
       telefone: "",
       cpf: "",
+      cnh: "",
       cargo: "",
     },
   });
@@ -70,6 +72,7 @@ export default function PerfilPage() {
         nome: usuarioData.nome || user?.name || "",
         telefone: maskTelefone(usuarioData.telefone || user?.telefone || ""),
         cpf: maskCPF(usuarioData.cpf || user?.cpf || ""),
+        cnh: maskCNH(usuarioData.cnh || (user as any)?.cnh || ""),
         cargo: usuarioData.role || user?.role || "",
       });
     } else if (user) {
@@ -77,6 +80,7 @@ export default function PerfilPage() {
         nome: user.name || "",
         telefone: maskTelefone(user.telefone || ""),
         cpf: maskCPF(user.cpf || ""),
+        cnh: maskCNH((user as any)?.cnh || ""),
         cargo: user.role || "",
       });
     }
@@ -86,12 +90,14 @@ export default function PerfilPage() {
     if (!user?.id) return;
     try {
       const cleanCpf = data.cpf ? unmask(data.cpf) : undefined;
+      const cleanCnh = data.cnh ? unmask(data.cnh) : undefined;
       const cleanTelefone = data.telefone ? unmask(data.telefone) : undefined;
 
       await usuarioService.atualizar(user.id, {
         nome: data.nome,
         telefone: cleanTelefone,
         cpf: cleanCpf,
+        cnh: cleanCnh,
       });
       toast.success("Perfil atualizado com sucesso!");
       await refetch();
@@ -120,6 +126,58 @@ export default function PerfilPage() {
 
   const fotoPerfilAtual = usuarioData?.foto_perfil || user?.image || "";
 
+  const renderRoleBadge = () => {
+    const role = usuarioData?.role || user?.role;
+    switch (role) {
+      case "superAdmin":
+        return (
+          <Badge variant="destructive" className="rounded-md bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 font-bold px-2.5 py-1 text-xs">
+            Super Administrador
+          </Badge>
+        );
+      case "admin":
+        return (
+          <Badge variant="outline" className="rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30 font-bold px-2.5 py-1 text-xs">
+            Administrador
+          </Badge>
+        );
+      case "gestor":
+        return (
+          <Badge variant="outline" className="rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 font-bold px-2.5 py-1 text-xs">
+            Gestor
+          </Badge>
+        );
+      case "motorista":
+        return (
+          <Badge variant="outline" className="rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-bold px-2.5 py-1 text-xs">
+            Motorista
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline" className="rounded-md text-muted-foreground border-border capitalize px-2.5 py-1 text-xs">
+            {role || "Usuário"}
+          </Badge>
+        );
+    }
+  };
+
+  const getCargoLabel = () => {
+    const role = usuarioData?.role || user?.role;
+    switch (role) {
+      case "superAdmin":
+        return "Super Administrador (Global)";
+      case "admin":
+        return "Administrador Geral da Empresa";
+      case "gestor":
+        return "Gestor de Frotas";
+      case "motorista":
+        return "Motorista";
+      default:
+        return "Usuário";
+    }
+  };
+
   return (
     <div className="max-w-3xl space-y-6 animate-fade-in">
       <Card className="rounded-2xl border-border/80 shadow-sm">
@@ -134,13 +192,7 @@ export default function PerfilPage() {
                 Seus dados cadastrais e foto de perfil na plataforma RotaRDV.
               </CardDescription>
             </div>
-            {isAdmin ? (
-              <Badge variant="destructive">Super Administrador</Badge>
-            ) : (
-              <Badge variant="outline" className="text-primary border-primary/30 capitalize">
-                {user?.role || "Gestor"}
-              </Badge>
-            )}
+            {renderRoleBadge()}
           </div>
         </CardHeader>
 
@@ -215,7 +267,7 @@ export default function PerfilPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="cpf">CPF</Label>
                 <Input 
@@ -229,6 +281,21 @@ export default function PerfilPage() {
                 />
               </div>
 
+              <div className="space-y-1.5">
+                <Label htmlFor="cnh">CNH (Habilitação)</Label>
+                <Input 
+                  id="cnh" 
+                  placeholder="00000000000" 
+                  className="rounded-xl" 
+                  maxLength={11}
+                  {...register("cnh", {
+                    onChange: (e) => setValue("cnh", maskCNH(e.target.value)),
+                  })} 
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="telefone">Telefone</Label>
                 <Input 
@@ -246,9 +313,9 @@ export default function PerfilPage() {
                 <Label htmlFor="cargo">Cargo / Função (Não editável)</Label>
                 <Input
                   id="cargo"
-                  value={user?.role ? user.role.toUpperCase() : "GESTOR"}
+                  value={getCargoLabel()}
                   disabled
-                  className="rounded-xl opacity-70 bg-muted uppercase"
+                  className="rounded-xl opacity-70 bg-muted font-medium"
                 />
               </div>
             </div>

@@ -1,6 +1,7 @@
 // src/types/next-auth.d.ts
 
 import { DefaultSession } from "next-auth";
+import { UserRole } from "./usuario";
 
 declare module "next-auth" {
   interface Session {
@@ -9,7 +10,7 @@ declare module "next-auth" {
     error?: string;
     user: {
       id: string;
-      role?: "admin" | "gestor" | "motorista";
+      role?: UserRole;
       empresa_id?: string;
       isAdmin?: boolean;
       cpf?: string;
@@ -19,7 +20,7 @@ declare module "next-auth" {
 
   interface User {
     id: string;
-    role?: "admin" | "gestor" | "motorista";
+    role?: UserRole;
     empresa_id?: string;
     isAdmin?: boolean;
     cpf?: string;
@@ -32,7 +33,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     id?: string;
-    role?: "admin" | "gestor" | "motorista";
+    role?: UserRole;
     empresa_id?: string;
     isAdmin?: boolean;
     cpf?: string;

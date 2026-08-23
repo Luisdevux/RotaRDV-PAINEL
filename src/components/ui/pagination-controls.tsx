@@ -21,10 +21,15 @@ import {
 interface PaginationControlsProps {
   currentPage: number;
   totalPages: number;
-  totalItems: number;
-  itemsPerPage: number;
+  totalItems?: number;
+  totalDocs?: number; // Alias para totalItems
+  itemsPerPage?: number;
+  limite?: number; // Alias para itemsPerPage
+  limit?: number;  // Alias para itemsPerPage
   onPageChange: (page: number) => void;
   onItemsPerPageChange?: (limit: number) => void;
+  onLimiteChange?: (limit: number) => void; // Alias para onItemsPerPageChange
+  onLimitChange?: (limit: number) => void;  // Alias para onItemsPerPageChange
   isLoading?: boolean;
   className?: string;
 }
@@ -32,19 +37,41 @@ interface PaginationControlsProps {
 export function PaginationControls({
   currentPage,
   totalPages,
-  totalItems,
-  itemsPerPage,
+  totalItems: rawTotalItems,
+  totalDocs: rawTotalDocs,
+  itemsPerPage: rawItemsPerPage,
+  limite: rawLimite,
+  limit: rawLimit,
   onPageChange,
-  onItemsPerPageChange,
+  onItemsPerPageChange: rawOnItemsPerPageChange,
+  onLimiteChange: rawOnLimiteChange,
+  onLimitChange: rawOnLimitChange,
   isLoading = false,
   className = "",
 }: PaginationControlsProps) {
-  // If no items, do not render pagination controls
-  if (totalItems === 0) return null;
+  const totalItems = typeof rawTotalItems === "number" && !isNaN(rawTotalItems)
+    ? rawTotalItems
+    : typeof rawTotalDocs === "number" && !isNaN(rawTotalDocs)
+    ? rawTotalDocs
+    : 0;
 
-  const validTotalPages = Math.max(1, totalPages || Math.ceil(totalItems / itemsPerPage) || 1);
-  const startItem = Math.min(totalItems, (currentPage - 1) * itemsPerPage + 1);
-  const endItem = Math.min(totalItems, currentPage * itemsPerPage);
+  const itemsPerPage = typeof rawItemsPerPage === "number" && !isNaN(rawItemsPerPage) && rawItemsPerPage > 0
+    ? rawItemsPerPage
+    : typeof rawLimite === "number" && !isNaN(rawLimite) && rawLimite > 0
+    ? rawLimite
+    : typeof rawLimit === "number" && !isNaN(rawLimit) && rawLimit > 0
+    ? rawLimit
+    : 10;
+
+  const onItemsPerPageChange = rawOnItemsPerPageChange || rawOnLimiteChange || rawOnLimitChange;
+
+  // If no items, do not render pagination controls
+  if (totalItems <= 0) return null;
+
+  const validCurrentPage = Math.max(1, typeof currentPage === "number" && !isNaN(currentPage) ? currentPage : 1);
+  const validTotalPages = Math.max(1, typeof totalPages === "number" && !isNaN(totalPages) ? totalPages : Math.ceil(totalItems / itemsPerPage));
+  const startItem = Math.min(totalItems, (validCurrentPage - 1) * itemsPerPage + 1);
+  const endItem = Math.min(totalItems, validCurrentPage * itemsPerPage);
 
   // Generate visible page numbers
   const getPageNumbers = () => {

@@ -49,7 +49,7 @@ export function MembroEditModal({
   onSubmit,
   isLoading = false,
 }: MembroEditModalProps) {
-  const [selectedRole, setSelectedRole] = useState<UserRole>("gestor");
+  const [selectedRole, setSelectedRole] = useState<"admin" | "gestor" | "motorista">("gestor");
 
   const {
     register,
@@ -63,7 +63,10 @@ export function MembroEditModal({
 
   useEffect(() => {
     if (open && membro) {
-      const role = membro.role || (membro.isAdmin ? "admin" : "gestor");
+      const role: "admin" | "gestor" | "motorista" = 
+        membro.role === "admin" || membro.role === "gestor" || membro.role === "motorista"
+          ? membro.role
+          : (membro.isAdmin ? "admin" : "gestor");
       setSelectedRole(role);
       reset({
         nome: membro.nome || "",
@@ -138,7 +141,7 @@ export function MembroEditModal({
 
               <Select
                 value={selectedRole}
-                onValueChange={(val: UserRole) => setSelectedRole(val)}
+                onValueChange={(val: "admin" | "gestor" | "motorista") => setSelectedRole(val)}
                 disabled={!isAdmin}
               >
                 <SelectTrigger className="rounded-xl bg-background">

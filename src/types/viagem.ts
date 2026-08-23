@@ -58,6 +58,7 @@ export interface Viagem {
   km_final?: number;
   data_inicio: string;
   data_fim?: string;
+  descricao?: string;
   veiculo?: VeiculoSnapshot;
   resumo_financeiro?: ResumoFinanceiro;
   despesas?: Despesa[];

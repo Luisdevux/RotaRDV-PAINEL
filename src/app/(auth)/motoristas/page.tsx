@@ -13,7 +13,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { formatCPF, formatPlaca, formatTelefone } from "@/lib/formatters";
+import { formatCPF, formatCNH, formatPlaca, formatTelefone } from "@/lib/formatters";
 import { unmask } from "@/lib/masks";
 import { 
   UserPlus, 
@@ -25,7 +25,8 @@ import {
   Phone, 
   CheckCircle2, 
   XCircle, 
-  Loader2 
+  Loader2,
+  FileText
 } from "lucide-react";
 import { Usuario, CriarMotoristaInput, AtualizarUsuarioInput, Veiculo } from "@/types";
 import { MotoristaFormModal } from "./components/MotoristaFormModal";
@@ -69,7 +70,8 @@ export default function MotoristasPage() {
       return (
         m.nome?.toLowerCase().includes(term) ||
         m.email?.toLowerCase().includes(term) ||
-        (m.cpf && (m.cpf.includes(cleanSearch) || m.cpf.toLowerCase().includes(term)))
+        (m.cpf && (m.cpf.includes(cleanSearch) || m.cpf.toLowerCase().includes(term))) ||
+        (m.cnh && (m.cnh.includes(cleanSearch) || m.cnh.toLowerCase().includes(term)))
       );
     });
   }, [motoristasList, debouncedSearch]);
@@ -114,7 +116,7 @@ export default function MotoristasPage() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar por nome, e-mail ou CPF..."
+            placeholder="Buscar por nome, e-mail, CPF ou CNH..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -141,7 +143,7 @@ export default function MotoristasPage() {
             <TableRow className="bg-muted/30">
               <TableHead className="font-bold">Motorista</TableHead>
               <TableHead className="font-bold">Contatos</TableHead>
-              <TableHead className="font-bold">Documento (CPF)</TableHead>
+              <TableHead className="font-bold">Documentos (CPF / CNH)</TableHead>
               <TableHead className="font-bold">Caminhão Vinculado</TableHead>
               <TableHead className="font-bold">Status</TableHead>
               <TableHead className="font-bold text-right">Ações</TableHead>
@@ -208,8 +210,19 @@ export default function MotoristasPage() {
                       </div>
                     </TableCell>
 
-                    <TableCell className="font-mono text-xs text-foreground font-medium">
-                      {formatCPF(motorista.cpf)}
+                    <TableCell>
+                      <div className="space-y-0.5 text-xs font-mono">
+                        <p className="text-foreground font-medium">
+                          <span className="text-[10px] text-muted-foreground font-sans uppercase font-bold mr-1">CPF:</span>
+                          {formatCPF(motorista.cpf)}
+                        </p>
+                        {motorista.cnh && (
+                          <p className="text-muted-foreground">
+                            <span className="text-[10px] text-muted-foreground font-sans uppercase font-bold mr-1">CNH:</span>
+                            {formatCNH(motorista.cnh)}
+                          </p>
+                        )}
+                      </div>
                     </TableCell>
 
                     <TableCell>

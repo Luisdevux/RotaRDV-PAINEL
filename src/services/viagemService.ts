@@ -42,6 +42,14 @@ export const viagemService = {
     return response.data?.dados || response.data?.data || (response.data as any);
   },
 
+  async cancelar(id: string, motivo?: string): Promise<Viagem> {
+    const response = await api.patch<ApiResponse<Viagem>>(`/viagens/${id}`, {
+      status: 'cancelada',
+      ...(motivo ? { descricao: motivo } : {})
+    });
+    return response.data?.dados || response.data?.data || (response.data as any);
+  },
+
   async deletar(id: string): Promise<void> {
     await api.delete(`/viagens/${id}`);
   }

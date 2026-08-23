@@ -4,13 +4,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { empresaService } from "../services/empresaService";
 import { usuarioService } from "../services/usuarioService";
 import { useAuth } from "./useAuth";
+import { useActiveEmpresa } from "../providers/ActiveEmpresaProvider";
 import { CriarMotoristaInput, AtualizarUsuarioInput } from "../types";
 import { toast } from "sonner";
 
 export function useMotoristas(customEmpresaId?: string, params?: { page?: number; limite?: number }) {
   const queryClient = useQueryClient();
   const { empresaId: userEmpresaId } = useAuth();
-  const targetEmpresaId = customEmpresaId || userEmpresaId;
+  const { empresaId: activeEmpresaId } = useActiveEmpresa();
+  const targetEmpresaId = customEmpresaId || activeEmpresaId || userEmpresaId;
 
   const motoristasQuery = useQuery({
     queryKey: ["motoristas", targetEmpresaId, params],

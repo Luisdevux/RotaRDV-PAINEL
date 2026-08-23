@@ -30,9 +30,9 @@ export function useEquipeAdministrativa(options?: UseEquipeAdministrativaOptions
   const equipeQuery = useQuery({
     queryKey: ["equipe-administrativa", empresa?._id, roleFilter, statusFilter],
     queryFn: async () => {
-      const roleParam = roleFilter === "todos" ? undefined : roleFilter;
+      const roleParam = roleFilter === "todos" ? "admin,gestor" : roleFilter;
       const statusParam = statusFilter !== "todos" ? statusFilter : undefined;
-      const empresaIdParam = !isAdmin && empresa?._id ? empresa._id : undefined;
+      const empresaIdParam = empresa?._id || undefined;
 
       return await usuarioService.listar({
         limite: 100,
@@ -41,6 +41,7 @@ export function useEquipeAdministrativa(options?: UseEquipeAdministrativaOptions
         empresa_id: empresaIdParam,
       });
     },
+    enabled: Boolean(empresa?._id),
   });
 
   const cadastrarMutation = useMutation({
@@ -110,8 +111,15 @@ export function useEquipeAdministrativa(options?: UseEquipeAdministrativaOptions
     equipeQuery.data?.items || 
     (Array.isArray(equipeQuery.data) ? equipeQuery.data : []);
 
-  // Garante que apenas membros da equipe administrativa (admin e gestor) sejam considerados
-  const membros = rawMembros.filter((m) => m.role === "admin" || m.role === "gestor" || m.isAdmin);
+  // Garante que apenas membros da equipe (admin e gestor) vinculados a esta empresa sejam exibidos
+  // O Super Admin Global (sem empresa_id) é estritamente ignorado desta lista
+  const membros = rawMembros.filter((m) => {
+    const isEquipe = m.role === "admin" || m.role === "gestor";
+    if (!isEquipe) return false;
+    if (!m.empresa_id) return false; // Exclui superAdmin global
+    if (empresa?._id && String(m.empresa_id) !== String(empresa._id)) return false;
+    return true;
+  });
 
   return {
     ...equipeQuery,

@@ -36,7 +36,7 @@ interface SidebarProps {
 
 export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
   const pathname = usePathname();
-  const { user, isAdmin, isGestor, logout } = useAuth();
+  const { user, isAdmin, isSuperAdmin, isGestor, logout } = useAuth();
   const { empresa } = useActiveEmpresa();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -45,60 +45,58 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
       name: "Dashboard",
       href: "/dashboard",
       icon: LayoutDashboard,
-      roles: ["admin", "gestor"],
+      roles: ["superAdmin", "admin", "gestor"],
     },
     {
       name: "Motoristas",
       href: "/motoristas",
       icon: Users,
-      roles: ["admin", "gestor"],
-    },
-    {
-      name: "Administrativo",
-      href: "/administrativo",
-      icon: ShieldCheck,
-      roles: ["admin", "gestor"],
+      roles: ["superAdmin", "admin", "gestor"],
     },
     {
       name: "Frota de Veículos",
       href: "/veiculos",
       icon: Truck,
-      roles: ["admin", "gestor"],
+      roles: ["superAdmin", "admin", "gestor"],
     },
     {
       name: "Viagens",
       href: "/viagens",
       icon: Route,
-      roles: ["admin", "gestor"],
+      roles: ["superAdmin", "admin", "gestor"],
     },
     {
       name: "Despesas & Fotos",
       href: "/despesas",
       icon: ReceiptText,
-      roles: ["admin", "gestor"],
+      roles: ["superAdmin", "admin", "gestor"],
     },
     {
       name: "Empresas",
       href: "/empresas",
       icon: Building2,
-      roles: ["admin"],
+      roles: ["superAdmin"],
+      superAdminOnly: true,
     },
     {
-      name: "Minha Empresa",
+      name: "Dados da Empresa",
       href: "/empresa/configuracoes",
       icon: Building,
-      roles: ["gestor"],
+      roles: ["admin", "gestor"],
+      empresaOnly: true,
     },
     {
       name: "Meu Perfil",
       href: "/perfil",
       icon: Settings,
-      roles: ["admin", "gestor", "motorista"],
+      roles: ["superAdmin", "admin", "gestor", "motorista"],
     },
   ];
 
   const filteredNav = navigation.filter((item) => {
-    if (isAdmin) return true;
+    if (item.superAdminOnly) return isSuperAdmin;
+    if (item.empresaOnly) return !isSuperAdmin;
+    if (isSuperAdmin) return true;
     if (user?.role && item.roles.includes(user.role)) return true;
     return false;
   });
@@ -137,6 +135,42 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
     </div>
   );
 
+  const renderUserRoleBadge = () => {
+    const role = user?.role;
+    switch (role) {
+      case "superAdmin":
+        return (
+          <Badge variant="outline" className="px-1.5 py-0 text-[9px] h-4 font-bold bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30">
+            Super Admin
+          </Badge>
+        );
+      case "admin":
+        return (
+          <Badge variant="outline" className="px-1.5 py-0 text-[9px] h-4 font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30">
+            Admin
+          </Badge>
+        );
+      case "gestor":
+        return (
+          <Badge variant="outline" className="px-1.5 py-0 text-[9px] h-4 font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30">
+            Gestor
+          </Badge>
+        );
+      case "motorista":
+        return (
+          <Badge variant="outline" className="px-1.5 py-0 text-[9px] h-4 font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
+            Motorista
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline" className="px-1.5 py-0 text-[9px] h-4 text-sidebar-foreground/70 border-sidebar-border capitalize">
+            {role || "Usuário"}
+          </Badge>
+        );
+    }
+  };
+
   const renderUserInfo = (isMobile = false) => (
     <div className="border-t border-sidebar-border p-3">
       <div className={cn("flex items-center gap-3 p-2 rounded-xl bg-sidebar-accent/60 border border-sidebar-border", collapsed && !isMobile ? "justify-center" : "justify-between")}>
@@ -150,12 +184,8 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
           {(!collapsed || isMobile) && (
             <div className="flex flex-col overflow-hidden">
               <span className="text-xs font-semibold truncate text-sidebar-foreground">{user?.name || "Usuário"}</span>
-              <span className="text-[10px] text-sidebar-foreground/70 flex items-center gap-1">
-                {isAdmin ? (
-                  <Badge variant="destructive" className="px-1.5 py-0 text-[9px] h-4">Admin</Badge>
-                ) : (
-                  <Badge variant="outline" className="px-1.5 py-0 text-[9px] h-4 text-sidebar-primary border-sidebar-primary/40">Gestor</Badge>
-                )}
+              <span className="text-[10px] text-sidebar-foreground/70 flex items-center gap-1 mt-0.5">
+                {renderUserRoleBadge()}
               </span>
             </div>
           )}
@@ -217,19 +247,6 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
           </button>
         </div>
 
-        {/* Empresa Ativa Badge */}
-        {!collapsed && empresa && isGestor && (
-          <div className="px-4 py-3 mx-3 mt-3 rounded-xl bg-sidebar-accent/80 border border-sidebar-border flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-lg bg-sidebar-primary/20 border border-sidebar-primary/40 flex items-center justify-center text-sidebar-primary shrink-0">
-              <Building className="h-4 w-4" />
-            </div>
-            <div className="overflow-hidden">
-              <p className="text-xs font-semibold truncate text-sidebar-foreground">{empresa.nome_empresa}</p>
-              <p className="text-[10px] text-sidebar-foreground/70">CNPJ: {empresa.cnpj}</p>
-            </div>
-          </div>
-        )}
-
         {/* Navigation Links */}
         {renderNavLinks(false)}
 
@@ -283,19 +300,6 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
                 <X className="h-4 w-4" />
               </button>
             </div>
-
-            {/* Empresa Ativa Badge */}
-            {empresa && isGestor && (
-              <div className="px-4 py-3 mx-3 mt-3 rounded-xl bg-sidebar-accent/80 border border-sidebar-border flex items-center gap-2.5">
-                <div className="h-8 w-8 rounded-lg bg-sidebar-primary/20 border border-sidebar-primary/40 flex items-center justify-center text-sidebar-primary shrink-0">
-                  <Building className="h-4 w-4" />
-                </div>
-                <div className="overflow-hidden">
-                  <p className="text-xs font-semibold truncate text-sidebar-foreground">{empresa.nome_empresa}</p>
-                  <p className="text-[10px] text-sidebar-foreground/70">CNPJ: {empresa.cnpj}</p>
-                </div>
-              </div>
-            )}
 
             {/* Navigation Links */}
             {renderNavLinks(true)}

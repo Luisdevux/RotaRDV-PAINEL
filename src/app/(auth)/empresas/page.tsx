@@ -2,7 +2,9 @@
 
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import { SafeImage } from "@/components/ui/safe-image";
 import { useEmpresasAdmin } from "@/hooks/useEmpresa";
 import { useDebounce } from "@/hooks";
@@ -26,6 +28,15 @@ import { unmask } from "@/lib/masks";
 import { Empresa } from "@/types";
 
 export default function EmpresasAdminPage() {
+  const router = useRouter();
+  const { isSuperAdmin, isLoading: isLoadingAuth } = useAuth();
+
+  useEffect(() => {
+    if (!isLoadingAuth && !isSuperAdmin) {
+      router.replace("/dashboard");
+    }
+  }, [isLoadingAuth, isSuperAdmin, router]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
   const [statusModalEmpresa, setStatusModalEmpresa] = useState<{ empresa: Empresa; nextStatus: "ativo" | "inativo" } | null>(null);

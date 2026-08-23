@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatPlaca } from "@/lib/formatters";
-import { maskCPF, maskTelefone, unmask } from "@/lib/masks";
+import { maskCPF, maskCNH, maskTelefone, unmask } from "@/lib/masks";
 import { Edit3, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +26,7 @@ import { Usuario, Veiculo, AtualizarUsuarioInput } from "@/types";
 const editMotoristaSchema = z.object({
   nome: z.string().min(2, "Nome é obrigatório"),
   cpf: z.string().optional(),
+  cnh: z.string().optional(),
   telefone: z.string().optional(),
 });
 
@@ -65,6 +66,7 @@ export function MotoristaEditModal({
       reset({
         nome: motorista.nome || "",
         cpf: maskCPF(motorista.cpf || ""),
+        cnh: maskCNH(motorista.cnh || ""),
         telefone: maskTelefone(motorista.telefone || ""),
       });
       const veicId = typeof motorista.veiculo_id === "object" ? motorista.veiculo_id?._id : motorista.veiculo_id;
@@ -76,6 +78,7 @@ export function MotoristaEditModal({
     await onSubmit({
       nome: data.nome,
       cpf: data.cpf ? unmask(data.cpf) : undefined,
+      cnh: data.cnh ? unmask(data.cnh) : undefined,
       telefone: data.telefone ? unmask(data.telefone) : undefined,
       veiculo_id: editVeiculoId === "nenhum" ? null : editVeiculoId || undefined,
     });
@@ -123,17 +126,30 @@ export function MotoristaEditModal({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="edit-telefone">Telefone</Label>
+                <Label htmlFor="edit-cnh">CNH</Label>
                 <Input
-                  id="edit-telefone"
-                  placeholder="(00) 00000-0000"
+                  id="edit-cnh"
+                  placeholder="00000000000"
                   className="rounded-xl"
-                  maxLength={15}
-                  {...register("telefone", {
-                    onChange: (e) => setValue("telefone", maskTelefone(e.target.value)),
+                  maxLength={11}
+                  {...register("cnh", {
+                    onChange: (e) => setValue("cnh", maskCNH(e.target.value)),
                   })}
                 />
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-telefone">Telefone / WhatsApp</Label>
+              <Input
+                id="edit-telefone"
+                placeholder="(00) 00000-0000"
+                className="rounded-xl"
+                maxLength={15}
+                {...register("telefone", {
+                  onChange: (e) => setValue("telefone", maskTelefone(e.target.value)),
+                })}
+              />
             </div>
 
             <div className="space-y-1.5">

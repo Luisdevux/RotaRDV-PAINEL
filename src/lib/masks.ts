@@ -12,6 +12,13 @@ export function maskCPF(value: string = ""): string {
 }
 
 /**
+ * Limita e normaliza o campo CNH em até 11 dígitos numéricos
+ */
+export function maskCNH(value: string = ""): string {
+  return value.replace(/\D/g, "").slice(0, 11);
+}
+
+/**
  * Aplica máscara de CNPJ: XX.XXX.XXX/XXXX-99 (suporta o novo padrão alfanumérico da Receita Federal e o clássico numérico)
  * Máximo 14 caracteres alfanuméricos -> 18 caracteres formatados
  */

@@ -81,21 +81,24 @@ export const authOptions: NextAuthOptions = {
           const apiUser = data?.user;
 
           if (apiUser) {
-            const isAdm = Boolean(apiUser.isAdmin || apiUser.role === "admin");
-            const isGest = apiUser.role === "gestor";
+            const isSuperAdmin = apiUser.role === "superAdmin";
+            const isAdmin = apiUser.role === "admin" || isSuperAdmin || Boolean(apiUser.isAdmin);
+            const isGestor = apiUser.role === "gestor";
 
             // Apenas motoristas comuns (não admins) são restritos ao app
-            if (!isAdm && !isGest && apiUser.role === "motorista") {
+            if (!isAdmin && !isGestor && apiUser.role === "motorista") {
               throw new Error("Acesso restrito. Motoristas devem utilizar exclusivamente o aplicativo móvel RotaRDV.");
             }
+
+            const finalRole = isSuperAdmin ? "superAdmin" : (apiUser.role || (apiUser.isAdmin ? "admin" : "gestor"));
 
             return {
               id: apiUser._id,
               name: apiUser.nome,
               email: apiUser.email,
-              role: isAdm ? "admin" : (apiUser.role || "gestor"),
+              role: finalRole,
               empresa_id: apiUser.empresa_id,
-              isAdmin: isAdm,
+              isAdmin: Boolean(apiUser.isAdmin || isSuperAdmin),
               cpf: apiUser.cpf,
               telefone: apiUser.telefone,
               image: apiUser.foto_perfil,
@@ -123,21 +126,24 @@ export const authOptions: NextAuthOptions = {
           const apiUser = data?.user;
 
           if (apiUser) {
-            const isAdm = Boolean(apiUser.isAdmin || apiUser.role === "admin");
-            const isGest = apiUser.role === "gestor";
+            const isSuperAdmin = apiUser.role === "superAdmin";
+            const isAdmin = apiUser.role === "admin" || isSuperAdmin || Boolean(apiUser.isAdmin);
+            const isGestor = apiUser.role === "gestor";
 
             // Apenas motoristas comuns (não admins) são restritos ao app
-            if (!isAdm && !isGest && apiUser.role === "motorista") {
+            if (!isAdmin && !isGestor && apiUser.role === "motorista") {
               console.warn(`[NextAuth] Acesso restrito: Motorista (${apiUser.email}) tentou acessar o painel web.`);
               return "/login?error=MotoristaRestrito";
             }
 
+            const finalRole = isSuperAdmin ? "superAdmin" : (apiUser.role || (apiUser.isAdmin ? "admin" : "gestor"));
+
             user.id = apiUser._id;
             user.name = apiUser.nome;
             user.email = apiUser.email;
-            user.role = isAdm ? "admin" : (apiUser.role || "gestor");
+            user.role = finalRole;
             user.empresa_id = apiUser.empresa_id;
-            user.isAdmin = isAdm;
+            user.isAdmin = Boolean(apiUser.isAdmin || isSuperAdmin);
             user.cpf = apiUser.cpf;
             user.telefone = apiUser.telefone;
             user.image = apiUser.foto_perfil || user.image;

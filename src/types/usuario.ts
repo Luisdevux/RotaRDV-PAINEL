@@ -2,7 +2,7 @@
 
 import { Veiculo } from './veiculo';
 
-export type UserRole = 'admin' | 'gestor' | 'motorista';
+export type UserRole = 'superAdmin' | 'admin' | 'gestor' | 'motorista';
 export type UserStatus = 'ativo' | 'inativo';
 
 export interface UsuarioEmpresaSnapshot {
@@ -18,6 +18,7 @@ export interface Usuario {
   isAdmin?: boolean;
   status: UserStatus;
   cpf?: string;
+  cnh?: string;
   telefone?: string;
   foto_perfil?: string;
   empresa_id?: string;
@@ -34,6 +35,7 @@ export interface CriarMotoristaInput {
   email: string;
   senha?: string;
   cpf?: string;
+  cnh?: string;
   telefone?: string;
   cargo?: string;
   veiculo_id?: string;
@@ -46,6 +48,7 @@ export interface CriarMembroAdministrativoInput {
   role: 'admin' | 'gestor';
   cargo: string;
   cpf?: string;
+  cnh?: string;
   telefone?: string;
 }
 
@@ -54,6 +57,7 @@ export interface AtualizarMembroAdministrativoInput {
   cargo: string;
   role: UserRole;
   cpf?: string;
+  cnh?: string;
   telefone?: string;
 }
 
@@ -61,6 +65,7 @@ export interface AtualizarUsuarioInput {
   nome?: string;
   email?: string;
   cpf?: string;
+  cnh?: string;
   telefone?: string;
   cargo?: string;
   role?: UserRole;
@@ -78,6 +83,7 @@ export interface ListarUsuariosParams {
   status?: UserStatus | string;
   empresa_id?: string;
   cpf?: string;
+  cnh?: string;
   email?: string;
   nome?: string;
 }

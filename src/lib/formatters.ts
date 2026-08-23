@@ -79,6 +79,15 @@ export function formatCPF(cpf?: string | null): string {
 }
 
 /**
+ * Formata CNH (11 dígitos)
+ */
+export function formatCNH(cnh?: string | null): string {
+  if (!cnh) return "-";
+  const clean = cnh.replace(/\D/g, "");
+  return clean.slice(0, 11) || "-";
+}
+
+/**
  * Formata Telefone Celular/Fixo ((00) 00000-0000 ou (00) 0000-0000)
  */
 export function formatTelefone(telefone?: string | null): string {

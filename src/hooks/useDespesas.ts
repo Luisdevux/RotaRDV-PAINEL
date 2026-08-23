@@ -2,6 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { despesaService } from "../services/despesaService";
+import { useActiveEmpresa } from "../providers/ActiveEmpresaProvider";
+import { useAuth } from "./useAuth";
 import { CriarDespesaInput } from "../types";
 import { toast } from "sonner";
 
@@ -12,13 +14,21 @@ export function useDespesas(params?: {
   tipo?: string; 
   data_inicio?: string; 
   data_fim?: string; 
+  empresa_id?: string;
 }) {
   const queryClient = useQueryClient();
+  const { empresaId: activeEmpresaId } = useActiveEmpresa();
+  const { isSuperAdmin } = useAuth();
+
+  const queryParams = {
+    ...params,
+    empresa_id: params?.empresa_id || (isSuperAdmin ? (activeEmpresaId || undefined) : undefined),
+  };
 
   const despesasQuery = useQuery({
-    queryKey: ["despesas", params],
+    queryKey: ["despesas", queryParams],
     queryFn: async () => {
-      return await despesaService.listar(params);
+      return await despesaService.listar(queryParams);
     },
   });
 

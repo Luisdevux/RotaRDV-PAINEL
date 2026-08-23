@@ -9,3 +9,4 @@ export * from './useDespesas';
 export * from './useEmpresa';
 export * from './useEquipeAdministrativa';
 export * from './useDebounce';
+export * from './useViaCep';

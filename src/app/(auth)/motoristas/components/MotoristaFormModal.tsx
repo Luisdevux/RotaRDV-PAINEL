@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatPlaca } from "@/lib/formatters";
-import { maskCPF, maskTelefone, unmask } from "@/lib/masks";
+import { maskCPF, maskCNH, maskTelefone, unmask } from "@/lib/masks";
 import { UserPlus, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +28,7 @@ const motoristaSchema = z.object({
   email: z.string().email("E-mail válido é obrigatório"),
   senha: z.string().min(6, "Mínimo 6 caracteres para acesso inicial").optional().or(z.literal("")),
   cpf: z.string().optional(),
+  cnh: z.string().optional(),
   telefone: z.string().optional(),
 });
 
@@ -66,6 +67,7 @@ export function MotoristaFormModal({
       email: data.email,
       senha: data.senha || undefined,
       cpf: data.cpf ? unmask(data.cpf) : undefined,
+      cnh: data.cnh ? unmask(data.cnh) : undefined,
       telefone: data.telefone ? unmask(data.telefone) : undefined,
       cargo: "Motorista Rodoviário",
       veiculo_id: selectedVeiculoId === "nenhum" ? undefined : selectedVeiculoId,
@@ -145,17 +147,30 @@ export function MotoristaFormModal({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="telefone">Telefone</Label>
+                <Label htmlFor="cnh">CNH (11 dígitos)</Label>
                 <Input
-                  id="telefone"
-                  placeholder="(00) 00000-0000"
+                  id="cnh"
+                  placeholder="00000000000"
                   className="rounded-xl"
-                  maxLength={15}
-                  {...register("telefone", {
-                    onChange: (e) => setValue("telefone", maskTelefone(e.target.value)),
+                  maxLength={11}
+                  {...register("cnh", {
+                    onChange: (e) => setValue("cnh", maskCNH(e.target.value)),
                   })}
                 />
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="telefone">Telefone / WhatsApp</Label>
+              <Input
+                id="telefone"
+                placeholder="(00) 00000-0000"
+                className="rounded-xl"
+                maxLength={15}
+                {...register("telefone", {
+                  onChange: (e) => setValue("telefone", maskTelefone(e.target.value)),
+                })}
+              />
             </div>
 
             <div className="space-y-1.5">

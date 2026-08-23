@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useState, useMemo, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useDespesas, useDebounce } from "@/hooks";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,12 @@ import {
   Calendar, 
   Eye, 
   FileX2,
-  Trash2
+  Trash2,
+  Filter,
+  X,
+  RotateCcw,
+  Sparkles,
+  Route
 } from "lucide-react";
 import { Despesa, TipoDespesa } from "@/types";
 
@@ -38,26 +43,33 @@ const CATEGORY_ICONS: Record<string, any> = {
 };
 
 function DespesasContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const viagemIdFromUrl = searchParams.get("viagem_id") || undefined;
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
   const [tipoFilter, setTipoFilter] = useState<string>("todas");
+  const [dataInicio, setDataInicio] = useState<string>("");
+  const [dataFim, setDataFim] = useState<string>("");
   const [comprovanteDespesa, setComprovanteDespesa] = useState<Despesa | null>(null);
   const [comprovanteOpen, setComprovanteOpen] = useState(false);
   const [deletingDespesa, setDeletingDespesa] = useState<Despesa | null>(null);
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
 
+  // Carrega as despesas do período auditado no backend (até 100 registros por período)
   const { data: despesasData, isLoading, deletarDespesa, isDeletando } = useDespesas({
     limite: 100,
     viagem_id: viagemIdFromUrl,
     tipo: tipoFilter !== "todas" ? tipoFilter : undefined,
+    data_inicio: dataInicio || undefined,
+    data_fim: dataFim || undefined,
   });
 
   const despesasList: Despesa[] = despesasData?.docs || despesasData?.items || (Array.isArray(despesasData) ? despesasData : []);
 
+  // Busca textual instantânea sobre todo o período carregado
   const filteredDespesas = useMemo(() => {
     if (!debouncedSearch.trim()) return despesasList;
     const term = debouncedSearch.toLowerCase().trim();
@@ -65,7 +77,9 @@ function DespesasContent() {
       return (
         d.local?.toLowerCase().includes(term) ||
         d.descricao?.toLowerCase().includes(term) ||
-        d.tipo?.toLowerCase().includes(term)
+        d.tipo?.toLowerCase().includes(term) ||
+        d.oficina_nome?.toLowerCase().includes(term) ||
+        d.praca_nome?.toLowerCase().includes(term)
       );
     });
   }, [despesasList, debouncedSearch]);
@@ -79,82 +93,220 @@ function DespesasContent() {
     setComprovanteOpen(true);
   };
 
+  // Atalhos de Período para Auditoria Rápida
+  const aplicarPeriodo = (tipoPeriodo: "hoje" | "7dias" | "30dias" | "mesAtual") => {
+    const hoje = new Date();
+    const formatYMD = (d: Date) => d.toISOString().split("T")[0];
+
+    setDataFim(formatYMD(hoje));
+
+    if (tipoPeriodo === "hoje") {
+      setDataInicio(formatYMD(hoje));
+    } else if (tipoPeriodo === "7dias") {
+      const seteDiasAtras = new Date();
+      seteDiasAtras.setDate(hoje.getDate() - 7);
+      setDataInicio(formatYMD(seteDiasAtras));
+    } else if (tipoPeriodo === "30dias") {
+      const trintaDiasAtras = new Date();
+      trintaDiasAtras.setDate(hoje.getDate() - 30);
+      setDataInicio(formatYMD(trintaDiasAtras));
+    } else if (tipoPeriodo === "mesAtual") {
+      const primeiroDiaDoMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+      setDataInicio(formatYMD(primeiroDiaDoMes));
+    }
+    setPage(1);
+  };
+
+  const limparTodosFiltros = () => {
+    setDataInicio("");
+    setDataFim("");
+    setTipoFilter("todas");
+    setSearchTerm("");
+    setPage(1);
+  };
+
+  const hasActiveFilters = Boolean(dataInicio || dataFim || tipoFilter !== "todas" || searchTerm || viagemIdFromUrl);
+
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Filters Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por posto, local ou descrição..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(1);
-            }}
-            className="pl-9 rounded-xl"
-          />
+      {/* Banner de Viagem Selecionada (se houver viagem_id na URL) */}
+      {viagemIdFromUrl && (
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-primary/10 border border-primary/20 text-xs">
+          <div className="flex items-center gap-2 text-primary font-semibold">
+            <Route className="h-4 w-4 shrink-0" />
+            <span>Exibindo despesas vinculadas exclusivamente à Viagem selecionada:</span>
+            <code className="font-mono bg-background/80 px-2 py-0.5 rounded-md text-[11px] border border-primary/20">
+              {viagemIdFromUrl.slice(0, 8)}...
+            </code>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 text-xs font-semibold rounded-xl gap-1 border-primary/30 text-primary hover:bg-primary/20"
+            onClick={() => router.push("/despesas")}
+          >
+            <X className="h-3 w-3" />
+            Remover Filtro da Viagem
+          </Button>
+        </div>
+      )}
+
+      {/* Barra de Filtros e Auditoria */}
+      <Card className="p-4 rounded-2xl border-border/80 shadow-sm space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          {/* Busca Textual */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por posto, local ou descrição..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+              className="pl-9 rounded-xl"
+            />
+          </div>
+
+          {/* Filtro por Categoria */}
+          <div className="flex flex-wrap items-center gap-1 p-1 rounded-xl bg-muted/50 border border-border">
+            <Button
+              variant={tipoFilter === "todas" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-lg text-xs font-semibold h-8"
+              onClick={() => {
+                setTipoFilter("todas");
+                setPage(1);
+              }}
+            >
+              Todas
+            </Button>
+            <Button
+              variant={tipoFilter === "ABASTECIMENTO" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-lg text-xs font-semibold h-8"
+              onClick={() => {
+                setTipoFilter("ABASTECIMENTO");
+                setPage(1);
+              }}
+            >
+              Abastecimentos
+            </Button>
+            <Button
+              variant={tipoFilter === "ALIMENTACAO" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-lg text-xs font-semibold h-8"
+              onClick={() => {
+                setTipoFilter("ALIMENTACAO");
+                setPage(1);
+              }}
+            >
+              Alimentação
+            </Button>
+            <Button
+              variant={tipoFilter === "PEDAGIO" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-lg text-xs font-semibold h-8"
+              onClick={() => {
+                setTipoFilter("PEDAGIO");
+                setPage(1);
+              }}
+            >
+              Pedágio
+            </Button>
+            <Button
+              variant={tipoFilter === "MANUTENCAO" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-lg text-xs font-semibold h-8"
+              onClick={() => {
+                setTipoFilter("MANUTENCAO");
+                setPage(1);
+              }}
+            >
+              Manutenção
+            </Button>
+          </div>
         </div>
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap items-center gap-1 p-1 rounded-xl bg-muted/50 border border-border">
-          <Button
-            variant={tipoFilter === "todas" ? "default" : "ghost"}
-            size="sm"
-            className="rounded-lg text-xs font-semibold"
-            onClick={() => {
-              setTipoFilter("todas");
-              setPage(1);
-            }}
-          >
-            Todas
-          </Button>
-          <Button
-            variant={tipoFilter === "ABASTECIMENTO" ? "default" : "ghost"}
-            size="sm"
-            className="rounded-lg text-xs font-semibold"
-            onClick={() => {
-              setTipoFilter("ABASTECIMENTO");
-              setPage(1);
-            }}
-          >
-            Abastecimentos
-          </Button>
-          <Button
-            variant={tipoFilter === "ALIMENTACAO" ? "default" : "ghost"}
-            size="sm"
-            className="rounded-lg text-xs font-semibold"
-            onClick={() => {
-              setTipoFilter("ALIMENTACAO");
-              setPage(1);
-            }}
-          >
-            Alimentação
-          </Button>
-          <Button
-            variant={tipoFilter === "PEDAGIO" ? "default" : "ghost"}
-            size="sm"
-            className="rounded-lg text-xs font-semibold"
-            onClick={() => {
-              setTipoFilter("PEDAGIO");
-              setPage(1);
-            }}
-          >
-            Pedágio
-          </Button>
-          <Button
-            variant={tipoFilter === "MANUTENCAO" ? "default" : "ghost"}
-            size="sm"
-            className="rounded-lg text-xs font-semibold"
-            onClick={() => {
-              setTipoFilter("MANUTENCAO");
-              setPage(1);
-            }}
-          >
-            Manutenção
-          </Button>
+        {/* Linha de Auditoria Temporal (Date Range Picker) */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border/60 text-xs">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-muted-foreground font-medium flex items-center gap-1.5 mr-1">
+              <Calendar className="h-3.5 w-3.5 text-primary" />
+              Período:
+            </span>
+
+            {/* Input Data Início */}
+            <div className="flex items-center gap-1 bg-background border border-border/80 rounded-xl px-2.5 py-1">
+              <span className="text-[11px] text-muted-foreground">De:</span>
+              <input
+                type="date"
+                value={dataInicio}
+                onChange={(e) => {
+                  setDataInicio(e.target.value);
+                  setPage(1);
+                }}
+                className="bg-transparent text-xs text-foreground focus:outline-none cursor-pointer"
+              />
+            </div>
+
+            {/* Input Data Fim */}
+            <div className="flex items-center gap-1 bg-background border border-border/80 rounded-xl px-2.5 py-1">
+              <span className="text-[11px] text-muted-foreground">Até:</span>
+              <input
+                type="date"
+                value={dataFim}
+                onChange={(e) => {
+                  setDataFim(e.target.value);
+                  setPage(1);
+                }}
+                className="bg-transparent text-xs text-foreground focus:outline-none cursor-pointer"
+              />
+            </div>
+
+            {/* Atalhos Rápidos */}
+            <div className="hidden sm:flex items-center gap-1 ml-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
+                onClick={() => aplicarPeriodo("7dias")}
+              >
+                7 Dias
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
+                onClick={() => aplicarPeriodo("30dias")}
+              >
+                30 Dias
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
+                onClick={() => aplicarPeriodo("mesAtual")}
+              >
+                Este Mês
+              </Button>
+            </div>
+          </div>
+
+          {/* Botão Limpar Filtros */}
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1.5 rounded-lg"
+              onClick={limparTodosFiltros}
+            >
+              <RotateCcw className="h-3 w-3" />
+              Limpar Filtros
+            </Button>
+          )}
         </div>
-      </div>
+      </Card>
 
       {/* Despesas Table */}
       <Card className="rounded-2xl border-border/80 shadow-sm overflow-hidden">
@@ -263,7 +415,7 @@ function DespesasContent() {
           </TableBody>
         </Table>
 
-        {/* Controles de Paginação */}
+        {/* Controles de Paginação Server-Side */}
         <PaginationControls
           currentPage={page}
           totalPages={totalPages}
@@ -312,3 +464,4 @@ export default function DespesasPage() {
     </Suspense>
   );
 }
+

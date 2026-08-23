@@ -36,7 +36,11 @@ import {
   ArrowRight, 
   CheckCircle2, 
   Clock, 
-  ReceiptText 
+  ReceiptText, 
+  RotateCcw, 
+  X, 
+  XCircle,
+  Ban
 } from "lucide-react";
 import { Viagem } from "@/types";
 import Link from "next/link";
@@ -45,17 +49,25 @@ export default function ViagensPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
   const [statusFilter, setStatusFilter] = useState<string>("todas");
+  const [dataInicio, setDataInicio] = useState<string>("");
+  const [dataFim, setDataFim] = useState<string>("");
   const [selectedViagem, setSelectedViagem] = useState<Viagem | null>(null);
+  const [cancelingViagem, setCancelingViagem] = useState<Viagem | null>(null);
+  const [motivoCancelamento, setMotivoCancelamento] = useState("");
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
 
-  const { data: viagensData, isLoading } = useViagens({
+  // Carrega as viagens da empresa no período auditado (até 100 por período)
+  const { data: viagensData, isLoading, cancelarViagem, isCancelando } = useViagens({
     limite: 100,
     status: statusFilter !== "todas" ? statusFilter : undefined,
+    data_inicio: dataInicio || undefined,
+    data_fim: dataFim || undefined,
   });
 
   const viagensList: Viagem[] = viagensData?.docs || viagensData?.items || (Array.isArray(viagensData) ? viagensData : []);
 
+  // Busca textual instantânea sobre todo o período carregado
   const filteredViagens = useMemo(() => {
     if (!debouncedSearch.trim()) return viagensList;
     const term = debouncedSearch.toLowerCase().trim();
@@ -80,60 +92,187 @@ export default function ViagensPage() {
   const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
   const displayedViagens = filteredViagens.slice((page - 1) * limite, page * limite);
 
+  // Atalhos de Período para Auditoria Rápida
+  const aplicarPeriodo = (tipoPeriodo: "hoje" | "7dias" | "30dias" | "mesAtual") => {
+    const hoje = new Date();
+    const formatYMD = (d: Date) => d.toISOString().split("T")[0];
+
+    setDataFim(formatYMD(hoje));
+
+    if (tipoPeriodo === "hoje") {
+      setDataInicio(formatYMD(hoje));
+    } else if (tipoPeriodo === "7dias") {
+      const seteDiasAtras = new Date();
+      seteDiasAtras.setDate(hoje.getDate() - 7);
+      setDataInicio(formatYMD(seteDiasAtras));
+    } else if (tipoPeriodo === "30dias") {
+      const trintaDiasAtras = new Date();
+      trintaDiasAtras.setDate(hoje.getDate() - 30);
+      setDataInicio(formatYMD(trintaDiasAtras));
+    } else if (tipoPeriodo === "mesAtual") {
+      const primeiroDiaDoMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+      setDataInicio(formatYMD(primeiroDiaDoMes));
+    }
+    setPage(1);
+  };
+
+  const limparTodosFiltros = () => {
+    setDataInicio("");
+    setDataFim("");
+    setStatusFilter("todas");
+    setSearchTerm("");
+    setPage(1);
+  };
+
+  const hasActiveFilters = Boolean(dataInicio || dataFim || statusFilter !== "todas" || searchTerm);
+
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Search & Filter Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por origem, destino, motorista ou placa..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(1);
-            }}
-            className="pl-9 rounded-xl"
-          />
+      {/* Barra de Filtros e Auditoria */}
+      <Card className="p-4 rounded-2xl border-border/80 shadow-sm space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          {/* Search Input */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por origem, destino, motorista ou placa..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+              className="pl-9 rounded-xl"
+            />
+          </div>
+
+          {/* Status Filter Buttons */}
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-muted/50 border border-border">
+            <Button
+              variant={statusFilter === "todas" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-lg text-xs font-semibold h-8"
+              onClick={() => {
+                setStatusFilter("todas");
+                setPage(1);
+              }}
+            >
+              Todas
+            </Button>
+            <Button
+              variant={statusFilter === "em_andamento" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-lg text-xs font-semibold h-8"
+              onClick={() => {
+                setStatusFilter("em_andamento");
+                setPage(1);
+              }}
+            >
+              Em Andamento
+            </Button>
+            <Button
+              variant={statusFilter === "concluída" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-lg text-xs font-semibold h-8"
+              onClick={() => {
+                setStatusFilter("concluída");
+                setPage(1);
+              }}
+            >
+              Concluídas
+            </Button>
+            <Button
+              variant={statusFilter === "cancelada" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-lg text-xs font-semibold h-8"
+              onClick={() => {
+                setStatusFilter("cancelada");
+                setPage(1);
+              }}
+            >
+              Canceladas
+            </Button>
+          </div>
         </div>
 
-        {/* Status Filter Buttons */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-muted/50 border border-border">
-          <Button
-            variant={statusFilter === "todas" ? "default" : "ghost"}
-            size="sm"
-            className="rounded-lg text-xs font-semibold"
-            onClick={() => {
-              setStatusFilter("todas");
-              setPage(1);
-            }}
-          >
-            Todas
-          </Button>
-          <Button
-            variant={statusFilter === "em_andamento" ? "default" : "ghost"}
-            size="sm"
-            className="rounded-lg text-xs font-semibold"
-            onClick={() => {
-              setStatusFilter("em_andamento");
-              setPage(1);
-            }}
-          >
-            Em Andamento
-          </Button>
-          <Button
-            variant={statusFilter === "concluída" ? "default" : "ghost"}
-            size="sm"
-            className="rounded-lg text-xs font-semibold"
-            onClick={() => {
-              setStatusFilter("concluída");
-              setPage(1);
-            }}
-          >
-            Concluídas
-          </Button>
+        {/* Linha de Auditoria Temporal (Date Range Picker) */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border/60 text-xs">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-muted-foreground font-medium flex items-center gap-1.5 mr-1">
+              <Calendar className="h-3.5 w-3.5 text-primary" />
+              Período de Partida:
+            </span>
+
+            {/* Input Data Início */}
+            <div className="flex items-center gap-1 bg-background border border-border/80 rounded-xl px-2.5 py-1">
+              <span className="text-[11px] text-muted-foreground">De:</span>
+              <input
+                type="date"
+                value={dataInicio}
+                onChange={(e) => {
+                  setDataInicio(e.target.value);
+                  setPage(1);
+                }}
+                className="bg-transparent text-xs text-foreground focus:outline-none cursor-pointer"
+              />
+            </div>
+
+            {/* Input Data Fim */}
+            <div className="flex items-center gap-1 bg-background border border-border/80 rounded-xl px-2.5 py-1">
+              <span className="text-[11px] text-muted-foreground">Até:</span>
+              <input
+                type="date"
+                value={dataFim}
+                onChange={(e) => {
+                  setDataFim(e.target.value);
+                  setPage(1);
+                }}
+                className="bg-transparent text-xs text-foreground focus:outline-none cursor-pointer"
+              />
+            </div>
+
+            {/* Atalhos Rápidos */}
+            <div className="hidden sm:flex items-center gap-1 ml-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
+                onClick={() => aplicarPeriodo("7dias")}
+              >
+                7 Dias
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
+                onClick={() => aplicarPeriodo("30dias")}
+              >
+                30 Dias
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
+                onClick={() => aplicarPeriodo("mesAtual")}
+              >
+                Este Mês
+              </Button>
+            </div>
+          </div>
+
+          {/* Botão Limpar Filtros */}
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1.5 rounded-lg"
+              onClick={limparTodosFiltros}
+            >
+              <RotateCcw className="h-3 w-3" />
+              Limpar Filtros
+            </Button>
+          )}
         </div>
-      </div>
+      </Card>
 
       {/* Viagens Table */}
       <Card className="rounded-2xl border-border/80 shadow-sm overflow-hidden">
@@ -229,6 +368,11 @@ export default function ViagensPage() {
                           <Clock className="h-3 w-3" />
                           Em Andamento
                         </Badge>
+                      ) : viagem.status === "cancelada" ? (
+                        <Badge variant="destructive" className="gap-1 font-semibold">
+                          <XCircle className="h-3 w-3" />
+                          Cancelada
+                        </Badge>
                       ) : (
                         <Badge variant="success" className="gap-1 font-semibold">
                           <CheckCircle2 className="h-3 w-3" />
@@ -287,6 +431,8 @@ export default function ViagensPage() {
                 </div>
                 {selectedViagem.status === "em_andamento" ? (
                   <Badge variant="warning">Em Andamento</Badge>
+                ) : selectedViagem.status === "cancelada" ? (
+                  <Badge variant="destructive">Cancelada</Badge>
                 ) : (
                   <Badge variant="success">Concluída</Badge>
                 )}
@@ -334,6 +480,27 @@ export default function ViagensPage() {
                 </div>
               );
             })()}
+
+            {/* Motivo do Cancelamento ou Descrição/Observações */}
+            {selectedViagem.descricao && (
+              <div className={`p-3 rounded-xl text-xs my-1 border ${
+                selectedViagem.status === "cancelada"
+                  ? "bg-destructive/10 border-destructive/20 text-destructive"
+                  : "bg-muted/40 border-border/60 text-foreground"
+              }`}>
+                <div className="flex items-start gap-2">
+                  {selectedViagem.status === "cancelada" && (
+                    <Ban className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                  )}
+                  <div>
+                    <span className="font-bold block mb-0.5">
+                      {selectedViagem.status === "cancelada" ? "Motivo do Cancelamento:" : "Observações / Descrição:"}
+                    </span>
+                    <p className="text-foreground">{selectedViagem.descricao}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Resumo Financeiro & Métricas */}
             <div className="grid grid-cols-3 gap-3 my-2">
@@ -403,15 +570,85 @@ export default function ViagensPage() {
               </div>
             )}
 
-            <DialogFooter className="mt-4 flex items-center justify-between">
+            <DialogFooter className="mt-4 flex flex-wrap items-center justify-between gap-2">
               <Button asChild variant="outline" className="gap-2">
                 <Link href={`/despesas?viagem_id=${selectedViagem._id}`}>
                   <ReceiptText className="h-4 w-4 text-primary" />
                   Ver Comprovantes desta Viagem
                 </Link>
               </Button>
-              <Button variant="default" onClick={() => setSelectedViagem(null)}>
-                Fechar
+              <div className="flex items-center gap-2">
+                {selectedViagem.status === "em_andamento" && (
+                  <Button
+                    variant="destructive"
+                    className="gap-1.5 font-semibold"
+                    onClick={() => {
+                      setCancelingViagem(selectedViagem);
+                      setMotivoCancelamento("");
+                    }}
+                  >
+                    <Ban className="h-4 w-4" />
+                    Cancelar Viagem
+                  </Button>
+                )}
+                <Button variant="default" onClick={() => setSelectedViagem(null)}>
+                  Fechar
+                </Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Modal de Confirmação de Cancelamento de Viagem */}
+      {cancelingViagem && (
+        <Dialog open={Boolean(cancelingViagem)} onOpenChange={(open) => !open && setCancelingViagem(null)}>
+          <DialogContent className="max-w-md p-6">
+            <DialogHeader>
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-destructive/15 text-destructive flex items-center justify-center shrink-0 border border-destructive/30">
+                  <Ban className="h-5 w-5" />
+                </div>
+                <div>
+                  <DialogTitle className="text-lg font-bold">Cancelar Viagem</DialogTitle>
+                  <DialogDescription className="text-xs pt-0.5">
+                    A viagem de {formatLocal(cancelingViagem.origem)} para {formatLocal(cancelingViagem.destino)} será cancelada e interrompida.
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+
+            <div className="space-y-2 py-2">
+              <label className="text-xs font-semibold text-foreground">
+                Motivo do Cancelamento <span className="text-muted-foreground font-normal">(opcional)</span>
+              </label>
+              <Input
+                placeholder="Ex: Quebra mecânica no cavalo, sinistro, cancelamento de carga..."
+                value={motivoCancelamento}
+                onChange={(e) => setMotivoCancelamento(e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setCancelingViagem(null)}
+                disabled={isCancelando}
+              >
+                Voltar
+              </Button>
+              <Button
+                variant="destructive"
+                disabled={isCancelando}
+                onClick={async () => {
+                  if (!cancelingViagem) return;
+                  await cancelarViagem({ id: cancelingViagem._id, motivo: motivoCancelamento });
+                  setCancelingViagem(null);
+                  setSelectedViagem(null);
+                }}
+              >
+                {isCancelando ? "Cancelando..." : "Confirmar Cancelamento"}
               </Button>
             </DialogFooter>
           </DialogContent>

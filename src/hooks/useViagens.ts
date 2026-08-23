@@ -2,6 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { viagemService } from "../services/viagemService";
+import { useActiveEmpresa } from "../providers/ActiveEmpresaProvider";
+import { useAuth } from "./useAuth";
 import { CriarViagemInput, ConcluirViagemInput } from "../types";
 import { toast } from "sonner";
 
@@ -10,15 +12,23 @@ export function useViagens(params?: {
   limite?: number; 
   status?: string; 
   veiculo_id?: string;
-  data_inicio?: string;
-  data_fim?: string;
+  data_inicio?: string; 
+  data_fim?: string; 
+  empresa_id?: string;
 }) {
   const queryClient = useQueryClient();
+  const { empresaId: activeEmpresaId } = useActiveEmpresa();
+  const { isSuperAdmin } = useAuth();
+
+  const queryParams = {
+    ...params,
+    empresa_id: params?.empresa_id || (isSuperAdmin ? (activeEmpresaId || undefined) : undefined),
+  };
 
   const viagensQuery = useQuery({
-    queryKey: ["viagens", params],
+    queryKey: ["viagens", queryParams],
     queryFn: async () => {
-      return await viagemService.listar(params);
+      return await viagemService.listar(queryParams);
     },
   });
 
@@ -50,6 +60,20 @@ export function useViagens(params?: {
     },
   });
 
+  const cancelarMutation = useMutation({
+    mutationFn: async ({ id, motivo }: { id: string; motivo?: string }) => {
+      return await viagemService.cancelar(id, motivo);
+    },
+    onSuccess: () => {
+      toast.success("Viagem cancelada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["viagens"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.friendlyMessage || "Erro ao cancelar viagem.");
+    },
+  });
+
   const deletarMutation = useMutation({
     mutationFn: async (id: string) => {
       return await viagemService.deletar(id);
@@ -70,6 +94,8 @@ export function useViagens(params?: {
     isCriando: criarMutation.isPending,
     concluirViagem: concluirMutation.mutateAsync,
     isConcluindo: concluirMutation.isPending,
+    cancelarViagem: cancelarMutation.mutateAsync,
+    isCancelando: cancelarMutation.isPending,
     deletarViagem: deletarMutation.mutateAsync,
     isDeletando: deletarMutation.isPending,
   };
