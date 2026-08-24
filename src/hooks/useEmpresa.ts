@@ -77,7 +77,7 @@ export function useEmpresa(customId?: string) {
   };
 }
 
-export function useEmpresasAdmin(params?: { page?: number; limite?: number; search?: string; status?: string }) {
+export function useEmpresasAdmin(params?: { page?: number; limite?: number; search?: string; status?: string; todos?: boolean }) {
   const queryClient = useQueryClient();
 
   const empresasQuery = useQuery({
@@ -85,6 +85,8 @@ export function useEmpresasAdmin(params?: { page?: number; limite?: number; sear
     queryFn: async () => {
       return await empresaService.listar(params);
     },
+    placeholderData: (previousData) => previousData,
+    staleTime: 60 * 1000,
   });
 
   const criarEmpresaMutation = useMutation({

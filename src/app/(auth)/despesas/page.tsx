@@ -67,9 +67,9 @@ function DespesasContent() {
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
 
-  // Carrega viagens para cruzar metadados de motorista e caminhão sincronizado com a empresa ativa
+  // Carrega todas as viagens da empresa ativa para cruzar metadados de motorista e caminhão em 0ms
   const { data: viagensData } = useViagens({ 
-    limite: 100,
+    todos: true,
     empresa_id: activeEmpresaId || undefined 
   });
   const viagensList: Viagem[] = viagensData?.docs || viagensData?.items || (Array.isArray(viagensData) ? viagensData : []);
@@ -83,9 +83,10 @@ function DespesasContent() {
     return map;
   }, [viagensList]);
 
-  // Carrega as despesas do período auditado no backend sincronizado com a empresa ativa
+  // Carrega as despesas paginadas no servidor sincronizado com a empresa ativa
   const { data: despesasData, isLoading, deletarDespesa, isDeletando } = useDespesas({
-    limite: 100,
+    page,
+    limite,
     viagem_id: viagemIdFromUrl,
     tipo: tipoFilter !== "todas" ? tipoFilter : undefined,
     data_inicio: dataInicio || undefined,
@@ -95,7 +96,7 @@ function DespesasContent() {
 
   const despesasList: Despesa[] = despesasData?.docs || despesasData?.items || (Array.isArray(despesasData) ? despesasData : []);
 
-  // Busca textual inteligente (posto, cidade, descrição, nome do motorista, placa)
+  // Busca textual inteligente no cliente sobre a página atual
   const filteredDespesas = useMemo(() => {
     if (!debouncedSearch.trim()) return despesasList;
     const term = debouncedSearch.toLowerCase().trim();
@@ -132,9 +133,9 @@ function DespesasContent() {
     });
   }, [despesasList, debouncedSearch, viagemMap]);
 
-  const totalDocs = filteredDespesas.length;
-  const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
-  const displayedDespesas = filteredDespesas.slice((page - 1) * limite, page * limite);
+  const totalDocs = despesasData?.totalDocs ?? filteredDespesas.length;
+  const totalPages = despesasData?.totalPages ?? Math.max(1, Math.ceil(totalDocs / limite));
+  const displayedDespesas = filteredDespesas;
 
   const openComprovante = (despesa: Despesa) => {
     setComprovanteDespesa(despesa);

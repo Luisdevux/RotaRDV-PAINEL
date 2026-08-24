@@ -53,9 +53,9 @@ export default function VeiculosPage() {
     isAlterandoStatus,
     deletarVeiculo, 
     isDeletando 
-  } = useVeiculos({ limite: 100 });
+  } = useVeiculos({ page, limite });
 
-  const { data: motoristasData } = useMotoristas(undefined, { limite: 100 });
+  const { data: motoristasData } = useMotoristas(undefined, { todos: true });
 
   const veiculosList: Veiculo[] = veiculosData?.docs || veiculosData?.items || (Array.isArray(veiculosData) ? veiculosData : []);
   const motoristasList: Usuario[] = motoristasData?.docs || motoristasData?.items || (Array.isArray(motoristasData) ? motoristasData : []);
@@ -83,9 +83,9 @@ export default function VeiculosPage() {
     });
   }, [veiculosList, motoristasList, debouncedSearch]);
 
-  const totalDocs = filteredVeiculos.length;
-  const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
-  const displayedVeiculos = filteredVeiculos.slice((page - 1) * limite, page * limite);
+  const totalDocs = veiculosData?.totalDocs ?? filteredVeiculos.length;
+  const totalPages = veiculosData?.totalPages ?? Math.max(1, Math.ceil(totalDocs / limite));
+  const displayedVeiculos = filteredVeiculos;
 
   const handleCreateSubmit = async (data: CriarVeiculoInput | AtualizarVeiculoInput) => {
     await criarVeiculo(data as CriarVeiculoInput);

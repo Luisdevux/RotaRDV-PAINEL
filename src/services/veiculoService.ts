@@ -10,7 +10,7 @@ import {
 } from '../types';
 
 export const veiculoService = {
-  async listar(params?: { page?: number; limite?: number; placa?: string; modelo?: string }): Promise<PaginatedResult<Veiculo>> {
+  async listar(params?: { page?: number; limite?: number; placa?: string; modelo?: string; empresa_id?: string; todos?: boolean }): Promise<PaginatedResult<Veiculo>> {
     const response = await api.get<ApiResponse<PaginatedResult<Veiculo>>>('/veiculos', { params });
     return response.data?.dados || response.data?.data || (response.data as any);
   },

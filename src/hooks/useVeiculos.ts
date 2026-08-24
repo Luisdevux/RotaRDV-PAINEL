@@ -5,7 +5,7 @@ import { useAuth } from "./useAuth";
 import { CriarVeiculoInput, AtualizarVeiculoInput } from "../types";
 import { toast } from "sonner";
 
-export function useVeiculos(params?: { page?: number; limite?: number; placa?: string; modelo?: string; empresa_id?: string }) {
+export function useVeiculos(params?: { page?: number; limite?: number; placa?: string; modelo?: string; empresa_id?: string; todos?: boolean }) {
   const queryClient = useQueryClient();
   const { empresaId: activeEmpresaId } = useActiveEmpresa();
   const { isSuperAdmin } = useAuth();
@@ -20,6 +20,8 @@ export function useVeiculos(params?: { page?: number; limite?: number; placa?: s
     queryFn: async () => {
       return await veiculoService.listar(queryParams);
     },
+    placeholderData: (previousData) => previousData,
+    staleTime: 60 * 1000,
   });
 
   const criarMutation = useMutation({

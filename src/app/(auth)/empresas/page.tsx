@@ -43,7 +43,7 @@ export default function EmpresasAdminPage() {
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
 
-  const { data: empresasData, isLoading, alterarStatus, isAlterandoStatus } = useEmpresasAdmin({ limite: 100 });
+  const { data: empresasData, isLoading, alterarStatus, isAlterandoStatus } = useEmpresasAdmin({ page, limite });
 
   const empresasList: Empresa[] = empresasData?.docs || empresasData?.items || (Array.isArray(empresasData) ? empresasData : []);
 
@@ -60,9 +60,9 @@ export default function EmpresasAdminPage() {
     });
   }, [empresasList, debouncedSearch]);
 
-  const totalDocs = filteredEmpresas.length;
-  const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
-  const displayedEmpresas = filteredEmpresas.slice((page - 1) * limite, page * limite);
+  const totalDocs = empresasData?.totalDocs ?? filteredEmpresas.length;
+  const totalPages = empresasData?.totalPages ?? Math.max(1, Math.ceil(totalDocs / limite));
+  const displayedEmpresas = filteredEmpresas;
 
   const handleConfirmStatus = async () => {
     if (!statusModalEmpresa) return;

@@ -15,6 +15,7 @@ export function useDespesas(params?: {
   data_inicio?: string; 
   data_fim?: string; 
   empresa_id?: string;
+  todos?: boolean;
 }) {
   const queryClient = useQueryClient();
   const { empresaId: activeEmpresaId } = useActiveEmpresa();
@@ -30,6 +31,8 @@ export function useDespesas(params?: {
     queryFn: async () => {
       return await despesaService.listar(queryParams);
     },
+    placeholderData: (previousData) => previousData,
+    staleTime: 60 * 1000,
   });
 
   const criarMutation = useMutation({

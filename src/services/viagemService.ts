@@ -17,6 +17,8 @@ export const viagemService = {
     veiculo_id?: string; 
     data_inicio?: string; 
     data_fim?: string; 
+    empresa_id?: string;
+    todos?: boolean;
   }): Promise<PaginatedResult<Viagem>> {
     const response = await api.get<ApiResponse<PaginatedResult<Viagem>>>('/viagens', { params });
     return response.data?.dados || response.data?.data || (response.data as any);

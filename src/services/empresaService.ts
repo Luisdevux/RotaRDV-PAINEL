@@ -65,7 +65,7 @@ export const empresaService = {
     return response.data?.dados || response.data?.data || (response.data as any);
   },
 
-  async listarMotoristas(id: string, params?: { page?: number; limite?: number }): Promise<PaginatedResult<Usuario>> {
+  async listarMotoristas(id: string, params?: { page?: number; limite?: number; nome?: string; status?: string; todos?: boolean }): Promise<PaginatedResult<Usuario>> {
     const response = await api.get<ApiResponse<PaginatedResult<Usuario>>>(`/empresas/${id}/motoristas`, { params });
     return response.data?.dados || response.data?.data || (response.data as any);
   },
@@ -79,7 +79,7 @@ export const empresaService = {
     await api.delete(`/empresas/${empresaId}/motoristas/${motoristaId}`);
   },
 
-  async listarVeiculos(id: string, params?: { page?: number; limite?: number }): Promise<PaginatedResult<Veiculo>> {
+  async listarVeiculos(id: string, params?: { page?: number; limite?: number; placa?: string; modelo?: string; todos?: boolean }): Promise<PaginatedResult<Veiculo>> {
     const response = await api.get<ApiResponse<PaginatedResult<Veiculo>>>(`/empresas/${id}/veiculos`, { params });
     return response.data?.dados || response.data?.data || (response.data as any);
   }

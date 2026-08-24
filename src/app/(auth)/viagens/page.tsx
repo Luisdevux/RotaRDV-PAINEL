@@ -71,7 +71,7 @@ export default function ViagensPage() {
       setIsExportingPdf(true);
       const resDespesas = await despesaService.listar({
         viagem_id: selectedViagem._id,
-        limite: 100,
+        todos: true,
       });
       const despesasViagem: Despesa[] = resDespesas?.docs || resDespesas?.items || (Array.isArray(resDespesas) ? resDespesas : []);
       
@@ -88,17 +88,19 @@ export default function ViagensPage() {
     }
   };
 
-  // Carrega as viagens da empresa no período auditado (até 100 por período)
+  // Carrega as viagens da empresa no período auditado paginadas no servidor
   const { data: viagensData, isLoading, cancelarViagem, isCancelando } = useViagens({
-    limite: 100,
+    page,
+    limite,
     status: statusFilter !== "todas" ? statusFilter : undefined,
     data_inicio: dataInicio || undefined,
     data_fim: dataFim || undefined,
+    empresa_id: empresa?._id || undefined,
   });
 
   const viagensList: Viagem[] = viagensData?.docs || viagensData?.items || (Array.isArray(viagensData) ? viagensData : []);
 
-  // Busca textual instantânea sobre todo o período carregado
+  // Busca textual instantânea sobre a página atual
   const filteredViagens = useMemo(() => {
     if (!debouncedSearch.trim()) return viagensList;
     const term = debouncedSearch.toLowerCase().trim();
@@ -119,9 +121,9 @@ export default function ViagensPage() {
     });
   }, [viagensList, debouncedSearch]);
 
-  const totalDocs = filteredViagens.length;
-  const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
-  const displayedViagens = filteredViagens.slice((page - 1) * limite, page * limite);
+  const totalDocs = viagensData?.totalDocs ?? filteredViagens.length;
+  const totalPages = viagensData?.totalPages ?? Math.max(1, Math.ceil(totalDocs / limite));
+  const displayedViagens = filteredViagens;
 
   // Atalhos de Período para Auditoria Rápida
   const aplicarPeriodo = (tipoPeriodo: "hoje" | "7dias" | "30dias" | "mesAtual") => {

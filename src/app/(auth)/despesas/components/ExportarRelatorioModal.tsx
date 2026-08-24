@@ -55,7 +55,7 @@ export function ExportarRelatorioModal({
   const [dataInicio, setDataInicio] = useState<string>(initialDataInicio);
   const [dataFim, setDataFim] = useState<string>(initialDataFim);
   const [categoria, setCategoria] = useState<string>(initialCategoria);
-  const [limite, setLimite] = useState<number>(200);
+  const [limite, setLimite] = useState<number>(0);
   const [isGerando, setIsGerando] = useState(false);
 
   // Manipular atalhos rápidos de período
@@ -90,19 +90,21 @@ export function ExportarRelatorioModal({
     try {
       setIsGerando(true);
 
-      // Busca dados com os filtros específicos configurados no modal
+      // Busca dados consolidados de acordo com o limite escolhido
       const response = await despesaService.listar({
-        limite,
+        todos: limite === 0,
+        limite: limite > 0 ? limite : undefined,
         tipo: categoria !== "todas" ? categoria : undefined,
         data_inicio: dataInicio || undefined,
         data_fim: dataFim || undefined,
+        empresa_id: empresa?._id || undefined,
       });
 
       const despesasEncontradas: Despesa[] =
         response?.docs || response?.items || (Array.isArray(response) ? response : []);
 
       if (despesasEncontradas.length === 0) {
-        toast.error("Nenhuma despesa encontrada para os parâmetros e período selecionados.");
+        toast.info("Nenhuma despesa encontrada para os parâmetros e período selecionados.");
         return;
       }
 
@@ -117,8 +119,14 @@ export function ExportarRelatorioModal({
 
       toast.success(`Relatório com ${despesasEncontradas.length} despesas gerado com sucesso!`);
       onOpenChange(false);
-    } catch {
-      toast.error("Erro ao consultar despesas e gerar o arquivo PDF.");
+    } catch (error: any) {
+      const msg =
+        error?.response?.data?.errors?.[0]?.message ||
+        error?.response?.data?.message ||
+        error?.response?.data?.mensagem ||
+        error?.message ||
+        "Não foi possível consultar as despesas e gerar o arquivo PDF.";
+      toast.error(msg);
     } finally {
       setIsGerando(false);
     }
@@ -223,9 +231,10 @@ export function ExportarRelatorioModal({
                 <SelectValue placeholder="Limite de registros..." />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="0">Todos os lançamentos do período (Recomendado)</SelectItem>
                 <SelectItem value="50">Até 50 lançamentos mais recentes</SelectItem>
                 <SelectItem value="100">Até 100 lançamentos</SelectItem>
-                <SelectItem value="200">Até 200 lançamentos (Recomendado)</SelectItem>
+                <SelectItem value="200">Até 200 lançamentos</SelectItem>
                 <SelectItem value="500">Até 500 lançamentos (Auditoria Extensa)</SelectItem>
               </SelectContent>
             </Select>

@@ -55,9 +55,9 @@ export default function MotoristasPage() {
     isAlterandoStatus,
     desvincularMotorista, 
     isDesvinculando 
-  } = useMotoristas(undefined, { limite: 100 });
+  } = useMotoristas(undefined, { page, limite });
   
-  const { data: veiculosData } = useVeiculos({ limite: 100 });
+  const { data: veiculosData } = useVeiculos({ todos: true });
 
   const motoristasList: Usuario[] = motoristasData?.docs || motoristasData?.items || (Array.isArray(motoristasData) ? motoristasData : []);
   const veiculosList: Veiculo[] = veiculosData?.docs || veiculosData?.items || (Array.isArray(veiculosData) ? veiculosData : []);
@@ -76,9 +76,9 @@ export default function MotoristasPage() {
     });
   }, [motoristasList, debouncedSearch]);
 
-  const totalDocs = filteredMotoristas.length;
-  const totalPages = Math.max(1, Math.ceil(totalDocs / limite));
-  const displayedMotoristas = filteredMotoristas.slice((page - 1) * limite, page * limite);
+  const totalDocs = motoristasData?.totalDocs ?? filteredMotoristas.length;
+  const totalPages = motoristasData?.totalPages ?? Math.max(1, Math.ceil(totalDocs / limite));
+  const displayedMotoristas = filteredMotoristas;
 
   const handleCreateSubmit = async (data: CriarMotoristaInput) => {
     await cadastrarMotorista(data);

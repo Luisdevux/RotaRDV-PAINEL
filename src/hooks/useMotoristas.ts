@@ -8,7 +8,7 @@ import { useActiveEmpresa } from "../providers/ActiveEmpresaProvider";
 import { CriarMotoristaInput, AtualizarUsuarioInput } from "../types";
 import { toast } from "sonner";
 
-export function useMotoristas(customEmpresaId?: string, params?: { page?: number; limite?: number }) {
+export function useMotoristas(customEmpresaId?: string, params?: { page?: number; limite?: number; nome?: string; status?: string; todos?: boolean }) {
   const queryClient = useQueryClient();
   const { empresaId: userEmpresaId } = useAuth();
   const { empresaId: activeEmpresaId } = useActiveEmpresa();
@@ -21,6 +21,8 @@ export function useMotoristas(customEmpresaId?: string, params?: { page?: number
       return await empresaService.listarMotoristas(targetEmpresaId, params);
     },
     enabled: Boolean(targetEmpresaId),
+    placeholderData: (previousData) => previousData,
+    staleTime: 60 * 1000,
   });
 
   const cadastrarMutation = useMutation({
