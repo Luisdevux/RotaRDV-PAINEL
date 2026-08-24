@@ -53,7 +53,7 @@ function DespesasContent() {
   const searchParams = useSearchParams();
   const viagemIdFromUrl = searchParams.get("viagem_id") || undefined;
 
-  const { empresa } = useActiveEmpresa();
+  const { empresa, empresaId: activeEmpresaId } = useActiveEmpresa();
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
@@ -67,26 +67,30 @@ function DespesasContent() {
   const [page, setPage] = useState(1);
   const [limite, setLimite] = useState(10);
 
-  // Carrega viagens para cruzar metadados de motorista e caminhão
-  const { data: viagensData } = useViagens({ limite: 100 });
+  // Carrega viagens para cruzar metadados de motorista e caminhão sincronizado com a empresa ativa
+  const { data: viagensData } = useViagens({ 
+    limite: 100,
+    empresa_id: activeEmpresaId || undefined 
+  });
   const viagensList: Viagem[] = viagensData?.docs || viagensData?.items || (Array.isArray(viagensData) ? viagensData : []);
 
   // Mapeamento rápido Viagem ID -> Objeto Viagem
   const viagemMap = useMemo(() => {
     const map = new Map<string, Viagem>();
     viagensList.forEach((v) => {
-      if (v._id) map.set(v._id, v);
+      if (v._id) map.set(String(v._id), v);
     });
     return map;
   }, [viagensList]);
 
-  // Carrega as despesas do período auditado no backend (até 100 registros por período)
+  // Carrega as despesas do período auditado no backend sincronizado com a empresa ativa
   const { data: despesasData, isLoading, deletarDespesa, isDeletando } = useDespesas({
     limite: 100,
     viagem_id: viagemIdFromUrl,
     tipo: tipoFilter !== "todas" ? tipoFilter : undefined,
     data_inicio: dataInicio || undefined,
     data_fim: dataFim || undefined,
+    empresa_id: activeEmpresaId || undefined,
   });
 
   const despesasList: Despesa[] = despesasData?.docs || despesasData?.items || (Array.isArray(despesasData) ? despesasData : []);
@@ -96,13 +100,24 @@ function DespesasContent() {
     if (!debouncedSearch.trim()) return despesasList;
     const term = debouncedSearch.toLowerCase().trim();
     return despesasList.filter((d) => {
-      const v = viagemMap.get(d.viagem_id);
-      const motoristaNome = typeof v?.usuario_id === "object" 
-        ? v.usuario_id.nome 
-        : (v?.usuario_snapshot?.nome || "");
-      const veic = typeof v?.veiculo_id === "object" && v.veiculo_id !== null 
-        ? (v.veiculo_id as any) 
-        : (v?.veiculo_snapshot || (v as any)?.veiculo);
+      const viagemIdStr = typeof d.viagem_id === "object" 
+        ? (d.viagem_id as any)?._id 
+        : d.viagem_id;
+
+      const v = (typeof d.viagem_id === "object" && d.viagem_id !== null)
+        ? (d.viagem_id as any)
+        : (viagemIdStr ? viagemMap.get(String(viagemIdStr)) : null);
+
+      const motoristaNome = 
+        (typeof v?.usuario_id === "object" ? v.usuario_id?.nome : null) ||
+        v?.usuario_snapshot?.nome ||
+        "";
+
+      const veic = 
+        (typeof v?.veiculo_id === "object" && v.veiculo_id !== null ? v.veiculo_id : null) ||
+        v?.veiculo_snapshot ||
+        (v as any)?.veiculo;
+
       const placa = veic?.placa || "";
 
       return (
@@ -395,13 +410,24 @@ function DespesasContent() {
             ) : (
               displayedDespesas.map((despesa) => {
                 const Icon = CATEGORY_ICONS[despesa.tipo] || ReceiptText;
-                const v = viagemMap.get(despesa.viagem_id);
-                const motoristaNome = typeof v?.usuario_id === "object" 
-                  ? v.usuario_id.nome 
-                  : (v?.usuario_snapshot?.nome || "");
-                const veic = typeof v?.veiculo_id === "object" && v.veiculo_id !== null 
-                  ? (v.veiculo_id as any) 
-                  : (v?.veiculo_snapshot || (v as any)?.veiculo);
+                const viagemIdStr = typeof despesa.viagem_id === "object" 
+                  ? (despesa.viagem_id as any)?._id 
+                  : despesa.viagem_id;
+
+                const v = (typeof despesa.viagem_id === "object" && despesa.viagem_id !== null)
+                  ? (despesa.viagem_id as any)
+                  : (viagemIdStr ? viagemMap.get(String(viagemIdStr)) : null);
+
+                const motoristaNome = 
+                  (typeof v?.usuario_id === "object" ? v.usuario_id?.nome : null) ||
+                  v?.usuario_snapshot?.nome ||
+                  "";
+
+                const veic = 
+                  (typeof v?.veiculo_id === "object" && v.veiculo_id !== null ? v.veiculo_id : null) ||
+                  v?.veiculo_snapshot ||
+                  (v as any)?.veiculo;
+
                 const placa = veic?.placa ? formatPlaca(veic.placa) : "";
 
                 return (
