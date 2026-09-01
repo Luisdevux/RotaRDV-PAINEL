@@ -55,7 +55,7 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
       roles: ["superAdmin", "admin", "gestor"],
     },
     {
-      name: "Frota de Veículos",
+      name: "Frota de veículos",
       href: "/veiculos",
       icon: Truck,
       roles: ["superAdmin", "admin", "gestor"],
@@ -67,7 +67,7 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
       roles: ["superAdmin", "admin", "gestor"],
     },
     {
-      name: "Despesas & Fotos",
+      name: "Despesas e fotos",
       href: "/despesas",
       icon: ReceiptText,
       roles: ["superAdmin", "admin", "gestor"],
@@ -80,20 +80,20 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
       superAdminOnly: true,
     },
     {
-      name: "Dados da Empresa",
+      name: "Dados da empresa",
       href: "/empresa/configuracoes",
       icon: Building,
       roles: ["admin", "gestor"],
       empresaOnly: true,
     },
     {
-      name: "Equipe Administrativa",
+      name: "Equipe administrativa",
       href: "/administrativo",
       icon: Briefcase,
       roles: ["superAdmin", "admin", "gestor"],
     },
     {
-      name: "Meu Perfil",
+      name: "Meu perfil",
       href: "/perfil",
       icon: Settings,
       roles: ["superAdmin", "admin", "gestor", "motorista"],
@@ -239,7 +239,7 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
                   Rota<span className="text-sidebar-primary">RDV</span>
                 </span>
                 <span className="text-[11px] text-sidebar-foreground/70 font-medium truncate max-w-[140px]">
-                  {isAdmin ? "Painel Master" : (empresa?.nome_empresa || "Gestão de Frotas")}
+                  {isAdmin ? "Painel master" : (empresa?.nome_empresa || "Gestão de frotas")}
                 </span>
               </div>
             )}
@@ -294,7 +294,7 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
                     Rota<span className="text-sidebar-primary">RDV</span>
                   </span>
                   <span className="text-[11px] text-sidebar-foreground/70 font-medium truncate max-w-[140px]">
-                    {isAdmin ? "Painel Master" : (empresa?.nome_empresa || "Gestão de Frotas")}
+                    {isAdmin ? "Painel master" : (empresa?.nome_empresa || "Gestão de frotas")}
                   </span>
                 </div>
               </Link>

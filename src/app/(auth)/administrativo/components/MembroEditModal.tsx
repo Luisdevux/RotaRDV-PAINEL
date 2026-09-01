@@ -92,7 +92,7 @@ export function MembroEditModal({
           <DialogHeader>
             <DialogTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
               <Edit3 className="h-5 w-5 text-primary" />
-              Alterar Cargo & Nível de Acesso
+              Alterar cargo e nível de acesso
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
               Defina as responsabilidades e permissões hierárquicas deste membro na transportadora.
@@ -101,7 +101,7 @@ export function MembroEditModal({
 
           <div className="space-y-3.5 py-4">
             <div className="space-y-1.5">
-              <Label htmlFor="edit-nome">Nome Completo *</Label>
+              <Label htmlFor="edit-nome">Nome completo *</Label>
               <Input
                 id="edit-nome"
                 className="rounded-xl"
@@ -114,7 +114,7 @@ export function MembroEditModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="edit-cargo">Cargo / Função na Empresa *</Label>
+              <Label htmlFor="edit-cargo">Cargo / função na empresa *</Label>
               <Input
                 id="edit-cargo"
                 placeholder="Ex: Diretor de Operações, Gestor de Logística..."
@@ -132,10 +132,10 @@ export function MembroEditModal({
               <div className="flex items-center justify-between">
                 <Label className="font-bold text-xs flex items-center gap-1.5 text-foreground">
                   <ShieldCheck className="h-4 w-4 text-primary" />
-                  Papel Hierárquico (Nível de Acesso)
+                  Papel hierárquico (nível de acesso)
                 </Label>
                 {!isAdmin && (
-                  <span className="text-[10px] text-destructive font-medium">Requer perfil Admin</span>
+                  <span className="text-[10px] text-destructive font-medium">Requer perfil admin</span>
                 )}
               </div>
 
@@ -172,17 +172,17 @@ export function MembroEditModal({
               <div className="text-[11px] text-muted-foreground bg-background/80 rounded-lg p-2 border border-border/40 leading-relaxed">
                 {selectedRole === "admin" && (
                   <span>
-                    👑 <strong>Administrador:</strong> Acesso irrestrito ao sistema, governança, criação de novos gestores e promoção de cargos.
+                    <strong>Administrador:</strong> Acesso irrestrito ao sistema, governança, criação de novos gestores e promoção de cargos.
                   </span>
                 )}
                 {selectedRole === "gestor" && (
                   <span>
-                    🚛 <strong>Gestor:</strong> Permite gerenciar motoristas, veículos, viagens e auditoria de despesas da sua empresa.
+                    <strong>Gestor:</strong> Permite gerenciar motoristas, veículos, viagens e auditoria de despesas da sua empresa.
                   </span>
                 )}
                 {selectedRole === "motorista" && (
                   <span>
-                    📱 <strong>Motorista:</strong> Acesso restrito ao aplicativo móvel para lançamento de despesas e rotas de viagens.
+                    <strong>Motorista:</strong> Acesso restrito ao aplicativo móvel para lançamento de despesas e rotas de viagens.
                   </span>
                 )}
               </div>
@@ -237,7 +237,7 @@ export function MembroEditModal({
                   Salvando...
                 </>
               ) : (
-                "Salvar Alterações"
+                "Salvar alterações"
               )}
             </Button>
           </DialogFooter>

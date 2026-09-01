@@ -66,7 +66,7 @@ export default function EsqueciSenhaPage() {
             />
           </div>
           <h1 className="text-2xl font-black tracking-tight text-foreground">
-            Recuperação de Senha
+            Recuperação de senha
           </h1>
           <p className="text-xs text-muted-foreground">
             Enviaremos um link de redefinição para o seu e-mail cadastrado
@@ -79,13 +79,13 @@ export default function EsqueciSenhaPage() {
               <div className="mx-auto h-12 w-12 rounded-full bg-primary/15 border border-primary/30 text-primary flex items-center justify-center">
                 <CheckCircle className="h-6 w-6" />
               </div>
-              <h2 className="text-lg font-bold text-foreground">Verifique sua Caixa de Entrada</h2>
+              <h2 className="text-lg font-bold text-foreground">Verifique sua caixa de entrada</h2>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Enviamos um e-mail com as instruções para redefinir sua senha. O link expira em 1 hora.
               </p>
               <div className="pt-2">
                 <Button asChild variant="default" className="w-full rounded-xl">
-                  <Link href="/login">Voltar ao Login</Link>
+                  <Link href="/login">Voltar ao login</Link>
                 </Button>
               </div>
             </CardContent>
@@ -130,7 +130,7 @@ export default function EsqueciSenhaPage() {
                   ) : (
                     <>
                       <Send className="h-4 w-4" />
-                      Enviar Link de Recuperação
+                      Enviar link de recuperação
                     </>
                   )}
                 </Button>
@@ -142,7 +142,7 @@ export default function EsqueciSenhaPage() {
                   className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" />
-                  Voltar para o Login
+                  Voltar para o login
                 </Link>
               </CardFooter>
             </form>

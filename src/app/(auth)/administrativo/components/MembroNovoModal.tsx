@@ -74,7 +74,7 @@ export function MembroNovoModal({
           <DialogHeader>
             <DialogTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
               <UserPlus className="h-5 w-5 text-primary" />
-              Novo Membro Administrativo
+              Novo membro administrativo
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
               Cadastre um novo Administrador ou Gestor de Frota para a empresa.
@@ -83,7 +83,7 @@ export function MembroNovoModal({
 
           <div className="space-y-3.5 py-4">
             <div className="space-y-1.5">
-              <Label htmlFor="nome">Nome Completo *</Label>
+              <Label htmlFor="nome">Nome completo *</Label>
               <Input
                 id="nome"
                 placeholder="Ex: Carlos Eduardo de Souza"
@@ -97,7 +97,7 @@ export function MembroNovoModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="email">E-mail de Acesso *</Label>
+              <Label htmlFor="email">E-mail de acesso *</Label>
               <Input
                 id="email"
                 type="email"
@@ -111,7 +111,7 @@ export function MembroNovoModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="senha">Senha Inicial *</Label>
+              <Label htmlFor="senha">Senha inicial *</Label>
               <Input
                 id="senha"
                 type="password"
@@ -138,7 +138,7 @@ export function MembroNovoModal({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="telefone">Telefone / Celular</Label>
+                <Label htmlFor="telefone">Telefone / celular</Label>
                 <Input
                   id="telefone"
                   placeholder="(00) 00000-0000"
@@ -153,7 +153,7 @@ export function MembroNovoModal({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="cargo">Cargo / Função *</Label>
+                <Label htmlFor="cargo">Cargo / função *</Label>
                 <Input
                   id="cargo"
                   placeholder="Ex: Gestor Operacional"
@@ -165,7 +165,7 @@ export function MembroNovoModal({
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="role">Papel de Acesso</Label>
+                <Label htmlFor="role">Papel de acesso</Label>
                 <Select
                   defaultValue="gestor"
                   onValueChange={(val: "admin" | "gestor") => setValue("role", val)}
@@ -203,7 +203,7 @@ export function MembroNovoModal({
                   Cadastrando...
                 </>
               ) : (
-                "Cadastrar Membro"
+                "Cadastrar membro"
               )}
             </Button>
           </DialogFooter>

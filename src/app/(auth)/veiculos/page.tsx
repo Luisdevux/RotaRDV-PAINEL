@@ -139,7 +139,7 @@ export default function VeiculosPage() {
           className="rounded-xl font-bold gap-2 shadow-sm"
         >
           <Plus className="h-4 w-4" />
-          Novo Veículo
+          Novo veículo
         </Button>
       </div>
 
@@ -148,10 +148,10 @@ export default function VeiculosPage() {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30">
-              <TableHead className="font-bold">Cavalo Mecânico</TableHead>
-              <TableHead className="font-bold">Motorista Vinculado</TableHead>
-              <TableHead className="font-bold">Combustível / Tanque</TableHead>
-              <TableHead className="font-bold">Implemento / Carretas</TableHead>
+              <TableHead className="font-bold">Cavalo mecânico</TableHead>
+              <TableHead className="font-bold">Motorista vinculado</TableHead>
+              <TableHead className="font-bold">Combustível / tanque</TableHead>
+              <TableHead className="font-bold">Implemento / carretas</TableHead>
               <TableHead className="font-bold">Status</TableHead>
               <TableHead className="font-bold text-right">Ações</TableHead>
             </TableRow>
@@ -173,7 +173,7 @@ export default function VeiculosPage() {
                   <div className="flex flex-col items-center justify-center gap-1">
                     <Truck className="h-8 w-8 text-muted-foreground/50 mb-1" />
                     <p className="font-medium">Nenhum veículo encontrado na frota.</p>
-                    <p className="text-xs">Utilize o botão &quot;Novo Veículo&quot; para cadastrar seus caminhões.</p>
+                    <p className="text-xs">Utilize o botão &quot;Novo veículo&quot; para cadastrar seus caminhões.</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -228,7 +228,7 @@ export default function VeiculosPage() {
                         </div>
                       ) : (
                         <Badge variant="outline" className="text-xs text-muted-foreground border-dashed bg-muted/20 font-medium">
-                          Disponível / Sem Motorista
+                          Disponível / sem motorista
                         </Badge>
                       )}
                     </TableCell>
@@ -252,7 +252,7 @@ export default function VeiculosPage() {
                         <div className="space-y-1">
                           <div className="flex items-center gap-1.5 text-xs text-foreground font-medium">
                             <Layers className="h-3.5 w-3.5 text-primary" />
-                            <span>{veiculo.reboque.modelo || "Implemento Rodoviário"}</span>
+                            <span>{veiculo.reboque.modelo || "Implemento rodoviário"}</span>
                             {veiculo.reboque.ano_fabricacao && (
                               <span className="text-[10px] text-muted-foreground font-mono">
                                 ({veiculo.reboque.ano_fabricacao})
@@ -377,9 +377,9 @@ export default function VeiculosPage() {
       <ConfirmDialog
         open={Boolean(deletingVeiculo)}
         onOpenChange={(open) => !open && setDeletingVeiculo(null)}
-        title="Excluir Veículo da Frota"
+        title="Excluir veículo da frota"
         description={`Tem certeza que deseja remover o veículo "${deletingVeiculo?.modelo}" (Placa: ${deletingVeiculo ? formatPlaca(deletingVeiculo.placa) : ""})? Esta ação não poderá ser desfeita.`}
-        confirmText="Sim, Excluir"
+        confirmText="Sim, excluir"
         cancelText="Cancelar"
         variant="destructive"
         isLoading={isDeletando}
@@ -392,15 +392,15 @@ export default function VeiculosPage() {
         onOpenChange={(open) => !open && setStatusModalVeiculo(null)}
         title={
           statusModalVeiculo?.nextStatus === "inativo"
-            ? "Desativar Veículo"
-            : "Ativar Veículo"
+            ? "Desativar veículo"
+            : "Ativar veículo"
         }
         description={
           statusModalVeiculo?.nextStatus === "inativo"
             ? `Tem certeza que deseja desativar o veículo "${statusModalVeiculo?.veiculo.modelo}" (Placa: ${statusModalVeiculo ? formatPlaca(statusModalVeiculo.veiculo.placa) : ""})? O caminhão ficará indisponível para seleção em novas viagens.`
             : `Deseja reativar o veículo "${statusModalVeiculo?.veiculo.modelo}" (Placa: ${statusModalVeiculo ? formatPlaca(statusModalVeiculo.veiculo.placa) : ""}) para a frota operacional?`
         }
-        confirmText={statusModalVeiculo?.nextStatus === "inativo" ? "Sim, Desativar" : "Sim, Ativar"}
+        confirmText={statusModalVeiculo?.nextStatus === "inativo" ? "Sim, desativar" : "Sim, ativar"}
         cancelText="Cancelar"
         variant={statusModalVeiculo?.nextStatus === "inativo" ? "destructive" : "default"}
         isLoading={isAlterandoStatus}

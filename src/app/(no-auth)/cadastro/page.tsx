@@ -98,7 +98,7 @@ export default function CadastroPage() {
             />
           </div>
           <h1 className="text-2xl font-black tracking-tight text-foreground">
-            Cadastro de Transportadora
+            Cadastro de transportadora
           </h1>
           <p className="text-xs text-muted-foreground">
             Crie sua conta corporativa para gerenciar frotas, motoristas e despesas de viagem
@@ -109,12 +109,12 @@ export default function CadastroPage() {
         <div className="flex items-center justify-center gap-3">
           <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${step === 1 ? "bg-primary/15 text-primary border-primary/30" : "bg-muted text-muted-foreground border-border"}`}>
             <span className="h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px]">1</span>
-            Dados da Transportadora
+            Dados da transportadora
           </div>
           <div className="h-px w-6 bg-border" />
           <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${step === 2 ? "bg-primary/15 text-primary border-primary/30" : "bg-muted text-muted-foreground border-border"}`}>
             <span className="h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px]">2</span>
-            Gestor Master
+            Gestor master
           </div>
         </div>
 
@@ -126,7 +126,7 @@ export default function CadastroPage() {
               {step === 1 && (
                 <div className="space-y-4 animate-fade-in">
                   <div className="space-y-1.5">
-                    <Label htmlFor="nome_empresa">Razão Social / Nome da Transportadora</Label>
+                    <Label htmlFor="nome_empresa">Razão social / nome da transportadora</Label>
                     <div className="relative">
                       <Building2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -144,7 +144,7 @@ export default function CadastroPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="cnpj">CNPJ (Numérico ou Alfanumérico)</Label>
+                      <Label htmlFor="cnpj">CNPJ (numérico ou alfanumérico)</Label>
                       <div className="relative">
                         <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -163,7 +163,7 @@ export default function CadastroPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="telefone_empresa">Telefone Corporativo</Label>
+                      <Label htmlFor="telefone_empresa">Telefone corporativo</Label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -180,7 +180,7 @@ export default function CadastroPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="email_empresa">E-mail Corporativo Oficial</Label>
+                    <Label htmlFor="email_empresa">E-mail corporativo oficial</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -203,7 +203,7 @@ export default function CadastroPage() {
               {step === 2 && (
                 <div className="space-y-4 animate-fade-in">
                   <div className="space-y-1.5">
-                    <Label htmlFor="nome">Nome Completo do Gestor / Administrador</Label>
+                    <Label htmlFor="nome">Nome completo do gestor / administrador</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -221,7 +221,7 @@ export default function CadastroPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="email">E-mail de Acesso do Gestor</Label>
+                      <Label htmlFor="email">E-mail de acesso do gestor</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -239,7 +239,7 @@ export default function CadastroPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="cpf">CPF do Gestor</Label>
+                      <Label htmlFor="cpf">CPF do gestor</Label>
                       <div className="relative">
                         <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -273,7 +273,7 @@ export default function CadastroPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="senha">Senha de Acesso</Label>
+                      <Label htmlFor="senha">Senha de acesso</Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -292,7 +292,7 @@ export default function CadastroPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="confirmarSenha">Confirmar Senha</Label>
+                    <Label htmlFor="confirmarSenha">Confirmar senha</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -318,7 +318,7 @@ export default function CadastroPage() {
                   <p className="text-xs text-muted-foreground">
                     Já possui conta?{" "}
                     <Link href="/login" className="text-primary font-bold hover:underline">
-                      Fazer Login
+                      Fazer login
                     </Link>
                   </p>
                   <Button
@@ -326,7 +326,7 @@ export default function CadastroPage() {
                     onClick={nextStep}
                     className="w-full sm:w-auto rounded-xl font-bold gap-2 shadow-md"
                   >
-                    Avançar para Gestor
+                    Avançar para gestor
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </>
@@ -339,7 +339,7 @@ export default function CadastroPage() {
                     className="w-full sm:w-auto rounded-xl gap-2 font-semibold"
                   >
                     <ArrowLeft className="h-4 w-4" />
-                    Voltar aos Dados da Empresa
+                    Voltar aos dados da empresa
                   </Button>
                   <Button
                     type="submit"
@@ -354,7 +354,7 @@ export default function CadastroPage() {
                     ) : (
                       <>
                         <CheckCircle2 className="h-4 w-4" />
-                        Finalizar Cadastro
+                        Finalizar cadastro
                       </>
                     )}
                   </Button>

@@ -133,7 +133,7 @@ export default function AdministrativoPage() {
                 <SelectValue placeholder="Papel" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="todos">Todos os Papéis</SelectItem>
+                <SelectItem value="todos">Todos os papéis</SelectItem>
                 <SelectItem value="admin">Administrador</SelectItem>
                 <SelectItem value="gestor">Gestor</SelectItem>
               </SelectContent>
@@ -150,7 +150,7 @@ export default function AdministrativoPage() {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="todos">Todos Status</SelectItem>
+                <SelectItem value="todos">Todos status</SelectItem>
                 <SelectItem value="ativo">Ativos</SelectItem>
                 <SelectItem value="inativo">Inativos</SelectItem>
               </SelectContent>
@@ -165,7 +165,7 @@ export default function AdministrativoPage() {
             className="rounded-xl font-bold gap-2 shadow-sm"
           >
             <UserPlus className="h-4 w-4" />
-            Adicionar Administrador / Gestor
+            Adicionar administrador / gestor
           </Button>
         )}
       </div>
@@ -186,11 +186,11 @@ export default function AdministrativoPage() {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30">
-              <TableHead className="font-bold">Membro da Equipe</TableHead>
+              <TableHead className="font-bold">Membro da equipe</TableHead>
               <TableHead className="font-bold">Contatos</TableHead>
               <TableHead className="font-bold">CPF</TableHead>
               <TableHead className="font-bold">Cargo</TableHead>
-              <TableHead className="font-bold">Nível de Acesso</TableHead>
+              <TableHead className="font-bold">Nível de acesso</TableHead>
               <TableHead className="font-bold">Status</TableHead>
               {canManageTeam && <TableHead className="font-bold text-right">Ações</TableHead>}
             </TableRow>
@@ -271,7 +271,7 @@ export default function AdministrativoPage() {
                     <TableCell>
                       <div className="flex items-center gap-1.5 text-xs text-foreground font-semibold">
                         <Briefcase className="h-3.5 w-3.5 text-primary" />
-                        <span>{membro.empresa?.cargo || (isItemAdmin ? "Administrador Geral" : "Gestor de Frota")}</span>
+                        <span>{membro.empresa?.cargo || (isItemAdmin ? "Administrador geral" : "Gestor de frota")}</span>
                       </div>
                     </TableCell>
 
@@ -400,15 +400,15 @@ export default function AdministrativoPage() {
         onOpenChange={(open) => !open && setStatusModalMembro(null)}
         title={
           statusModalMembro?.nextStatus === "inativo"
-            ? "Inativar Membro Administrativo"
-            : "Ativar Membro Administrativo"
+            ? "Inativar membro administrativo"
+            : "Ativar membro administrativo"
         }
         description={
           statusModalMembro?.nextStatus === "inativo"
             ? `Tem certeza que deseja inativar o acesso de "${statusModalMembro?.membro.nome}"? O usuário perderá o acesso ao painel administrativo até ser reativado.`
             : `Deseja reativar o acesso de "${statusModalMembro?.membro.nome}" ao painel administrativo?`
         }
-        confirmText={statusModalMembro?.nextStatus === "inativo" ? "Sim, Inativar" : "Sim, Ativar"}
+        confirmText={statusModalMembro?.nextStatus === "inativo" ? "Sim, inativar" : "Sim, ativar"}
         cancelText="Cancelar"
         variant={statusModalMembro?.nextStatus === "inativo" ? "destructive" : "default"}
         isLoading={isAlterandoStatus}

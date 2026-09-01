@@ -164,7 +164,7 @@ export function VeiculoFormModal({
           <DialogHeader>
             <DialogTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
               <Truck className="h-5 w-5 text-primary" />
-              {isEditing ? "Editar Veículo da Frota" : "Cadastrar Veículo na Frota"}
+              {isEditing ? "Editar veículo da frota" : "Cadastrar veículo na frota"}
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
               {isEditing 
@@ -179,14 +179,14 @@ export function VeiculoFormModal({
               <div className="flex items-center gap-2 pb-1 border-b border-border/60">
                 <Truck className="h-4 w-4 text-primary" />
                 <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
-                  Unidade de Tração (Cavalo Mecânico)
+                  Unidade de tração (cavalo mecânico)
                 </h4>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="placa" className="text-xs font-semibold text-foreground">
-                    Placa do Cavalo *
+                    Placa do cavalo *
                   </Label>
                   <Input
                     id="placa"
@@ -205,7 +205,7 @@ export function VeiculoFormModal({
 
                 <div className="space-y-1.5">
                   <Label htmlFor="modelo" className="text-xs font-semibold text-foreground">
-                    Modelo do Caminhão *
+                    Modelo do caminhão *
                   </Label>
                   <Input
                     id="modelo"
@@ -223,7 +223,7 @@ export function VeiculoFormModal({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5 flex flex-col justify-end">
                   <Label htmlFor="combustivel" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
-                    Combustível Preferencial
+                    Combustível preferencial
                   </Label>
                   <Select
                     value={combustivel}
@@ -245,7 +245,7 @@ export function VeiculoFormModal({
 
                 <div className="space-y-1.5 flex flex-col justify-end">
                   <Label htmlFor="capacidade_tanque" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
-                    Capacidade Tanque (L) *
+                    Capacidade do tanque (L) *
                   </Label>
                   <Input
                     id="capacidade_tanque"
@@ -263,7 +263,7 @@ export function VeiculoFormModal({
 
                 <div className="space-y-1.5 flex flex-col justify-end">
                   <Label htmlFor="ano_fabricacao" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
-                    Ano de Fabricação *
+                    Ano de fabricação *
                   </Label>
                   <Input
                     id="ano_fabricacao"
@@ -287,7 +287,7 @@ export function VeiculoFormModal({
                 <div className="flex items-center gap-2">
                   <Layers className="h-4 w-4 text-primary" />
                   <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
-                    Implemento / Carretas (Bitrem, Rodotrem, Canavieiro)
+                    Implemento / carretas (bitrem, rodotrem, canavieiro)
                   </h4>
                 </div>
                 <Button
@@ -298,14 +298,14 @@ export function VeiculoFormModal({
                   className="rounded-lg h-7 px-2 text-xs font-semibold gap-1 text-primary border-primary/40 hover:bg-primary/10"
                 >
                   <Plus className="h-3.5 w-3.5" />
-                  Adicionar Carreta
+                  Adicionar carreta
                 </Button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="reboque_modelo" className="text-xs font-semibold text-foreground">
-                    Tipo / Modelo do Implemento
+                    Tipo / modelo do implemento
                   </Label>
                   <Input
                     id="reboque_modelo"
@@ -318,7 +318,7 @@ export function VeiculoFormModal({
 
                 <div className="space-y-1.5">
                   <Label htmlFor="reboque_ano_fabricacao" className="text-xs font-semibold text-foreground">
-                    Ano do Implemento
+                    Ano do implemento
                   </Label>
                   <Input
                     id="reboque_ano_fabricacao"
@@ -335,7 +335,7 @@ export function VeiculoFormModal({
               {/* Lista Dinâmica de Placas de Carretas */}
               <div className="space-y-2 pt-1">
                 <Label className="text-xs text-muted-foreground font-medium">
-                  Placas das Carretas Acopladas:
+                  Placas das carretas acopladas:
                 </Label>
 
                 <div className="space-y-2">
@@ -343,7 +343,7 @@ export function VeiculoFormModal({
                     <div key={index} className="flex items-center gap-2">
                       <div className="flex-1 relative">
                         <Input
-                          placeholder={`Placa da Carreta #${index + 1} (ex: XYZ-9A87)`}
+                          placeholder={`Placa da carreta #${index + 1} (ex: XYZ-9A87)`}
                           value={placa}
                           onChange={(e) => handleReboquePlacaChange(index, e.target.value)}
                           maxLength={8}
@@ -391,7 +391,7 @@ export function VeiculoFormModal({
                   Salvando...
                 </>
               ) : (
-                isEditing ? "Salvar Alterações" : "Cadastrar Veículo"
+                isEditing ? "Salvar alterações" : "Cadastrar veículo"
               )}
             </Button>
           </DialogFooter>

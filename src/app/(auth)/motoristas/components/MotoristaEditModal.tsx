@@ -88,7 +88,7 @@ export function MotoristaEditModal({
           <DialogHeader>
             <DialogTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
               <Edit3 className="h-5 w-5 text-primary" />
-              Editar Dados do Motorista
+              Editar dados do motorista
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
               Atualize as informações de contato e o caminhão vinculado ao motorista.
@@ -97,7 +97,7 @@ export function MotoristaEditModal({
 
           <div className="space-y-3.5 py-4">
             <div className="space-y-1.5">
-              <Label htmlFor="edit-nome">Nome Completo *</Label>
+              <Label htmlFor="edit-nome">Nome completo *</Label>
               <Input
                 id="edit-nome"
                 className="rounded-xl"
@@ -150,7 +150,7 @@ export function MotoristaEditModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="edit-veiculo">Caminhão Vinculado</Label>
+              <Label htmlFor="edit-veiculo">Caminhão vinculado</Label>
               <Select
                 value={editVeiculoId}
                 onValueChange={setEditVeiculoId}
@@ -191,7 +191,7 @@ export function MotoristaEditModal({
                   Salvando...
                 </>
               ) : (
-                "Salvar Alterações"
+                "Salvar alterações"
               )}
             </Button>
           </DialogFooter>

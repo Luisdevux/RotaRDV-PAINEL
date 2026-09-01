@@ -22,15 +22,15 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
-  "/dashboard": { title: "Visão Geral", subtitle: "Métricas consolidadas, frotas e despesas operacionais" },
-  "/motoristas": { title: "Gestão de Motoristas", subtitle: "Equipe de condutores, credenciais e veículos vinculados" },
-  "/veiculos": { title: "Frota de Veículos", subtitle: "Cavalos mecânicos, carretas e implementos rodoviários" },
-  "/viagens": { title: "Controle de Viagens", subtitle: "Auditoria de rotas, odômetro inicial/final e status" },
-  "/despesas": { title: "Despesas & Comprovantes", subtitle: "Auditoria financeira, abastecimentos e fotos de notas" },
-  "/empresas": { title: "Transportadoras Globais", subtitle: "Administração de empresas clientes da plataforma" },
-  "/administrativo": { title: "Equipe Administrativa", subtitle: "Gestão de administradores e gestores da transportadora" },
-  "/empresa/configuracoes": { title: "Dados da Transportadora", subtitle: "CNPJ, endereços e logotipo corporativo" },
-  "/perfil": { title: "Meu Perfil", subtitle: "Informações pessoais e credenciais de acesso" },
+  "/dashboard": { title: "Visão geral", subtitle: "Métricas consolidadas, frotas e despesas operacionais" },
+  "/motoristas": { title: "Gestão de motoristas", subtitle: "Equipe de condutores, credenciais e veículos vinculados" },
+  "/veiculos": { title: "Frota de veículos", subtitle: "Cavalos mecânicos, carretas e implementos rodoviários" },
+  "/viagens": { title: "Controle de viagens", subtitle: "Auditoria de rotas, odômetro inicial/final e status" },
+  "/despesas": { title: "Despesas e comprovantes", subtitle: "Auditoria financeira, abastecimentos e fotos de notas" },
+  "/empresas": { title: "Transportadoras globais", subtitle: "Administração de empresas clientes da plataforma" },
+  "/administrativo": { title: "Equipe administrativa", subtitle: "Gestão de administradores e gestores da transportadora" },
+  "/empresa/configuracoes": { title: "Dados da transportadora", subtitle: "CNPJ, endereços e logotipo corporativo" },
+  "/perfil": { title: "Meu perfil", subtitle: "Informações pessoais e credenciais de acesso" },
 };
 
 interface HeaderProps {
@@ -49,8 +49,8 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
   }, []);
 
   const pageInfo = PAGE_TITLES[pathname] || {
-    title: "Painel de Controle",
-    subtitle: "Sistema de Gestão de Despesas e Frotas",
+    title: "Painel de controle",
+    subtitle: "Sistema de gestão de despesas e frotas",
   };
 
   const getRoleLabel = () => {
@@ -92,18 +92,18 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
               <Button
                 variant="outline"
                 className="flex items-center gap-2 px-3 py-1.5 h-10 rounded-xl border-primary/30 bg-primary/5 hover:bg-primary/10 text-xs font-semibold text-foreground transition-colors max-w-[170px] sm:max-w-[260px]"
-                title="Alternar Transportadora Ativa"
+                title="Alternar transportadora ativa"
               >
                 <Building className="h-4 w-4 text-primary shrink-0" />
                 <span className="truncate">
-                  {empresa?.nome_empresa || (isLoadingEmpresas ? "Carregando..." : "Selecione uma Empresa")}
+                  {empresa?.nome_empresa || (isLoadingEmpresas ? "Carregando..." : "Selecione uma empresa")}
                 </span>
                 <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0 ml-auto" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-72 p-1.5 rounded-2xl shadow-xl">
               <DropdownMenuLabel className="text-xs font-bold text-muted-foreground px-2 py-1.5">
-                Transportadora Ativa (Visão Admin)
+                Transportadora ativa (Visão admin)
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <div className="max-h-60 overflow-y-auto space-y-1">
@@ -208,7 +208,7 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
             <DropdownMenuItem asChild>
               <Link href="/perfil" className="cursor-pointer">
                 <User className="mr-2 h-4 w-4 text-muted-foreground" />
-                <span>Meu Perfil</span>
+                <span>Meu perfil</span>
               </Link>
             </DropdownMenuItem>
 
@@ -216,7 +216,7 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
               <DropdownMenuItem asChild>
                 <Link href="/empresa/configuracoes" className="cursor-pointer">
                   <Building className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <span>Dados da Transportadora</span>
+                  <span>Dados da transportadora</span>
                 </Link>
               </DropdownMenuItem>
             )}

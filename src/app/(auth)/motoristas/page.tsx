@@ -132,7 +132,7 @@ export default function MotoristasPage() {
           className="rounded-xl font-bold gap-2 shadow-sm"
         >
           <UserPlus className="h-4 w-4" />
-          Cadastrar Motorista
+          Cadastrar motorista
         </Button>
       </div>
 
@@ -144,7 +144,7 @@ export default function MotoristasPage() {
               <TableHead className="font-bold">Motorista</TableHead>
               <TableHead className="font-bold">Contatos</TableHead>
               <TableHead className="font-bold">Documentos (CPF / CNH)</TableHead>
-              <TableHead className="font-bold">Caminhão Vinculado</TableHead>
+              <TableHead className="font-bold">Caminhão vinculado</TableHead>
               <TableHead className="font-bold">Status</TableHead>
               <TableHead className="font-bold text-right">Ações</TableHead>
             </TableRow>
@@ -190,7 +190,7 @@ export default function MotoristasPage() {
                         </Avatar>
                         <div>
                           <p className="font-bold text-foreground text-sm leading-tight">{motorista.nome}</p>
-                          <p className="text-xs text-muted-foreground">{motorista.empresa?.cargo || "Motorista Rodoviário"}</p>
+                          <p className="text-xs text-muted-foreground">{motorista.empresa?.cargo || "Motorista rodoviário"}</p>
                         </div>
                       </div>
                     </TableCell>
@@ -341,9 +341,9 @@ export default function MotoristasPage() {
       <ConfirmDialog
         open={Boolean(deletingMotorista)}
         onOpenChange={(open) => !open && setDeletingMotorista(null)}
-        title="Desvincular Motorista da Transportadora"
+        title="Desvincular motorista da transportadora"
         description={`Tem certeza que deseja desvincular o motorista "${deletingMotorista?.nome}"? O condutor perderá o acesso às viagens e dados vinculados a esta empresa.`}
-        confirmText="Sim, Desvincular"
+        confirmText="Sim, desvincular"
         cancelText="Cancelar"
         variant="destructive"
         isLoading={isDesvinculando}
@@ -356,15 +356,15 @@ export default function MotoristasPage() {
         onOpenChange={(open) => !open && setStatusModalMotorista(null)}
         title={
           statusModalMotorista?.nextStatus === "inativo"
-            ? "Inativar Motorista"
-            : "Ativar Motorista"
+            ? "Inativar motorista"
+            : "Ativar motorista"
         }
         description={
           statusModalMotorista?.nextStatus === "inativo"
             ? `Deseja suspender temporariamente o motorista "${statusModalMotorista?.motorista.nome}"? O condutor não conseguirá abrir novas viagens no aplicativo.`
             : `Deseja reativar o motorista "${statusModalMotorista?.motorista.nome}"? Ele voltará a ter acesso total ao aplicativo.`
         }
-        confirmText={statusModalMotorista?.nextStatus === "inativo" ? "Sim, Inativar" : "Sim, Ativar"}
+        confirmText={statusModalMotorista?.nextStatus === "inativo" ? "Sim, inativar" : "Sim, ativar"}
         cancelText="Cancelar"
         variant={statusModalMotorista?.nextStatus === "inativo" ? "destructive" : "default"}
         isLoading={isAlterandoStatus}

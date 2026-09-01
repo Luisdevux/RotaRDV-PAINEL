@@ -141,7 +141,7 @@ export function ExportarRelatorioModal({
               <FileDown className="h-5 w-5" />
             </div>
             <div>
-              <DialogTitle className="text-lg font-bold">Exportar Relatório em PDF</DialogTitle>
+              <DialogTitle className="text-lg font-bold">Exportar relatório em PDF</DialogTitle>
               <DialogDescription className="text-xs pt-0.5">
                 Configure os parâmetros e o período para emissão do relatório fiscal auditado.
               </DialogDescription>
@@ -154,19 +154,19 @@ export function ExportarRelatorioModal({
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
               <Calendar className="h-3.5 w-3.5 text-primary" />
-              Intervalo Temporal
+              Intervalo temporal
             </label>
             <Select value={periodoPredefinido} onValueChange={handlePeriodoChange}>
               <SelectTrigger className="rounded-xl text-xs h-9">
                 <SelectValue placeholder="Selecione o período..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="mesAtual">Mês Atual (Em andamento)</SelectItem>
-                <SelectItem value="mesAnterior">Mês Anterior Completo</SelectItem>
-                <SelectItem value="ultimos30">Últimos 30 Dias</SelectItem>
-                <SelectItem value="ultimos90">Últimos 90 Dias (Trimestre)</SelectItem>
-                <SelectItem value="personalizado">Personalizado (Escolher datas)</SelectItem>
-                <SelectItem value="todos">Histórico Completo (Geral)</SelectItem>
+                <SelectItem value="mesAtual">Mês atual (em andamento)</SelectItem>
+                <SelectItem value="mesAnterior">Mês anterior completo</SelectItem>
+                <SelectItem value="ultimos30">Últimos 30 dias</SelectItem>
+                <SelectItem value="ultimos90">Últimos 90 dias (trimestre)</SelectItem>
+                <SelectItem value="personalizado">Personalizado (escolher datas)</SelectItem>
+                <SelectItem value="todos">Histórico completo (geral)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -174,7 +174,7 @@ export function ExportarRelatorioModal({
           {/* Inputs de Data Início / Fim (se personalizado ou para ajuste fino) */}
           <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-muted/40 border border-border/60">
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-muted-foreground">Data Inicial:</label>
+              <label className="text-[11px] font-medium text-muted-foreground">Data inicial:</label>
               <Input
                 type="date"
                 value={dataInicio}
@@ -186,7 +186,7 @@ export function ExportarRelatorioModal({
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-muted-foreground">Data Final:</label>
+              <label className="text-[11px] font-medium text-muted-foreground">Data final:</label>
               <Input
                 type="date"
                 value={dataFim}
@@ -203,19 +203,19 @@ export function ExportarRelatorioModal({
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
               <Layers className="h-3.5 w-3.5 text-primary" />
-              Categoria de Despesa
+              Categoria de despesa
             </label>
             <Select value={categoria} onValueChange={setCategoria}>
               <SelectTrigger className="rounded-xl text-xs h-9">
                 <SelectValue placeholder="Selecione a categoria..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="todas">Todas as Categorias (Consolidado Geral)</SelectItem>
-                <SelectItem value="ABASTECIMENTO">Apenas Abastecimentos</SelectItem>
-                <SelectItem value="ALIMENTACAO">Apenas Alimentação</SelectItem>
-                <SelectItem value="PEDAGIO">Apenas Pedágios</SelectItem>
-                <SelectItem value="MANUTENCAO">Apenas Manutenção</SelectItem>
-                <SelectItem value="OUTROS">Apenas Outros / Diversos</SelectItem>
+                <SelectItem value="todas">Todas as categorias (consolidado geral)</SelectItem>
+                <SelectItem value="ABASTECIMENTO">Apenas abastecimentos</SelectItem>
+                <SelectItem value="ALIMENTACAO">Apenas alimentação</SelectItem>
+                <SelectItem value="PEDAGIO">Apenas pedágios</SelectItem>
+                <SelectItem value="MANUTENCAO">Apenas manutenção</SelectItem>
+                <SelectItem value="OUTROS">Apenas outros / diversos</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -224,18 +224,18 @@ export function ExportarRelatorioModal({
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
               <SlidersHorizontal className="h-3.5 w-3.5 text-primary" />
-              Volume Máximo de Registros
+              Volume máximo de registros
             </label>
             <Select value={String(limite)} onValueChange={(val) => setLimite(Number(val))}>
               <SelectTrigger className="rounded-xl text-xs h-9">
                 <SelectValue placeholder="Limite de registros..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="0">Todos os lançamentos do período (Recomendado)</SelectItem>
+                <SelectItem value="0">Todos os lançamentos do período (recomendado)</SelectItem>
                 <SelectItem value="50">Até 50 lançamentos mais recentes</SelectItem>
                 <SelectItem value="100">Até 100 lançamentos</SelectItem>
                 <SelectItem value="200">Até 200 lançamentos</SelectItem>
-                <SelectItem value="500">Até 500 lançamentos (Auditoria Extensa)</SelectItem>
+                <SelectItem value="500">Até 500 lançamentos (auditoria extensa)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -272,7 +272,7 @@ export function ExportarRelatorioModal({
             ) : (
               <>
                 <CheckCircle2 className="h-4 w-4" />
-                Gerar e Baixar PDF
+                Gerar e baixar PDF
               </>
             )}
           </Button>

@@ -200,7 +200,7 @@ export default function ViagensPage() {
                 setPage(1);
               }}
             >
-              Em Andamento
+              Em andamento
             </Button>
             <Button
               variant={statusFilter === "concluída" ? "default" : "ghost"}
@@ -232,7 +232,7 @@ export default function ViagensPage() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-muted-foreground font-medium flex items-center gap-1.5 mr-1">
               <Calendar className="h-3.5 w-3.5 text-primary" />
-              Período de Partida:
+              Período de partida:
             </span>
 
             {/* Input Data Início */}
@@ -271,7 +271,7 @@ export default function ViagensPage() {
                 className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
                 onClick={() => aplicarPeriodo("7dias")}
               >
-                7 Dias
+                7 dias
               </Button>
               <Button
                 variant="outline"
@@ -279,7 +279,7 @@ export default function ViagensPage() {
                 className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
                 onClick={() => aplicarPeriodo("30dias")}
               >
-                30 Dias
+                30 dias
               </Button>
               <Button
                 variant="outline"
@@ -287,7 +287,7 @@ export default function ViagensPage() {
                 className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
                 onClick={() => aplicarPeriodo("mesAtual")}
               >
-                Este Mês
+                Este mês
               </Button>
             </div>
           </div>
@@ -301,7 +301,7 @@ export default function ViagensPage() {
               onClick={limparTodosFiltros}
             >
               <RotateCcw className="h-3 w-3" />
-              Limpar Filtros
+              Limpar filtros
             </Button>
           )}
         </div>
@@ -312,10 +312,10 @@ export default function ViagensPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Origem & Destino</TableHead>
+              <TableHead>Origem e destino</TableHead>
               <TableHead>Motorista</TableHead>
               <TableHead>Veículo</TableHead>
-              <TableHead>Total Despesas</TableHead>
+              <TableHead>Total de despesas</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -399,7 +399,7 @@ export default function ViagensPage() {
                       {viagem.status === "em_andamento" ? (
                         <Badge variant="warning" className="gap-1 font-semibold">
                           <Clock className="h-3 w-3" />
-                          Em Andamento
+                          Em andamento
                         </Badge>
                       ) : viagem.status === "cancelada" ? (
                         <Badge variant="destructive" className="gap-1 font-semibold">
@@ -463,7 +463,7 @@ export default function ViagensPage() {
                   </DialogDescription>
                 </div>
                 {selectedViagem.status === "em_andamento" ? (
-                  <Badge variant="warning">Em Andamento</Badge>
+                  <Badge variant="warning">Em andamento</Badge>
                 ) : selectedViagem.status === "cancelada" ? (
                   <Badge variant="destructive">Cancelada</Badge>
                 ) : (
@@ -495,7 +495,7 @@ export default function ViagensPage() {
                     </Avatar>
                     <div>
                       <span className="font-bold text-foreground block">{modalMotoristaNome}</span>
-                      <span className="text-muted-foreground text-[11px]">Condutor Responsável</span>
+                      <span className="text-muted-foreground text-[11px]">Condutor responsável</span>
                     </div>
                   </div>
 
@@ -527,7 +527,7 @@ export default function ViagensPage() {
                   )}
                   <div>
                     <span className="font-bold block mb-0.5">
-                      {selectedViagem.status === "cancelada" ? "Motivo do Cancelamento:" : "Observações / Descrição:"}
+                      {selectedViagem.status === "cancelada" ? "Motivo do cancelamento:" : "Observações / descrição:"}
                     </span>
                     <p className="text-foreground">{selectedViagem.descricao}</p>
                   </div>
@@ -538,14 +538,14 @@ export default function ViagensPage() {
             {/* Resumo Financeiro & Métricas */}
             <div className="grid grid-cols-3 gap-3 my-2">
               <div className="p-3.5 rounded-xl bg-card border border-border/80 shadow-sm space-y-1">
-                <span className="text-xs text-muted-foreground block font-medium">Despesas Totais</span>
+                <span className="text-xs text-muted-foreground block font-medium">Despesas totais</span>
                 <span className="text-xl font-black text-primary block">
                   {formatCurrency(selectedViagem.resumo_financeiro?.total_geral || 0)}
                 </span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-card border border-border/80 shadow-sm space-y-1">
-                <span className="text-xs text-muted-foreground block font-medium">Distância Percorrida</span>
+                <span className="text-xs text-muted-foreground block font-medium">Distância percorrida</span>
                 <span className="text-xl font-black text-foreground block">
                   {formatKM(
                     selectedViagem.resumo_financeiro?.metricas?.km_percorrido || 
@@ -555,7 +555,7 @@ export default function ViagensPage() {
               </div>
 
               <div className="p-3.5 rounded-xl bg-card border border-border/80 shadow-sm space-y-1">
-                <span className="text-xs text-muted-foreground block font-medium">Média de Consumo</span>
+                <span className="text-xs text-muted-foreground block font-medium">Média de consumo</span>
                 <span className="text-xl font-black text-info block">
                   {formatConsumo(selectedViagem.resumo_financeiro?.metricas?.media_consumo)}
                 </span>
@@ -566,7 +566,7 @@ export default function ViagensPage() {
             {selectedViagem.resumo_financeiro?.por_categoria && (
               <div className="space-y-2 pt-2">
                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                  Detalhamento de Custos da Viagem
+                  Detalhamento de custos da viagem
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
                   <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50 flex items-center justify-between">
@@ -613,7 +613,7 @@ export default function ViagensPage() {
                 >
                   <Link href={`/despesas?viagem_id=${selectedViagem._id}`}>
                     <ReceiptText className="h-4 w-4 text-primary" />
-                    <span>Ver Comprovantes</span>
+                    <span>Ver comprovantes</span>
                   </Link>
                 </Button>
 
@@ -645,7 +645,7 @@ export default function ViagensPage() {
                     }}
                   >
                     <Ban className="h-4 w-4" />
-                    Cancelar Viagem
+                    Cancelar viagem
                   </Button>
                 )}
                 <Button 
@@ -671,7 +671,7 @@ export default function ViagensPage() {
                   <Ban className="h-5 w-5" />
                 </div>
                 <div>
-                  <DialogTitle className="text-lg font-bold">Cancelar Viagem</DialogTitle>
+                  <DialogTitle className="text-lg font-bold">Cancelar viagem</DialogTitle>
                   <DialogDescription className="text-xs pt-0.5">
                     A viagem de {formatLocal(cancelingViagem.origem)} para {formatLocal(cancelingViagem.destino)} será cancelada e interrompida.
                   </DialogDescription>
@@ -681,7 +681,7 @@ export default function ViagensPage() {
 
             <div className="space-y-2 py-2">
               <label className="text-xs font-semibold text-foreground">
-                Motivo do Cancelamento <span className="text-muted-foreground font-normal">(opcional)</span>
+                Motivo do cancelamento <span className="text-muted-foreground font-normal">(opcional)</span>
               </label>
               <Input
                 placeholder="Ex: Quebra mecânica no cavalo, sinistro, cancelamento de carga..."
@@ -709,7 +709,7 @@ export default function ViagensPage() {
                   setSelectedViagem(null);
                 }}
               >
-                {isCancelando ? "Cancelando..." : "Confirmar Cancelamento"}
+                {isCancelando ? "Cancelando..." : "Confirmar cancelamento"}
               </Button>
             </DialogFooter>
           </DialogContent>

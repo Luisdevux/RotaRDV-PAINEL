@@ -138,7 +138,7 @@ export function PaginationControls({
           className="h-8 w-8 rounded-lg"
           onClick={() => onPageChange(1)}
           disabled={currentPage <= 1 || isLoading}
-          title="Primeira Página"
+          title="Primeira página"
         >
           <ChevronsLeft className="h-4 w-4" />
         </Button>
@@ -150,7 +150,7 @@ export function PaginationControls({
           className="h-8 w-8 rounded-lg"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1 || isLoading}
-          title="Página Anterior"
+          title="Página anterior"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -198,7 +198,7 @@ export function PaginationControls({
           className="h-8 w-8 rounded-lg"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= validTotalPages || isLoading}
-          title="Próxima Página"
+          title="Próxima página"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -210,7 +210,7 @@ export function PaginationControls({
           className="h-8 w-8 rounded-lg"
           onClick={() => onPageChange(validTotalPages)}
           disabled={currentPage >= validTotalPages || isLoading}
-          title="Última Página"
+          title="Última página"
         >
           <ChevronsRight className="h-4 w-4" />
         </Button>

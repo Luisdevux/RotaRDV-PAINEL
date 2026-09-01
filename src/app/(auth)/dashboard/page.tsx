@@ -107,7 +107,7 @@ export default function DashboardPage() {
           <Button asChild variant="default" className="rounded-xl font-semibold gap-2 shadow-md">
             <Link href="/motoristas">
               <PlusCircle className="h-4 w-4" />
-              Novo Motorista
+              Novo motorista
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-xl font-semibold gap-2">
@@ -122,28 +122,28 @@ export default function DashboardPage() {
       {/* KPI Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
-          title="Motoristas Ativos"
+          title="Motoristas ativos"
           value={resumo.total_motoristas}
           subtitle={`Frota de ${resumo.total_veiculos} veículos`}
           icon={Users}
           variant="success"
         />
         <MetricCard
-          title="Viagens em Andamento"
+          title="Viagens em andamento"
           value={resumo.viagens_em_andamento}
           subtitle={`${resumo.viagens_concluidas} concluídas`}
           icon={Route}
           variant="info"
         />
         <MetricCard
-          title="Distância Total"
+          title="Distância total"
           value={formatKM(resumo.total_km_rodado)}
           subtitle={resumo.media_consumo_frota ? `Média da frota: ${formatConsumo(resumo.media_consumo_frota)}` : "Quilômetros auditados"}
           icon={TrendingUp}
           variant="warning"
         />
         <MetricCard
-          title="Despesas Operacionais"
+          title="Despesas operacionais"
           value={formatCurrency(resumo.total_despesas)}
           subtitle={resumo.total_litros ? `${resumo.total_litros.toLocaleString('pt-BR')}L de combustível` : "Comprovantes lançados"}
           icon={ReceiptText}
@@ -158,7 +158,7 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle className="text-base font-bold flex items-center gap-2">
               <ReceiptText className="h-5 w-5 text-primary" />
-              Divisão de Gastos
+              Divisão de gastos
             </CardTitle>
             <CardDescription className="text-xs">
               Distribuição percentual por tipo de despesa
@@ -232,10 +232,10 @@ export default function DashboardPage() {
             <div>
               <CardTitle className="text-base font-bold flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-info" />
-                Comparativo de Custos Operacionais
+                Comparativo de custos operacionais
               </CardTitle>
               <CardDescription className="text-xs">
-                Valores consolidados em Reais (BRL)
+                Valores consolidados em reais (BRL)
               </CardDescription>
             </div>
             <Button asChild variant="ghost" size="sm" className="gap-1 text-xs text-primary hover:text-primary/80">
@@ -264,7 +264,7 @@ export default function DashboardPage() {
                       tickFormatter={(v) => `R$ ${v}`}
                     />
                     <Tooltip
-                      formatter={(val: any) => [formatCurrency(Number(val)), "Valor Total"]}
+                      formatter={(val: any) => [formatCurrency(Number(val)), "Valor total"]}
                       contentStyle={{
                         backgroundColor: "hsl(var(--card))",
                         borderColor: "hsl(var(--border))",
@@ -303,7 +303,7 @@ export default function DashboardPage() {
         >
           <div className="space-y-1">
             <h4 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors">
-              Auditoria de Viagens
+              Auditoria de viagens
             </h4>
             <p className="text-xs text-muted-foreground">
               Acompanhe odômetros, condutores e rotas em tempo real
@@ -320,7 +320,7 @@ export default function DashboardPage() {
         >
           <div className="space-y-1">
             <h4 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors">
-              Notas & Comprovantes
+              Notas e comprovantes
             </h4>
             <p className="text-xs text-muted-foreground">
               Visualize fotos de abastecimento e recibos fiscais com zoom
@@ -337,7 +337,7 @@ export default function DashboardPage() {
         >
           <div className="space-y-1">
             <h4 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors">
-              Equipe de Motoristas
+              Equipe de motoristas
             </h4>
             <p className="text-xs text-muted-foreground">
               Cadastre novos condutores e vincule caminhões da frota

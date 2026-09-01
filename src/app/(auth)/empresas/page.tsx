@@ -225,15 +225,15 @@ export default function EmpresasAdminPage() {
         onOpenChange={(open) => !open && setStatusModalEmpresa(null)}
         title={
           statusModalEmpresa?.nextStatus === "inativo"
-            ? "Desativar Transportadora"
-            : "Ativar Transportadora"
+            ? "Desativar transportadora"
+            : "Ativar transportadora"
         }
         description={
           statusModalEmpresa?.nextStatus === "inativo"
             ? `Tem certeza que deseja desativar a transportadora "${statusModalEmpresa?.empresa.nome_empresa}"? Os gestores e motoristas desta empresa não conseguirão acessar a plataforma.`
             : `Deseja reativar o acesso da transportadora "${statusModalEmpresa?.empresa.nome_empresa}" à plataforma?`
         }
-        confirmText={statusModalEmpresa?.nextStatus === "inativo" ? "Sim, Desativar" : "Sim, Ativar"}
+        confirmText={statusModalEmpresa?.nextStatus === "inativo" ? "Sim, desativar" : "Sim, ativar"}
         cancelText="Cancelar"
         variant={statusModalEmpresa?.nextStatus === "inativo" ? "destructive" : "default"}
         isLoading={isAlterandoStatus}

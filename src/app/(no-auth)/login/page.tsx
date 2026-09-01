@@ -71,9 +71,9 @@ function LoginFormContent() {
   return (
     <Card className="border-border/80 shadow-2xl backdrop-blur-sm bg-card/90 rounded-2xl">
       <CardHeader className="space-y-1 pb-4">
-        <CardTitle className="text-xl font-bold text-center">Entrar no Painel</CardTitle>
+        <CardTitle className="text-xl font-bold text-center">Entrar no painel</CardTitle>
         <CardDescription className="text-center text-xs">
-          Acesso exclusivo para Gestores e Administradores
+          Acesso exclusivo para gestores e administradores
         </CardDescription>
       </CardHeader>
 
@@ -81,7 +81,7 @@ function LoginFormContent() {
         {authError === "MotoristaRestrito" && (
           <div className="p-3.5 rounded-xl border border-destructive/30 bg-destructive/10 text-destructive text-xs space-y-1">
             <p className="font-bold flex items-center gap-1.5">
-              Acesso Restrito ao Aplicativo Mobile!
+              Acesso restrito ao aplicativo mobile!
             </p>
             <p className="leading-relaxed">
               Contas de <strong>Motorista</strong> devem utilizar exclusivamente o <strong>aplicativo móvel RotaRDV</strong> para registrar viagens e despesas. O painel web é restrito a Gestores.
@@ -165,7 +165,7 @@ function LoginFormContent() {
               </>
             ) : (
               <>
-                Acessar Painel
+                Acessar painel
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
@@ -249,7 +249,7 @@ export default function LoginPage() {
             Rota<span className="text-primary">RDV</span>
           </h1>
           <p className="text-xs text-muted-foreground">
-            Painel de Gestão de Frotas & Auditoria de Despesas
+            Painel de gestão de frotas e auditoria de despesas
           </p>
         </div>
 

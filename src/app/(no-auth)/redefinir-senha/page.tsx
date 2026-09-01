@@ -73,20 +73,20 @@ function RedefinirSenhaContent() {
           <div className="mx-auto h-12 w-12 rounded-full bg-primary/15 border border-primary/30 text-primary flex items-center justify-center">
             <CheckCircle2 className="h-6 w-6" />
           </div>
-          <h2 className="text-lg font-bold text-foreground">Senha Atualizada!</h2>
+          <h2 className="text-lg font-bold text-foreground">Senha atualizada!</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
             Sua nova senha foi salva. Você já pode fazer login na plataforma.
           </p>
           <div className="pt-2">
             <Button asChild variant="default" className="w-full rounded-xl">
-              <Link href="/login">Ir para o Login</Link>
+              <Link href="/login">Ir para o login</Link>
             </Button>
           </div>
         </CardContent>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold">Criar Nova Senha</CardTitle>
+            <CardTitle className="text-lg font-bold">Criar nova senha</CardTitle>
             <CardDescription className="text-xs">
               Escolha uma senha forte com no mínimo 8 caracteres.
             </CardDescription>
@@ -94,7 +94,7 @@ function RedefinirSenhaContent() {
 
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="senha">Nova Senha</Label>
+              <Label htmlFor="senha">Nova senha</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -111,7 +111,7 @@ function RedefinirSenhaContent() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="confirmarSenha">Confirmar Nova Senha</Label>
+              <Label htmlFor="confirmarSenha">Confirmar nova senha</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -139,7 +139,7 @@ function RedefinirSenhaContent() {
                   Salvando...
                 </>
               ) : (
-                "Salvar Nova Senha"
+                "Salvar nova senha"
               )}
             </Button>
           </CardContent>
@@ -165,7 +165,7 @@ export default function RedefinirSenhaPage() {
             />
           </div>
           <h1 className="text-2xl font-black tracking-tight text-foreground">
-            Redefinir Senha
+            Redefinir senha
           </h1>
         </div>
 

@@ -23,7 +23,7 @@ export default function NotFound() {
         <Button asChild variant="default" className="gap-2 rounded-xl">
           <Link href="/dashboard">
             <MoveLeft className="h-4 w-4" />
-            Voltar ao Dashboard
+            Voltar ao dashboard
           </Link>
         </Button>
       </div>

@@ -195,7 +195,7 @@ function DespesasContent() {
             onClick={() => router.push("/despesas")}
           >
             <X className="h-3 w-3" />
-            Remover Filtro da Viagem
+            Remover filtro da viagem
           </Button>
         </div>
       )}
@@ -332,7 +332,7 @@ function DespesasContent() {
                 className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
                 onClick={() => aplicarPeriodo("7dias")}
               >
-                7 Dias
+                7 dias
               </Button>
               <Button
                 variant="outline"
@@ -340,7 +340,7 @@ function DespesasContent() {
                 className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
                 onClick={() => aplicarPeriodo("30dias")}
               >
-                30 Dias
+                30 dias
               </Button>
               <Button
                 variant="outline"
@@ -348,7 +348,7 @@ function DespesasContent() {
                 className="h-7 text-[11px] px-2.5 rounded-lg font-medium text-muted-foreground hover:text-foreground"
                 onClick={() => aplicarPeriodo("mesAtual")}
               >
-                Este Mês
+                Este mês
               </Button>
             </div>
           </div>
@@ -363,7 +363,7 @@ function DespesasContent() {
                 onClick={limparTodosFiltros}
               >
                 <RotateCcw className="h-3.5 w-3.5" />
-                Limpar Filtros
+                Limpar filtros
               </Button>
             )}
 
@@ -375,7 +375,7 @@ function DespesasContent() {
               title="Configurar e exportar relatório consolidado em PDF"
             >
               <FileDown className="h-3.5 w-3.5 text-primary" />
-              Exportar Relatório PDF
+              Exportar relatório PDF
             </Button>
           </div>
         </div>
@@ -387,11 +387,11 @@ function DespesasContent() {
           <TableHeader>
             <TableRow>
               <TableHead>Categoria</TableHead>
-              <TableHead>Local / Estabelecimento</TableHead>
-              <TableHead>Motorista & Veículo</TableHead>
-              <TableHead>Data & Hora</TableHead>
-              <TableHead>Valor Total</TableHead>
-              <TableHead>Comprovante Fiscal</TableHead>
+              <TableHead>Local / estabelecimento</TableHead>
+              <TableHead>Motorista e veículo</TableHead>
+              <TableHead>Data e hora</TableHead>
+              <TableHead>Valor total</TableHead>
+              <TableHead>Comprovante fiscal</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -497,7 +497,7 @@ function DespesasContent() {
                           onClick={() => openComprovante(despesa)}
                         >
                           <ImageIcon className="h-3.5 w-3.5" />
-                          Ver Nota Fiscal
+                          Ver nota fiscal
                         </Button>
                       ) : (
                         <span className="text-xs text-muted-foreground flex items-center gap-1 italic">
@@ -561,9 +561,9 @@ function DespesasContent() {
       <ConfirmDialog
         open={Boolean(deletingDespesa)}
         onOpenChange={(open) => !open && setDeletingDespesa(null)}
-        title="Excluir Lançamento de Despesa"
+        title="Excluir lançamento de despesa"
         description={`Tem certeza que deseja excluir esta despesa de ${deletingDespesa ? formatCurrency(deletingDespesa.valor_total) : ""} (${deletingDespesa?.tipo})? O valor será deduzido do total da viagem.`}
-        confirmText="Sim, Excluir Despesa"
+        confirmText="Sim, excluir despesa"
         cancelText="Cancelar"
         variant="destructive"
         isLoading={isDeletando}

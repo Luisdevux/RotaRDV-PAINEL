@@ -163,7 +163,7 @@ function EmpresaConfiguracoesContent() {
 
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="px-3 py-1 text-xs border-primary/30 text-primary font-semibold">
-            {isSuperAdmin ? "Visão Global" : (isAdmin ? "Administrador Geral" : "Gestor de Frota")}
+            {isSuperAdmin ? "Visão global" : (isAdmin ? "Administrador geral" : "Gestor de frota")}
           </Badge>
         </div>
       </div>
@@ -173,7 +173,7 @@ function EmpresaConfiguracoesContent() {
         <CardHeader>
           <CardTitle className="text-base font-bold flex items-center gap-2">
             <UploadCloud className="h-5 w-5 text-primary" />
-            Identidade Visual da Transportadora
+            Identidade visual da transportadora
           </CardTitle>
           <CardDescription className="text-xs">
             Logotipo exibido nos relatórios, comprovantes e no topo do painel.
@@ -217,7 +217,7 @@ function EmpresaConfiguracoesContent() {
                         ) : (
                           <UploadCloud className="h-3.5 w-3.5" />
                         )}
-                        Alterar Logotipo
+                        Alterar logotipo
                       </span>
                     </Button>
                   </label>
@@ -230,7 +230,7 @@ function EmpresaConfiguracoesContent() {
                     disabled
                   >
                     <UploadCloud className="h-3.5 w-3.5" />
-                    Alterar Logotipo
+                    Alterar logotipo
                   </Button>
                 )}
 
@@ -244,7 +244,7 @@ function EmpresaConfiguracoesContent() {
                     disabled={isDeletandoFoto || !canEditCompany}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                    Remover Logotipo
+                    Remover logotipo
                   </Button>
                 )}
               </div>
@@ -263,7 +263,7 @@ function EmpresaConfiguracoesContent() {
           <CardHeader>
             <CardTitle className="text-base font-bold flex items-center gap-2">
               <Building2 className="h-5 w-5 text-primary" />
-              Informações Cadastrais & Contato
+              Informações cadastrais e contato
             </CardTitle>
             <CardDescription className="text-xs">
               Dados oficiais da empresa para emissão de relatórios e identificação.
@@ -275,7 +275,7 @@ function EmpresaConfiguracoesContent() {
               {/* Razão Social */}
               <div className="space-y-1.5">
                 <Label htmlFor="nome_empresa" className="text-xs font-semibold">
-                  Razão Social / Nome Fantasia <span className="text-destructive">*</span>
+                  Razão social / nome fantasia <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="nome_empresa"
@@ -292,7 +292,7 @@ function EmpresaConfiguracoesContent() {
               {/* CNPJ (Read Only) */}
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-muted-foreground">
-                  CNPJ (Registro Principal)
+                  CNPJ (registro principal)
                 </Label>
                 <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/50 border border-border text-xs font-mono font-bold text-foreground">
                   <span>{formatCNPJ(empresa?.cnpj) || "Não cadastrado"}</span>
@@ -303,7 +303,7 @@ function EmpresaConfiguracoesContent() {
               {/* E-mail Corporativo */}
               <div className="space-y-1.5">
                 <Label htmlFor="email" className="text-xs font-semibold">
-                  E-mail Corporativo <span className="text-destructive">*</span>
+                  E-mail corporativo <span className="text-destructive">*</span>
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -324,7 +324,7 @@ function EmpresaConfiguracoesContent() {
               {/* Telefone */}
               <div className="space-y-1.5">
                 <Label htmlFor="telefone" className="text-xs font-semibold">
-                  Telefone de Contato
+                  Telefone de contato
                 </Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -349,7 +349,7 @@ function EmpresaConfiguracoesContent() {
           <CardHeader>
             <CardTitle className="text-base font-bold flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary" />
-              Endereço da Sede
+              Endereço da sede
             </CardTitle>
             <CardDescription className="text-xs">
               Localização física do escritório ou pátio principal da transportadora.
@@ -377,7 +377,7 @@ function EmpresaConfiguracoesContent() {
               {/* Logradouro */}
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="logradouro" className="text-xs font-semibold">
-                  Logradouro / Rua / Avenida
+                  Logradouro / rua / avenida
                 </Label>
                 <Input
                   id="logradouro"
@@ -433,7 +433,7 @@ function EmpresaConfiguracoesContent() {
               {/* Estado / UF */}
               <div className="space-y-1.5 sm:col-span-1">
                 <Label htmlFor="estado" className="text-xs font-semibold">
-                  UF / Estado
+                  UF / estado
                 </Label>
                 <Input
                   id="estado"
@@ -458,12 +458,12 @@ function EmpresaConfiguracoesContent() {
                 {isAtualizando ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Salvando Dados...
+                    Salvando dados...
                   </>
                 ) : (
                   <>
                     <CheckCircle2 className="h-4 w-4" />
-                    Salvar Alterações Cadastrais
+                    Salvar alterações cadastrais
                   </>
                 )}
               </Button>
@@ -476,9 +476,9 @@ function EmpresaConfiguracoesContent() {
       <ConfirmDialog
         open={deleteLogoModalOpen}
         onOpenChange={setDeleteLogoModalOpen}
-        title="Remover Logotipo da Empresa"
+        title="Remover logotipo da empresa"
         description="Tem certeza que deseja remover o logotipo atual? A empresa voltará a utilizar o ícone corporativo padrão."
-        confirmText="Sim, Remover Logotipo"
+        confirmText="Sim, remover logotipo"
         cancelText="Cancelar"
         variant="destructive"
         isLoading={isDeletandoFoto}

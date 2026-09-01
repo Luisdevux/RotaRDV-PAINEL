@@ -132,7 +132,7 @@ export default function PerfilPage() {
       case "superAdmin":
         return (
           <Badge variant="destructive" className="rounded-md bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 font-bold px-2.5 py-1 text-xs">
-            Super Administrador
+            Super administrador
           </Badge>
         );
       case "admin":
@@ -166,11 +166,11 @@ export default function PerfilPage() {
     const role = usuarioData?.role || user?.role;
     switch (role) {
       case "superAdmin":
-        return "Super Administrador (Global)";
+        return "Super administrador (global)";
       case "admin":
-        return "Administrador Geral da Empresa";
+        return "Administrador geral da empresa";
       case "gestor":
-        return "Gestor de Frotas";
+        return "Gestor de frotas";
       case "motorista":
         return "Motorista";
       default:
@@ -186,7 +186,7 @@ export default function PerfilPage() {
             <div>
               <CardTitle className="text-base font-bold flex items-center gap-2">
                 <User className="h-5 w-5 text-primary" />
-                Informações Pessoais
+                Informações pessoais
               </CardTitle>
               <CardDescription className="text-xs">
                 Seus dados cadastrais e foto de perfil na plataforma RotaRDV.
@@ -229,7 +229,7 @@ export default function PerfilPage() {
                     ) : (
                       <UploadCloud className="h-3.5 w-3.5" />
                     )}
-                    Alterar Foto de Perfil
+                    Alterar foto de perfil
                   </span>
                 </Button>
               </label>
@@ -243,7 +243,7 @@ export default function PerfilPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="nome">Nome Completo</Label>
+                <Label htmlFor="nome">Nome completo</Label>
                 <Input 
                   id="nome" 
                   className="rounded-xl" 
@@ -256,7 +256,7 @@ export default function PerfilPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="email">E-mail (Não editável)</Label>
+                <Label htmlFor="email">E-mail (não editável)</Label>
                 <Input
                   id="email"
                   type="email"
@@ -282,7 +282,7 @@ export default function PerfilPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="cnh">CNH (Habilitação)</Label>
+                <Label htmlFor="cnh">CNH (habilitação)</Label>
                 <Input 
                   id="cnh" 
                   placeholder="00000000000" 
@@ -310,7 +310,7 @@ export default function PerfilPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="cargo">Cargo / Função (Não editável)</Label>
+                <Label htmlFor="cargo">Cargo / função (não editável)</Label>
                 <Input
                   id="cargo"
                   value={getCargoLabel()}
@@ -335,7 +335,7 @@ export default function PerfilPage() {
                 ) : (
                   <>
                     <CheckCircle2 className="h-4 w-4" />
-                    Atualizar Meus Dados
+                    Atualizar meus dados
                   </>
                 )}
               </Button>

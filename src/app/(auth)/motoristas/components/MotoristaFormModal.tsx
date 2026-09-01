@@ -78,7 +78,7 @@ export function MotoristaFormModal({
           <DialogHeader>
             <DialogTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
               <UserPlus className="h-5 w-5 text-primary" />
-              Cadastrar Novo Motorista
+              Cadastrar novo motorista
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
               O condutor receberá credenciais para acessar o aplicativo móvel RotaRDV.
@@ -87,7 +87,7 @@ export function MotoristaFormModal({
 
           <div className="space-y-3.5 py-4">
             <div className="space-y-1.5">
-              <Label htmlFor="nome">Nome Completo *</Label>
+              <Label htmlFor="nome">Nome completo *</Label>
               <Input
                 id="nome"
                 placeholder="Ex: João Ferreira da Silva"
@@ -115,7 +115,7 @@ export function MotoristaFormModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="senha">Senha Inicial (Opcional)</Label>
+              <Label htmlFor="senha">Senha inicial (opcional)</Label>
               <Input
                 id="senha"
                 type="password"
@@ -169,7 +169,7 @@ export function MotoristaFormModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="veiculo">Caminhão Vinculado (Opcional)</Label>
+              <Label htmlFor="veiculo">Caminhão vinculado (opcional)</Label>
               <Select
                 value={selectedVeiculoId}
                 onValueChange={setSelectedVeiculoId}
@@ -210,7 +210,7 @@ export function MotoristaFormModal({
                   Cadastrando...
                 </>
               ) : (
-                "Cadastrar Motorista"
+                "Cadastrar motorista"
               )}
             </Button>
           </DialogFooter>

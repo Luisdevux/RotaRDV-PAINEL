@@ -54,7 +54,7 @@ export function ComprovanteModal({ despesa, open, onOpenChange }: ComprovanteMod
           <div className="flex items-center justify-between pr-6">
             <div className="space-y-1">
               <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                Comprovante da Nota Fiscal
+                Comprovante da nota fiscal
                 <Badge variant="outline" className="text-xs text-primary border-primary/30">
                   {despesa.tipo}
                 </Badge>
@@ -83,7 +83,7 @@ export function ComprovanteModal({ despesa, open, onOpenChange }: ComprovanteMod
               >
                 <img
                   src={despesa.foto_anexo}
-                  alt="Comprovante de Despesa"
+                  alt="Comprovante de despesa"
                   className="max-h-[420px] w-auto object-contain rounded-lg shadow-2xl"
                   onError={() => setImageError(true)}
                 />
@@ -152,7 +152,7 @@ export function ComprovanteModal({ despesa, open, onOpenChange }: ComprovanteMod
           )}
           {despesa.valor_litro && (
             <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50">
-              <span className="text-muted-foreground block font-medium">Valor / Litro</span>
+              <span className="text-muted-foreground block font-medium">Valor / litro</span>
               <span className="font-bold text-foreground">{formatCurrency(despesa.valor_litro)}</span>
             </div>
           )}
@@ -172,7 +172,7 @@ export function ComprovanteModal({ despesa, open, onOpenChange }: ComprovanteMod
 
         {despesa.descricao && (
           <div className="p-3 rounded-xl bg-muted/30 border border-border/50 text-xs">
-            <span className="text-muted-foreground font-semibold block mb-1">Descrição / Observações:</span>
+            <span className="text-muted-foreground font-semibold block mb-1">Descrição / observações:</span>
             <p className="text-foreground">{despesa.descricao}</p>
           </div>
         )}
@@ -188,7 +188,7 @@ export function ComprovanteModal({ despesa, open, onOpenChange }: ComprovanteMod
               className="gap-2"
             >
               <Download className="h-4 w-4" />
-              Download da Foto
+              Download da foto
             </Button>
           )}
         </DialogFooter>
