@@ -194,11 +194,10 @@ export function MembroEditModal({
                 <Input
                   id="edit-cpf"
                   placeholder="000.000.000-00"
-                  className="rounded-xl"
+                  className="rounded-xl bg-muted/40 cursor-not-allowed text-muted-foreground"
                   maxLength={14}
-                  {...register("cpf", {
-                    onChange: (e) => setValue("cpf", maskCPF(e.target.value)),
-                  })}
+                  disabled
+                  {...register("cpf")}
                 />
               </div>
               <div className="space-y-1.5">

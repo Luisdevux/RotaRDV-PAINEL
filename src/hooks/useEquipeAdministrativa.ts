@@ -46,9 +46,10 @@ export function useEquipeAdministrativa(options?: UseEquipeAdministrativaOptions
 
   const cadastrarMutation = useMutation({
     mutationFn: async (data: CriarMembroAdministrativoInput) => {
-      const payload: AtualizarUsuarioInput = {
+      const payload = {
         nome: data.nome,
         email: data.email,
+        senha: data.senha,
         cpf: data.cpf ? unmask(data.cpf) : undefined,
         telefone: data.telefone ? unmask(data.telefone) : undefined,
         empresa_id: empresa?._id,
@@ -59,7 +60,7 @@ export function useEquipeAdministrativa(options?: UseEquipeAdministrativaOptions
         role: data.role,
         isAdmin: data.role === "admin",
       };
-      return await usuarioService.atualizar(data.email, payload);
+      return await usuarioService.criar(payload);
     },
     onSuccess: () => {
       toast.success("Membro administrativo cadastrado com sucesso!");

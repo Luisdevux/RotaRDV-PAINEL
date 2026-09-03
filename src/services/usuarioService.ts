@@ -21,6 +21,11 @@ export const usuarioService = {
     return response.data?.dados || response.data?.data || (response.data as any);
   },
 
+  async criar(data: any): Promise<Usuario> {
+    const response = await api.post<ApiResponse<Usuario>>('/usuarios', data);
+    return response.data?.dados || response.data?.data || (response.data as any);
+  },
+
   async atualizar(id: string, data: AtualizarUsuarioInput): Promise<Usuario> {
     const response = await api.patch<ApiResponse<Usuario>>(`/usuarios/${id}`, data);
     return response.data?.dados || response.data?.data || (response.data as any);
