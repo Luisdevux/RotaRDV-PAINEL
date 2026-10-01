@@ -21,6 +21,7 @@ export interface Veiculo {
   modelo: string;
   combustivel_preferencial: CombustivelPreferencial;
   capacidade_tanque: number;
+  capacidade_arla?: number | null;
   ano_fabricacao: number;
   status?: 'ativo' | 'inativo' | string;
   reboque?: Reboque;
@@ -34,6 +35,7 @@ export interface CriarVeiculoInput {
   modelo: string;
   combustivel_preferencial: CombustivelPreferencial;
   capacidade_tanque: number;
+  capacidade_arla?: number | null;
   ano_fabricacao: number;
   reboque?: Reboque;
   empresa_id?: string;

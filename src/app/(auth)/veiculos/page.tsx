@@ -244,6 +244,11 @@ export default function VeiculosPage() {
                             Tanque: {veiculo.capacidade_tanque} L
                           </p>
                         )}
+                        {veiculo.capacidade_arla ? (
+                          <p className="text-muted-foreground font-mono">
+                            Arla 32: {veiculo.capacidade_arla} L
+                          </p>
+                        ) : null}
                       </div>
                     </TableCell>
 
