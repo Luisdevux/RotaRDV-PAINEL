@@ -33,6 +33,10 @@ const veiculoFormSchema = z.object({
   modelo: z.string().min(2, "Modelo do caminhão é obrigatório"),
   combustivel_preferencial: z.enum(["DIESEL_S10", "DIESEL_S500", "GASOLINA", "ETANOL", "ARLA_32", "OUTRO"]),
   capacidade_tanque: z.coerce.number().min(1, "Capacidade do tanque é obrigatória"),
+  capacidade_arla: z.preprocess(
+    (val) => (val === "" || val === null || val === undefined ? undefined : val),
+    z.coerce.number().min(0, "Capacidade do Arla não pode ser negativa").max(500, "Capacidade máxima de 500 L").optional()
+  ),
   ano_fabricacao: z.coerce.number().min(1980, "Ano de fabricação inválido"),
   reboque_modelo: z.string().optional(),
   reboque_ano_fabricacao: z.coerce.number().optional(),
@@ -71,6 +75,7 @@ export function VeiculoFormModal({
     defaultValues: {
       combustivel_preferencial: "DIESEL_S10",
       capacidade_tanque: 400,
+      capacidade_arla: undefined,
       ano_fabricacao: new Date().getFullYear(),
     },
   });
@@ -83,6 +88,7 @@ export function VeiculoFormModal({
           modelo: veiculo.modelo || "",
           combustivel_preferencial: veiculo.combustivel_preferencial || "DIESEL_S10",
           capacidade_tanque: veiculo.capacidade_tanque || 400,
+          capacidade_arla: veiculo.capacidade_arla ?? undefined,
           ano_fabricacao: veiculo.ano_fabricacao || new Date().getFullYear(),
           reboque_modelo: veiculo.reboque?.modelo || "",
           reboque_ano_fabricacao: veiculo.reboque?.ano_fabricacao || undefined,
@@ -103,6 +109,7 @@ export function VeiculoFormModal({
           modelo: "",
           combustivel_preferencial: "DIESEL_S10",
           capacidade_tanque: 400,
+          capacidade_arla: undefined,
           ano_fabricacao: new Date().getFullYear(),
           reboque_modelo: "",
           reboque_ano_fabricacao: undefined,
@@ -143,6 +150,7 @@ export function VeiculoFormModal({
       modelo: data.modelo,
       combustivel_preferencial: combustivel,
       capacidade_tanque: Number(data.capacidade_tanque),
+      capacidade_arla: data.capacidade_arla ? Number(data.capacidade_arla) : undefined,
       ano_fabricacao: Number(data.ano_fabricacao),
       reboque: hasReboque
         ? {
@@ -220,7 +228,7 @@ export function VeiculoFormModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div className="space-y-1.5 flex flex-col justify-end">
                   <Label htmlFor="combustivel" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
                     Combustível preferencial
@@ -245,7 +253,7 @@ export function VeiculoFormModal({
 
                 <div className="space-y-1.5 flex flex-col justify-end">
                   <Label htmlFor="capacidade_tanque" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
-                    Capacidade do tanque (L) *
+                    Tanque combustível (L) *
                   </Label>
                   <Input
                     id="capacidade_tanque"
@@ -258,6 +266,24 @@ export function VeiculoFormModal({
                   />
                   {errors.capacidade_tanque && (
                     <p className="text-xs text-destructive">{errors.capacidade_tanque.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5 flex flex-col justify-end">
+                  <Label htmlFor="capacidade_arla" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
+                    Tanque Arla 32 (L)
+                  </Label>
+                  <Input
+                    id="capacidade_arla"
+                    type="number"
+                    placeholder="Ex: 80 (opcional)"
+                    min={0}
+                    max={500}
+                    className="rounded-xl"
+                    {...register("capacidade_arla")}
+                  />
+                  {errors.capacidade_arla && (
+                    <p className="text-xs text-destructive">{errors.capacidade_arla.message}</p>
                   )}
                 </div>
 
