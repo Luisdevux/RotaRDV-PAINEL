@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { maskCPF, maskTelefone, unmask } from "@/lib/masks";
-import { UserPlus, Loader2 } from "lucide-react";
+import { UserPlus, Loader2, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -179,6 +179,13 @@ export function MembroNovoModal({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 flex items-start gap-2.5">
+              <Mail className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Um e-mail de boas-vindas com o link de acesso ao painel de gestão será enviado automaticamente para o endereço cadastrado.
+              </p>
             </div>
           </div>
 
