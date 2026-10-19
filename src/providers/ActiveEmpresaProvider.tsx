@@ -36,11 +36,13 @@ export function ActiveEmpresaProvider({ children }: { children: React.ReactNode 
   const [isLoadingEmpresas, setIsLoadingEmpresas] = useState<boolean>(false);
 
   const isSuperAdmin = session?.user?.role === "superAdmin";
+  const isAdminEmpresa = session?.user?.role === "admin";
+  const canSwitchEmpresa = Boolean(isSuperAdmin || isAdminEmpresa);
   const userEmpresaId = session?.user?.empresa_id;
 
-  // Carrega todas as empresas cadastradas (exclusivo para Super Admin Global)
+  // Carrega as empresas acessíveis (Super Admin Global ou Admin Master com Matriz e Filiais)
   const loadEmpresas = useCallback(async () => {
-    if (!isSuperAdmin) {
+    if (!canSwitchEmpresa) {
       setEmpresas([]);
       return [];
     }
@@ -56,7 +58,7 @@ export function ActiveEmpresaProvider({ children }: { children: React.ReactNode 
     } finally {
       setIsLoadingEmpresas(false);
     }
-  }, [isSuperAdmin]);
+  }, [canSwitchEmpresa]);
 
   // Define a empresa ativa e persiste a escolha no localStorage
   const setEmpresaId = useCallback((id: string | null) => {
@@ -74,18 +76,23 @@ export function ActiveEmpresaProvider({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (status === "authenticated") {
       const init = async () => {
-        // 1. Usuários de empresa (admin interno, gestor, motorista): sempre vinculados à sua própria empresa
-        if (!isSuperAdmin && userEmpresaId) {
+        // 1. Usuários operacionais locais (gestor, motorista): estritamente vinculados à sua própria empresa
+        if (!canSwitchEmpresa && userEmpresaId) {
           setEmpresaId(userEmpresaId);
           return;
         }
 
-        // 2. Super Admin Global: carrega todas as empresas e restaura seleção salva ou padrão
-        if (isSuperAdmin) {
+        // 2. Super Admin Global ou Admin Master: carrega empresas e restaura seleção salva ou padrão
+        if (canSwitchEmpresa) {
           const list = await loadEmpresas();
           const savedId = typeof window !== "undefined" ? localStorage.getItem("rotardv_active_empresa_id") : null;
           if (savedId && list.some(e => String(e._id) === String(savedId))) {
             setEmpresaId(savedId);
+            return;
+          }
+
+          if (userEmpresaId && list.some(e => String(e._id) === String(userEmpresaId))) {
+            setEmpresaId(userEmpresaId);
             return;
           }
 
@@ -97,7 +104,7 @@ export function ActiveEmpresaProvider({ children }: { children: React.ReactNode 
 
       init();
     }
-  }, [status, isSuperAdmin, userEmpresaId, loadEmpresas, setEmpresaId]);
+  }, [status, canSwitchEmpresa, userEmpresaId, loadEmpresas, setEmpresaId]);
 
   // Carrega os dados detalhados da empresa ativa
   const loadEmpresa = useCallback(async (id: string) => {

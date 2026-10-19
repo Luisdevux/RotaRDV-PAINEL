@@ -3,7 +3,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,9 +11,8 @@ import { authService } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { SafeImage } from "@/components/ui/safe-image";
-import { Mail, ArrowLeft, Send, Loader2, CheckCircle } from "lucide-react";
+import { Mail, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 const LOGO_URL = process.env.NEXT_PUBLIC_APP_LOGO_URL || "https://rota-rdv.web.fslab.dev/7c4bb021-7946-44b4-acc2-cdb9c29aadc2.jpeg";
@@ -51,11 +49,11 @@ export default function EsqueciSenhaPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-card to-background">
-      <div className="w-full max-w-md space-y-6 animate-fade-in">
-        {/* Header Logo */}
-        <div className="flex flex-col items-center text-center space-y-2">
-          <div className="relative h-14 w-14 overflow-hidden rounded-2xl border border-border shadow-xl bg-black/20">
+    <main className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+      <div className="w-full max-w-md p-8 space-y-8 bg-card rounded-xl shadow-lg border border-border">
+        {/* Header integrado ao Card */}
+        <div className="flex flex-col items-center text-center space-y-4">
+          <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-border shadow-sm bg-muted/20 mb-2">
             <SafeImage
               src={LOGO_URL}
               alt="RotaRDV Logo"
@@ -65,90 +63,71 @@ export default function EsqueciSenhaPage() {
               fallbackType="building"
             />
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-foreground">
-            Recuperação de senha
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            Enviaremos um link de redefinição para o seu e-mail cadastrado
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Recuperar Senha</h1>
+          <p className="text-muted-foreground text-sm">
+            Informe o e-mail corporativo da sua conta para receber as instruções de recuperação.
           </p>
         </div>
 
-        <Card className="border-border/80 shadow-2xl backdrop-blur-sm bg-card/90 rounded-2xl">
-          {enviado ? (
-            <CardContent className="space-y-4 pt-6 text-center">
-              <div className="mx-auto h-12 w-12 rounded-full bg-primary/15 border border-primary/30 text-primary flex items-center justify-center">
-                <CheckCircle className="h-6 w-6" />
+        {enviado ? (
+          <div className="flex flex-col items-center text-center space-y-4 py-4 animate-fade-in">
+            <div className="h-16 w-16 rounded-full bg-primary/10 border border-primary/30 text-primary flex items-center justify-center">
+              <CheckCircle2 className="h-8 w-8" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground">Verifique sua caixa de entrada</h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Enviamos um e-mail com as instruções para redefinir sua senha. O link expira em 1 hora.
+            </p>
+            <Button asChild className="w-full h-11 text-base font-bold mt-4 cursor-pointer active:scale-95 transition-all">
+              <Link href="/login">Voltar para o Login</Link>
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="cursor-pointer">E-mail corporativo</Label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="gestor@suatransportadora.com.br"
+                  className="pl-11 h-11"
+                  {...register("email")}
+                />
               </div>
-              <h2 className="text-lg font-bold text-foreground">Verifique sua caixa de entrada</h2>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Enviamos um e-mail com as instruções para redefinir sua senha. O link expira em 1 hora.
-              </p>
-              <div className="pt-2">
-                <Button asChild variant="default" className="w-full rounded-xl">
-                  <Link href="/login">Voltar ao login</Link>
-                </Button>
-              </div>
-            </CardContent>
-          ) : (
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-bold">Esqueceu sua senha?</CardTitle>
-                <CardDescription className="text-xs">
-                  Digite seu e-mail corporativo abaixo para receber as instruções.
-                </CardDescription>
-              </CardHeader>
+              {errors.email && (
+                <p className="text-xs text-destructive">{errors.email.message}</p>
+              )}
+            </div>
 
-              <CardContent className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="email">E-mail corporativo</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="gestor@suatransportadora.com.br"
-                      className="pl-9 rounded-xl"
-                      {...register("email")}
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-xs text-destructive">{errors.email.message}</p>
-                  )}
-                </div>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 text-base font-bold mt-2 cursor-pointer active:scale-95 transition-all"
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Enviando instruções...
+                </span>
+              ) : (
+                "Enviar Instruções"
+              )}
+            </Button>
+          </form>
+        )}
 
-                <Button
-                  type="submit"
-                  variant="default"
-                  className="w-full h-11 rounded-xl font-bold gap-2 shadow-lg shadow-primary/20"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4" />
-                      Enviar link de recuperação
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-
-              <CardFooter className="border-t border-border/60 pt-4 flex justify-center">
-                <Link
-                  href="/login"
-                  className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2"
-                >
-                  <ArrowLeft className="h-3.5 w-3.5" />
-                  Voltar para o login
-                </Link>
-              </CardFooter>
-            </form>
-          )}
-        </Card>
+        <div className="pt-2 text-center">
+          <Link 
+            href="/login" 
+            className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Voltar para o login
+          </Link>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -5,9 +5,10 @@
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Sun, Moon, LogOut, User, Building, ShieldCheck, Menu, ChevronDown, Check } from "lucide-react";
+import { Sun, Moon, LogOut, User, Building, ShieldCheck, Menu, ChevronDown, Check, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveEmpresa } from "@/providers/ActiveEmpresaProvider";
+import { CadastrarFilialModal } from "@/components/CadastrarFilialModal";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -41,6 +42,7 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [cadastrarFilialOpen, setCadastrarFilialOpen] = useState(false);
   const { user, isAdmin, isSuperAdmin, isAdminEmpresa, isGestor, logout } = useAuth();
   const { empresa, empresas, isLoadingEmpresas, setEmpresaId } = useActiveEmpresa();
 
@@ -85,30 +87,30 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
 
       {/* Right Controls (Company Selector + Theme Switcher + Profile Menu) */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Seletor de Empresa Ativa (Apenas para super administradores) */}
-        {isSuperAdmin && (
+        {/* Seletor de Empresa / Unidade Ativa (Super Admin e Admin Master de Empresas) */}
+        {(isSuperAdmin || (isAdminEmpresa && empresas.length > 0)) && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
                 className="flex items-center gap-2 px-3 py-1.5 h-10 rounded-xl border-primary/30 bg-primary/5 hover:bg-primary/10 text-xs font-semibold text-foreground transition-colors max-w-[170px] sm:max-w-[260px]"
-                title="Alternar transportadora ativa"
+                title="Alternar unidade / filial ativa"
               >
                 <Building className="h-4 w-4 text-primary shrink-0" />
                 <span className="truncate">
-                  {empresa?.nome_empresa || (isLoadingEmpresas ? "Carregando..." : "Selecione uma empresa")}
+                  {empresa?.nome_empresa || (isLoadingEmpresas ? "Carregando..." : "Selecione uma unidade")}
                 </span>
                 <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0 ml-auto" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-72 p-1.5 rounded-2xl shadow-xl">
               <DropdownMenuLabel className="text-xs font-bold text-muted-foreground px-2 py-1.5">
-                Transportadora ativa (Visão admin)
+                {isSuperAdmin ? "Transportadora ativa (Visão Super Admin)" : "Unidade / Filial ativa"}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <div className="max-h-60 overflow-y-auto space-y-1">
                 {empresas.length === 0 ? (
-                  <p className="text-xs text-muted-foreground p-3 text-center">Nenhuma transportadora cadastrada.</p>
+                  <p className="text-xs text-muted-foreground p-3 text-center">Nenhuma unidade cadastrada.</p>
                 ) : (
                   empresas.map((emp) => {
                     const isSelected = String(emp._id) === String(empresa?._id);
@@ -117,7 +119,7 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
                         key={emp._id}
                         onClick={() => {
                           setEmpresaId(emp._id);
-                          toast.info(`Empresa ativa: ${emp.nome_empresa}`);
+                          toast.info(`Unidade ativa: ${emp.nome_empresa}`);
                         }}
                         className={`flex items-center justify-between p-2 rounded-xl cursor-pointer ${
                           isSelected ? "bg-primary/10 text-primary font-bold" : ""
@@ -136,13 +138,25 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
                     );
                   })
                 )}
+                {(isAdminEmpresa || isSuperAdmin) && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => setCadastrarFilialOpen(true)}
+                      className="flex items-center gap-2 p-2 rounded-xl text-xs font-bold text-primary hover:bg-primary/10 cursor-pointer"
+                    >
+                      <Plus className="h-4 w-4 shrink-0" />
+                      <span>Cadastrar Nova Filial</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
 
-        {/* Indicador da Empresa Vinculada (Admins Internos e Gestores) */}
-        {!isSuperAdmin && empresa && (
+        {/* Indicador estático apenas para Gestores locais que não alternam unidades */}
+        {!isSuperAdmin && !isAdminEmpresa && empresa && (
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 h-10 rounded-md border border-border/80 bg-muted/40 text-xs text-foreground font-medium">
             <Building className="h-4 w-4 text-primary shrink-0" />
             <span className="max-w-[160px] md:max-w-[220px] truncate">{empresa.nome_empresa}</span>
@@ -233,6 +247,11 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <CadastrarFilialModal
+        open={cadastrarFilialOpen}
+        onOpenChange={setCadastrarFilialOpen}
+      />
     </header>
   );
 }

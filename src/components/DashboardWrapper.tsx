@@ -6,9 +6,10 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import Onboarding from "./Onboarding";
 
 export function DashboardWrapper({ children }: { children: React.ReactNode }) {
-  const { user, isMotorista, isAdmin, logout } = useAuth();
+  const { user, isMotorista, isAdmin, isSuperAdmin, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -28,6 +29,11 @@ export function DashboardWrapper({ children }: { children: React.ReactNode }) {
         </div>
       </div>
     );
+  }
+
+  // Se o usuário logado não tem empresa cadastrada (ex: login com Google), exibe o Onboarding
+  if (user && !user.empresa_id && !isSuperAdmin && !isMotorista) {
+    return <Onboarding />;
   }
 
   return (

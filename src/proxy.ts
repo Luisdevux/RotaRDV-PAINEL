@@ -27,6 +27,7 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/login") || 
     pathname.startsWith("/cadastro") || 
     pathname.startsWith("/esqueci-senha") || 
+    pathname.startsWith("/esqueceu-senha") || 
     pathname.startsWith("/redefinir-senha");
 
   // 2. Se o usuário já está logado
@@ -48,6 +49,7 @@ export async function proxy(request: NextRequest) {
   // 3. Rotas protegidas que exigem login
   const protectedRoutes = [
     "/dashboard",
+    "/administrativo",
     "/motoristas",
     "/veiculos",
     "/viagens",

@@ -65,11 +65,26 @@ export function useEmpresa(customId?: string) {
     },
   });
 
+  const cadastrarFilialMutation = useMutation({
+    mutationFn: async (data: CriarEmpresaInput) => {
+      return await empresaService.cadastrarFilial(data);
+    },
+    onSuccess: () => {
+      toast.success("Filial cadastrada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["empresas"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.friendlyMessage || "Erro ao cadastrar filial.");
+    },
+  });
+
   return {
     ...empresaQuery,
     empresa: empresaQuery.data,
     atualizarEmpresa: atualizarMutation.mutateAsync,
     isAtualizando: atualizarMutation.isPending,
+    cadastrarFilial: cadastrarFilialMutation.mutateAsync,
+    isCadastrandoFilial: cadastrarFilialMutation.isPending,
     uploadFoto: uploadFotoMutation.mutateAsync,
     isUploadingFoto: uploadFotoMutation.isPending,
     deletarFoto: deletarFotoMutation.mutateAsync,
@@ -102,6 +117,19 @@ export function useEmpresasAdmin(params?: { page?: number; limite?: number; sear
     },
   });
 
+  const cadastrarFilialMutation = useMutation({
+    mutationFn: async (data: CriarEmpresaInput) => {
+      return await empresaService.cadastrarFilial(data);
+    },
+    onSuccess: () => {
+      toast.success("Filial cadastrada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["empresas"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.friendlyMessage || "Erro ao cadastrar filial.");
+    },
+  });
+
   const alterarStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: EmpresaStatus }) => {
       return await empresaService.atualizarStatus(id, status);
@@ -119,6 +147,8 @@ export function useEmpresasAdmin(params?: { page?: number; limite?: number; sear
     ...empresasQuery,
     criarEmpresa: criarEmpresaMutation.mutateAsync,
     isCriando: criarEmpresaMutation.isPending,
+    cadastrarFilial: cadastrarFilialMutation.mutateAsync,
+    isCadastrandoFilial: cadastrarFilialMutation.isPending,
     alterarStatus: alterarStatusMutation.mutateAsync,
     isAlterandoStatus: alterarStatusMutation.isPending,
   };
