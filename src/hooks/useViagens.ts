@@ -19,11 +19,11 @@ export function useViagens(params?: {
 }) {
   const queryClient = useQueryClient();
   const { empresaId: activeEmpresaId } = useActiveEmpresa();
-  const { isSuperAdmin } = useAuth();
+  const { isSuperAdmin, isAdminEmpresa } = useAuth();
 
   const queryParams = {
     ...params,
-    empresa_id: params?.empresa_id || (isSuperAdmin ? (activeEmpresaId || undefined) : undefined),
+    empresa_id: params?.empresa_id || ((isSuperAdmin || isAdminEmpresa) ? (activeEmpresaId || undefined) : undefined),
   };
 
   const viagensQuery = useQuery({

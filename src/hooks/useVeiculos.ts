@@ -8,11 +8,11 @@ import { toast } from "sonner";
 export function useVeiculos(params?: { page?: number; limite?: number; placa?: string; modelo?: string; empresa_id?: string; todos?: boolean }) {
   const queryClient = useQueryClient();
   const { empresaId: activeEmpresaId } = useActiveEmpresa();
-  const { isSuperAdmin } = useAuth();
+  const { isSuperAdmin, isAdminEmpresa } = useAuth();
 
   const queryParams = {
     ...params,
-    empresa_id: params?.empresa_id || (isSuperAdmin ? (activeEmpresaId || undefined) : undefined),
+    empresa_id: params?.empresa_id || ((isSuperAdmin || isAdminEmpresa) ? (activeEmpresaId || undefined) : undefined),
   };
 
   const veiculosQuery = useQuery({

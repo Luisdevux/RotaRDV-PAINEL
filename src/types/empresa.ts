@@ -34,13 +34,15 @@ export interface EnderecoViaCep {
   estado: string;
 }
 
-export interface GestorResumo {
+export interface AdminResumo {
   _id: string;
   nome: string;
   email: string;
   cpf?: string;
   foto_perfil?: string;
 }
+
+export type GestorResumo = AdminResumo;
 
 export interface Empresa {
   _id: string;
@@ -51,7 +53,8 @@ export interface Empresa {
   endereco?: Endereco;
   foto_logo?: string;
   status: EmpresaStatus;
-  gestor_id?: GestorResumo | string;
+  admin_id?: AdminResumo | string;
+  gestor_id?: AdminResumo | string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -63,6 +66,7 @@ export interface CriarEmpresaInput {
   telefone?: string;
   endereco?: Endereco;
   status?: EmpresaStatus;
+  admin_id?: string;
   gestor_id?: string;
 }
 

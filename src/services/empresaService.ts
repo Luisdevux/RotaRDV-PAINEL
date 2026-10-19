@@ -30,6 +30,11 @@ export const empresaService = {
     return response.data?.dados || response.data?.data || (response.data as any);
   },
 
+  async cadastrarFilial(data: CriarEmpresaInput): Promise<Empresa> {
+    const response = await api.post<ApiResponse<Empresa>>('/empresas/filial', data);
+    return response.data?.dados || response.data?.data || (response.data as any);
+  },
+
   async atualizar(id: string, data: AtualizarEmpresaInput): Promise<Empresa> {
     const response = await api.patch<ApiResponse<Empresa>>(`/empresas/${id}`, data);
     return response.data?.dados || response.data?.data || (response.data as any);

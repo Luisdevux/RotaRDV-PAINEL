@@ -63,7 +63,7 @@ export function useEquipeAdministrativa(options?: UseEquipeAdministrativaOptions
       return await usuarioService.criar(payload);
     },
     onSuccess: () => {
-      toast.success("Membro administrativo cadastrado com sucesso!");
+      toast.success("Membro administrativo cadastrado com sucesso! E-mail de boas-vindas enviado.");
       queryClient.invalidateQueries({ queryKey: ["equipe-administrativa"] });
     },
     onError: (error: any) => {
