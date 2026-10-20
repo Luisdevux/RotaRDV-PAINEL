@@ -52,9 +52,14 @@ export default function EmpresasAdminPage() {
     const term = debouncedSearch.toLowerCase().trim();
     const cleanSearch = unmask(debouncedSearch).toUpperCase();
     return empresasList.filter((e) => {
+      const eCnpj = e.cnpj || "";
+      const cleanECnpj = unmask(eCnpj).toUpperCase();
+      const cnpjMatches = cleanSearch ? cleanECnpj.includes(cleanSearch) : false;
+      const rawCnpjMatches = eCnpj.toLowerCase().includes(term);
       return (
         e.nome_empresa?.toLowerCase().includes(term) ||
-        (e.cnpj && (e.cnpj.toLowerCase().includes(term) || e.cnpj.includes(cleanSearch))) ||
+        cnpjMatches ||
+        rawCnpjMatches ||
         e.email?.toLowerCase().includes(term)
       );
     });
