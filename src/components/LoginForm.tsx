@@ -111,7 +111,7 @@ export default function LoginForm() {
               id="email"
               {...register("email")}
               type="email"
-              placeholder="gestor@suatransportadora.com.br"
+              placeholder="email@suatransportadora.com.br"
               className="pl-11 h-11"
             />
           </div>

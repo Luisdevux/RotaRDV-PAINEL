@@ -15,7 +15,7 @@ export interface EnderecoInput {
   estado?: string;
 }
 
-export interface GestorSignupInput {
+export interface AdminSignupInput {
   nome: string;
   email: string;
   senha: string;
@@ -29,7 +29,7 @@ export interface SignupEmpresaData {
   email_empresa: string;
   telefone_empresa?: string;
   endereco?: EnderecoInput;
-  gestor: GestorSignupInput;
+  admin: AdminSignupInput;
 }
 
 export interface RecuperarSenhaInput {
