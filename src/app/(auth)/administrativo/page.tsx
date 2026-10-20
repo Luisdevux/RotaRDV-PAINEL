@@ -35,7 +35,7 @@ import { MembroEditModal } from "./components/MembroEditModal";
 
 export default function AdministrativoPage() {
   const { user: authUser, isSuperAdmin } = useAuth();
-  const canManageTeam = Boolean((authUser?.role === "admin" || authUser?.isAdmin) && !isSuperAdmin);
+  const canManageTeam = Boolean(authUser?.role === "admin" && !isSuperAdmin);
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);

@@ -83,7 +83,7 @@ export default function SignupForm() {
         cnpj: unmask(data.cnpj).toUpperCase(),
         email_empresa: data.email_empresa,
         telefone_empresa: data.telefone_empresa ? unmask(data.telefone_empresa) : undefined,
-        gestor: {
+        admin: {
           nome: data.nome,
           email: data.email,
           senha: data.senha,
@@ -246,7 +246,7 @@ export default function SignupForm() {
           </div>
         )}
 
-        {/* ETAPA 2: DADOS DO GESTOR / ADMINISTRADOR MASTER */}
+        {/* ETAPA 2: DADOS DO ADMINISTRADOR MASTER */}
         {step === 2 && (
           <div className="space-y-4 animate-in fade-in duration-200">
             <div className="space-y-1.5">

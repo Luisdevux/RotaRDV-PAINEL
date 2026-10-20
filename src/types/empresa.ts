@@ -42,8 +42,6 @@ export interface AdminResumo {
   foto_perfil?: string;
 }
 
-export type GestorResumo = AdminResumo;
-
 export interface Empresa {
   _id: string;
   nome_empresa: string;
@@ -54,7 +52,6 @@ export interface Empresa {
   foto_logo?: string;
   status: EmpresaStatus;
   admin_id?: AdminResumo | string;
-  gestor_id?: AdminResumo | string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -67,7 +64,6 @@ export interface CriarEmpresaInput {
   endereco?: Endereco;
   status?: EmpresaStatus;
   admin_id?: string;
-  gestor_id?: string;
 }
 
 export interface AtualizarEmpresaInput extends Partial<CriarEmpresaInput> {}

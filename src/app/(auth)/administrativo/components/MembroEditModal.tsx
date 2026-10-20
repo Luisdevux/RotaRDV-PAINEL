@@ -66,7 +66,7 @@ export function MembroEditModal({
       const role: "admin" | "gestor" | "motorista" = 
         membro.role === "admin" || membro.role === "gestor" || membro.role === "motorista"
           ? membro.role
-          : (membro.isAdmin ? "admin" : "gestor");
+          : "gestor";
       setSelectedRole(role);
       reset({
         nome: membro.nome || "",

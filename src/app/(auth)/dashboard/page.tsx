@@ -96,7 +96,7 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-card via-muted/30 to-card border border-border/70 shadow-sm">
         <div className="space-y-1">
           <h2 className="text-2xl font-black tracking-tight text-foreground">
-            Olá, {user?.name?.split(" ")[0] || "Gestor"}! 👋
+            Olá, {user?.name?.split(" ")[0] || (user?.role === "admin" ? "Administrador" : "Gestor")}! 👋
           </h2>
           <p className="text-xs text-muted-foreground">
             {empresa ? `Gerenciando a frota da ${empresa.nome_empresa}` : "Bem-vindo ao centro de controle operacional RotaRDV."}
