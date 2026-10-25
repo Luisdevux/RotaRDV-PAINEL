@@ -236,9 +236,9 @@ export function VeiculoFormModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="space-y-1.5 flex flex-col justify-end">
-                  <Label htmlFor="combustivel" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-start">
+                <div className="space-y-1.5">
+                  <Label htmlFor="combustivel" className="text-xs font-semibold text-foreground">
                     Combustível preferencial
                   </Label>
                   <Select
@@ -259,8 +259,8 @@ export function VeiculoFormModal({
                   </Select>
                 </div>
 
-                <div className="space-y-1.5 flex flex-col justify-end">
-                  <Label htmlFor="capacidade_tanque" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
+                <div className="space-y-1.5">
+                  <Label htmlFor="capacidade_tanque" className="text-xs font-semibold text-foreground">
                     Tanque combustível (L) *
                   </Label>
                   <Input
@@ -277,8 +277,8 @@ export function VeiculoFormModal({
                   )}
                 </div>
 
-                <div className="space-y-1.5 flex flex-col justify-end">
-                  <Label htmlFor="capacidade_arla" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
+                <div className="space-y-1.5">
+                  <Label htmlFor="capacidade_arla" className="text-xs font-semibold text-foreground">
                     Tanque Arla 32 (L)
                   </Label>
                   <Input
@@ -296,9 +296,9 @@ export function VeiculoFormModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1.5 flex flex-col justify-end">
-                  <Label htmlFor="ano_fabricacao" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                <div className="space-y-1.5">
+                  <Label htmlFor="ano_fabricacao" className="text-xs font-semibold text-foreground">
                     Ano de fabricação *
                   </Label>
                   <Input
@@ -315,8 +315,8 @@ export function VeiculoFormModal({
                   )}
                 </div>
 
-                <div className="space-y-1.5 flex flex-col justify-end">
-                  <Label htmlFor="km_atual" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
+                <div className="space-y-1.5">
+                  <Label htmlFor="km_atual" className="text-xs font-semibold text-foreground">
                     Odômetro atual (KM) *
                   </Label>
                   <Input
