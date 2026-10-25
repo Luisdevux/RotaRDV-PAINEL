@@ -73,11 +73,10 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
       roles: ["superAdmin", "admin", "gestor"],
     },
     {
-      name: "Empresas",
+      name: isSuperAdmin ? "Empresas" : "Unidades e filiais",
       href: "/empresas",
       icon: Building2,
-      roles: ["superAdmin"],
-      superAdminOnly: true,
+      roles: ["superAdmin", "admin"],
     },
     {
       name: "Dados da empresa",
@@ -101,7 +100,6 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }: SidebarProps) {
   ];
 
   const filteredNav = navigation.filter((item) => {
-    if (item.superAdminOnly) return isSuperAdmin;
     if (item.empresaOnly) return !isSuperAdmin;
     if (isSuperAdmin) return true;
     if (user?.role && item.roles.includes(user.role)) return true;

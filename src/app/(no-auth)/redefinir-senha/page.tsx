@@ -4,7 +4,7 @@
 
 import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -13,13 +13,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SafeImage } from "@/components/ui/safe-image";
-import { Lock, ArrowLeft, Loader2, CheckCircle2, Eye, EyeOff } from "lucide-react";
+import { Lock, KeyRound, ArrowLeft, Loader2, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 const LOGO_URL = process.env.NEXT_PUBLIC_APP_LOGO_URL || "https://rota-rdv.web.fslab.dev/7c4bb021-7946-44b4-acc2-cdb9c29aadc2.jpeg";
 
 const redefinirSchema = z.object({
-  senha: z.string().min(8, "A senha deve ter no mínimo 8 caracteres"),
+  token: z.string().trim().min(1, "Informe o token de recuperação enviado por e-mail"),
+  senha: z
+    .string()
+    .min(8, "A senha deve ter no mínimo 8 caracteres")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      "Use maiúscula, minúscula, número e símbolo (@$!%*?&)"
+    ),
   confirmarSenha: z.string().min(8, "Confirme sua senha"),
 }).refine((data) => data.senha === data.confirmarSenha, {
   message: "As senhas não coincidem",
@@ -30,8 +37,7 @@ type RedefinirFormValues = z.infer<typeof redefinirSchema>;
 
 function RedefinirSenhaContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const token = searchParams.get("token") || "";
+  const initialToken = searchParams.get("token") || "";
   const [loading, setLoading] = useState(false);
   const [sucesso, setSucesso] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -43,24 +49,22 @@ function RedefinirSenhaContent() {
     formState: { errors },
   } = useForm<RedefinirFormValues>({
     resolver: zodResolver(redefinirSchema),
+    defaultValues: {
+      token: initialToken,
+    },
   });
 
   const onSubmit = async (data: RedefinirFormValues) => {
-    if (!token) {
-      toast.error("Token de redefinição não encontrado na URL.");
-      return;
-    }
-
     setLoading(true);
     try {
       await authService.redefinirSenha({
-        token,
+        token: data.token.trim(),
         senha: data.senha,
       });
       setSucesso(true);
       toast.success("Senha redefinida com sucesso!");
     } catch (error: any) {
-      toast.error(error.friendlyMessage || "Token inválido ou expirado.");
+      toast.error(error.friendlyMessage || "Código inválido ou expirado.");
     } finally {
       setLoading(false);
     }
@@ -82,7 +86,7 @@ function RedefinirSenhaContent() {
         </div>
         <h1 className="text-3xl font-bold text-foreground tracking-tight">Nova Senha</h1>
         <p className="text-muted-foreground text-sm">
-          Escolha uma nova senha forte para acessar sua conta
+          Informe o token de recuperação recebido por e-mail e crie uma nova senha
         </p>
       </div>
 
@@ -101,6 +105,23 @@ function RedefinirSenhaContent() {
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div className="space-y-1.5">
+            <Label htmlFor="token" className="cursor-pointer">Token de recuperação</Label>
+            <div className="relative group">
+              <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <Input
+                id="token"
+                type="text"
+                placeholder="Cole ou digite o token de recuperação"
+                className="pl-11 h-11 text-xs"
+                {...register("token")}
+              />
+            </div>
+            {errors.token && (
+              <p className="text-xs text-destructive">{errors.token.message}</p>
+            )}
+          </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="senha" title="Senha" className="cursor-pointer">Nova Senha</Label>
             <div className="relative group">

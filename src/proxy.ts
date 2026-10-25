@@ -55,6 +55,7 @@ export async function proxy(request: NextRequest) {
     "/despesas",
     "/empresas",
     "/empresa",
+    "/administrativo",
     "/perfil",
   ];
 

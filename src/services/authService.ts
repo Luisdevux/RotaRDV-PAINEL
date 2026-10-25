@@ -15,12 +15,15 @@ export const authService = {
   },
 
   async recuperarSenha(data: RecuperarSenhaInput): Promise<ApiResponse> {
-    const response = await api.post<ApiResponse>('/recupera-senha', data);
+    const response = await api.post<ApiResponse>('/recover', {
+      ...data,
+      origem: 'web',
+    });
     return response.data;
   },
 
   async redefinirSenha(data: RedefinirSenhaInput): Promise<ApiResponse> {
-    const response = await api.patch<ApiResponse>(`/atualizar-senha-token?token=${data.token}`, {
+    const response = await api.patch<ApiResponse>(`/password/reset?token=${data.token}`, {
       senha: data.senha
     });
     return response.data;

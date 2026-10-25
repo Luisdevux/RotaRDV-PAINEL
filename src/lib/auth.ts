@@ -108,7 +108,12 @@ export const authOptions: NextAuthOptions = {
           }
           return null;
         } catch (error: any) {
-          const message = error.message || error.response?.data?.mensagem || "Falha na autenticação. Verifique suas credenciais.";
+          const message =
+            error.response?.data?.customMessage ||
+            error.response?.data?.message ||
+            error.response?.data?.mensagem ||
+            error.message ||
+            "Falha na autenticação. Verifique suas credenciais.";
           throw new Error(message);
         }
       },
