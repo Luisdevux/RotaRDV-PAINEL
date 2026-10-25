@@ -57,6 +57,7 @@ export function useViagens(params?: {
       toast.success("Viagem concluída com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["viagens"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["veiculos"] });
     },
     onError: (error: any) => {
       toast.error(error.friendlyMessage || "Erro ao concluir viagem.");
