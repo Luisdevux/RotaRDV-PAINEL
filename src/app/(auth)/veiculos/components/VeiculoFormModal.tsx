@@ -38,6 +38,10 @@ const veiculoFormSchema = z.object({
     z.coerce.number().min(0, "Capacidade do Arla não pode ser negativa").max(500, "Capacidade máxima de 500 L").optional()
   ),
   ano_fabricacao: z.coerce.number().min(1980, "Ano de fabricação inválido"),
+  km_atual: z.preprocess(
+    (val) => (val === "" || val === null || val === undefined ? 0 : val),
+    z.coerce.number().min(0, "O KM não pode ser negativo").optional()
+  ),
   reboque_modelo: z.string().optional(),
   reboque_ano_fabricacao: z.coerce.number().optional(),
 });
@@ -77,6 +81,7 @@ export function VeiculoFormModal({
       capacidade_tanque: 400,
       capacidade_arla: undefined,
       ano_fabricacao: new Date().getFullYear(),
+      km_atual: 0,
     },
   });
 
@@ -90,6 +95,7 @@ export function VeiculoFormModal({
           capacidade_tanque: veiculo.capacidade_tanque || 400,
           capacidade_arla: veiculo.capacidade_arla ?? undefined,
           ano_fabricacao: veiculo.ano_fabricacao || new Date().getFullYear(),
+          km_atual: veiculo.km_atual ?? 0,
           reboque_modelo: veiculo.reboque?.modelo || "",
           reboque_ano_fabricacao: veiculo.reboque?.ano_fabricacao || undefined,
         });
@@ -111,6 +117,7 @@ export function VeiculoFormModal({
           capacidade_tanque: 400,
           capacidade_arla: undefined,
           ano_fabricacao: new Date().getFullYear(),
+          km_atual: 0,
           reboque_modelo: "",
           reboque_ano_fabricacao: undefined,
         });
@@ -152,6 +159,7 @@ export function VeiculoFormModal({
       capacidade_tanque: Number(data.capacidade_tanque),
       capacidade_arla: data.capacidade_arla ? Number(data.capacidade_arla) : undefined,
       ano_fabricacao: Number(data.ano_fabricacao),
+      km_atual: data.km_atual !== undefined ? Number(data.km_atual) : 0,
       reboque: hasReboque
         ? {
             modelo: data.reboque_modelo || undefined,
@@ -228,7 +236,7 @@ export function VeiculoFormModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5 flex flex-col justify-end">
                   <Label htmlFor="combustivel" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
                     Combustível preferencial
@@ -286,7 +294,9 @@ export function VeiculoFormModal({
                     <p className="text-xs text-destructive">{errors.capacidade_arla.message}</p>
                   )}
                 </div>
+              </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5 flex flex-col justify-end">
                   <Label htmlFor="ano_fabricacao" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
                     Ano de fabricação *
@@ -302,6 +312,27 @@ export function VeiculoFormModal({
                   />
                   {errors.ano_fabricacao && (
                     <p className="text-xs text-destructive">{errors.ano_fabricacao.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5 flex flex-col justify-end">
+                  <Label htmlFor="km_atual" className="text-xs font-semibold text-foreground min-h-[1.25rem] flex items-end">
+                    Odômetro atual (KM) *
+                  </Label>
+                  <Input
+                    id="km_atual"
+                    type="number"
+                    placeholder="Ex: 125000"
+                    min={0}
+                    className="rounded-xl font-mono"
+                    {...register("km_atual")}
+                  />
+                  {errors.km_atual ? (
+                    <p className="text-xs text-destructive">{errors.km_atual.message}</p>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground">
+                      Base mínima do odômetro para viagens e controle de frota.
+                    </p>
                   )}
                 </div>
               </div>

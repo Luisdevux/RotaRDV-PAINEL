@@ -23,6 +23,7 @@ export interface Veiculo {
   capacidade_tanque: number;
   capacidade_arla?: number | null;
   ano_fabricacao: number;
+  km_atual?: number;
   status?: 'ativo' | 'inativo' | string;
   reboque?: Reboque;
   empresa_id?: string;
@@ -37,6 +38,7 @@ export interface CriarVeiculoInput {
   capacidade_tanque: number;
   capacidade_arla?: number | null;
   ano_fabricacao: number;
+  km_atual?: number;
   reboque?: Reboque;
   empresa_id?: string;
 }

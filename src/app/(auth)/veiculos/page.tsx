@@ -25,7 +25,8 @@ import {
   CheckCircle2, 
   XCircle, 
   Loader2,
-  User
+  User,
+  Gauge
 } from "lucide-react";
 import { Veiculo, Usuario, CriarVeiculoInput, AtualizarVeiculoInput } from "@/types";
 import { VeiculoFormModal } from "./components/VeiculoFormModal";
@@ -152,6 +153,7 @@ export default function VeiculosPage() {
               <TableHead className="font-bold">Motorista vinculado</TableHead>
               <TableHead className="font-bold">Combustível / tanque</TableHead>
               <TableHead className="font-bold">Implemento / carretas</TableHead>
+              <TableHead className="font-bold">Odômetro atual</TableHead>
               <TableHead className="font-bold">Status</TableHead>
               <TableHead className="font-bold text-right">Ações</TableHead>
             </TableRow>
@@ -160,7 +162,7 @@ export default function VeiculosPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-xs">
                   <div className="flex items-center justify-center gap-2">
                     <Loader2 className="h-5 w-5 animate-spin text-primary" />
                     <span>Carregando frota de veículos...</span>
@@ -169,7 +171,7 @@ export default function VeiculosPage() {
               </TableRow>
             ) : displayedVeiculos.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-xs">
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-xs">
                   <div className="flex flex-col items-center justify-center gap-1">
                     <Truck className="h-8 w-8 text-muted-foreground/50 mb-1" />
                     <p className="font-medium">Nenhum veículo encontrado na frota.</p>
@@ -277,6 +279,13 @@ export default function VeiculosPage() {
                       ) : (
                         <span className="text-xs text-muted-foreground italic">Nenhum</span>
                       )}
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex items-center gap-1.5 text-xs font-semibold font-mono text-foreground">
+                        <Gauge className="h-3.5 w-3.5 text-primary shrink-0" />
+                        <span>{(veiculo.km_atual ?? 0).toLocaleString('pt-BR')} km</span>
+                      </div>
                     </TableCell>
 
                     <TableCell>
