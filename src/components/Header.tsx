@@ -5,10 +5,9 @@
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Sun, Moon, LogOut, User, Building, ShieldCheck, Menu, ChevronDown, Check, Plus } from "lucide-react";
+import { Sun, Moon, LogOut, User, Building, ShieldCheck, Menu, ChevronDown, Check } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveEmpresa } from "@/providers/ActiveEmpresaProvider";
-import { CadastrarFilialModal } from "@/components/CadastrarFilialModal";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -42,7 +41,6 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [cadastrarFilialOpen, setCadastrarFilialOpen] = useState(false);
   const { user, isAdmin, isSuperAdmin, isAdminEmpresa, isGestor, logout } = useAuth();
   const { empresa, empresas, isLoadingEmpresas, setEmpresaId } = useActiveEmpresa();
 
@@ -50,10 +48,27 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
     setMounted(true);
   }, []);
 
-  const pageInfo = PAGE_TITLES[pathname] || {
-    title: "Painel de controle",
-    subtitle: "Sistema de gestão de despesas e frotas",
+  const getPageInfo = () => {
+    if (pathname === "/empresas") {
+      return isSuperAdmin
+        ? {
+            title: "Empresas e filiais",
+            subtitle: "Administração central de transportadoras e suas filiais no ecossistema",
+          }
+        : {
+            title: "Unidades e filiais",
+            subtitle: "Gerencie as filiais e bases operacionais da sua transportadora",
+          };
+    }
+    return (
+      PAGE_TITLES[pathname] || {
+        title: "Painel de controle",
+        subtitle: "Sistema de gestão de despesas e frotas",
+      }
+    );
   };
+
+  const pageInfo = getPageInfo();
 
   const getRoleLabel = () => {
     if (isSuperAdmin) return "Super Admin";
@@ -137,18 +152,6 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
                       </DropdownMenuItem>
                     );
                   })
-                )}
-                {(isAdminEmpresa || isSuperAdmin) && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => setCadastrarFilialOpen(true)}
-                      className="flex items-center gap-2 p-2 rounded-xl text-xs font-bold text-primary hover:bg-primary/10 cursor-pointer"
-                    >
-                      <Plus className="h-4 w-4 shrink-0" />
-                      <span>Cadastrar Nova Filial</span>
-                    </DropdownMenuItem>
-                  </>
                 )}
               </div>
             </DropdownMenuContent>
@@ -248,10 +251,6 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
         </DropdownMenu>
       </div>
 
-      <CadastrarFilialModal
-        open={cadastrarFilialOpen}
-        onOpenChange={setCadastrarFilialOpen}
-      />
     </header>
   );
 }

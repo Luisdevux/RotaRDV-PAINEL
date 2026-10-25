@@ -40,6 +40,7 @@ export interface AdminResumo {
   email: string;
   cpf?: string;
   foto_perfil?: string;
+  empresa_id?: string;
 }
 
 export interface Empresa {
@@ -52,6 +53,7 @@ export interface Empresa {
   foto_logo?: string;
   status: EmpresaStatus;
   admin_id?: AdminResumo | string;
+  matriz_id?: { _id: string; nome_empresa: string; cnpj: string } | string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -64,6 +66,7 @@ export interface CriarEmpresaInput {
   endereco?: Endereco;
   status?: EmpresaStatus;
   admin_id?: string;
+  matriz_id?: string;
 }
 
 export interface AtualizarEmpresaInput extends Partial<CriarEmpresaInput> {}
