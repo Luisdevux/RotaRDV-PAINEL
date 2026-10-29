@@ -253,7 +253,6 @@ export function VeiculoFormModal({
                       <SelectItem value="DIESEL_S500">Diesel S500</SelectItem>
                       <SelectItem value="GASOLINA">Gasolina</SelectItem>
                       <SelectItem value="ETANOL">Etanol</SelectItem>
-                      <SelectItem value="ARLA_32">Arla 32</SelectItem>
                       <SelectItem value="OUTRO">Outro</SelectItem>
                     </SelectContent>
                   </Select>
