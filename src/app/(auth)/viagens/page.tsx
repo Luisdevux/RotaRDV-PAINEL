@@ -559,6 +559,21 @@ export default function ViagensPage() {
                 <span className="text-xl font-black text-info block">
                   {formatConsumo(selectedViagem.resumo_financeiro?.metricas?.media_consumo)}
                 </span>
+                {(Boolean(selectedViagem.resumo_financeiro?.metricas?.total_litros) ||
+                  Boolean(selectedViagem.resumo_financeiro?.metricas?.total_litros_arla)) && (
+                  <span className="text-[11px] text-muted-foreground block">
+                    {selectedViagem.resumo_financeiro?.metricas?.total_litros
+                      ? `${selectedViagem.resumo_financeiro.metricas.total_litros.toLocaleString("pt-BR")} L comb.`
+                      : ""}
+                    {selectedViagem.resumo_financeiro?.metricas?.total_litros &&
+                    selectedViagem.resumo_financeiro?.metricas?.total_litros_arla
+                      ? " • "
+                      : ""}
+                    {selectedViagem.resumo_financeiro?.metricas?.total_litros_arla
+                      ? `${selectedViagem.resumo_financeiro.metricas.total_litros_arla.toLocaleString("pt-BR")} L Arla 32`
+                      : ""}
+                  </span>
+                )}
               </div>
             </div>
 

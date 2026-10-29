@@ -15,7 +15,8 @@ export interface DespesasPorCategoria {
 export interface MetricasConsumo {
   km_percorrido: number;
   total_litros: number;
-  media_consumo: number; // km/l
+  total_litros_arla?: number;
+  media_consumo: number; // km/l (apenas combustível do motor, sem Arla 32)
 }
 
 export interface ResumoFinanceiro {

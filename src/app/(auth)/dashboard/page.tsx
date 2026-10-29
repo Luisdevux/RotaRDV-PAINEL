@@ -68,6 +68,7 @@ export default function DashboardPage() {
     viagens_concluidas: 0,
     total_km_rodado: 0,
     total_litros: 0,
+    total_litros_arla: 0,
     media_consumo_frota: 0,
     total_despesas: 0,
     despesas_por_categoria: {
@@ -145,7 +146,15 @@ export default function DashboardPage() {
         <MetricCard
           title="Despesas operacionais"
           value={formatCurrency(resumo.total_despesas)}
-          subtitle={resumo.total_litros ? `${resumo.total_litros.toLocaleString('pt-BR')}L de combustível` : "Comprovantes lançados"}
+          subtitle={
+            resumo.total_litros && resumo.total_litros_arla
+              ? `${resumo.total_litros.toLocaleString('pt-BR')}L comb. • ${resumo.total_litros_arla.toLocaleString('pt-BR')}L Arla 32`
+              : resumo.total_litros
+                ? `${resumo.total_litros.toLocaleString('pt-BR')}L de combustível`
+                : resumo.total_litros_arla
+                  ? `${resumo.total_litros_arla.toLocaleString('pt-BR')}L de Arla 32`
+                  : "Comprovantes lançados"
+          }
           icon={ReceiptText}
           variant="destructive"
         />
